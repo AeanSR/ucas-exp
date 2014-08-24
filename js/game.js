@@ -71,7 +71,7 @@ GameManager.prototype.createRandomPoison=function(){
 GameManager.prototype.createEmptyBottles=function(bottles_id){
 	var _this = this
 	$("<div></div>",{class:"bottles",id:bottles_id})
-	.html('<p>0</p><img src="imgs/bottles.svg">')
+	.html('<p>0</p><img src="imgs/bottles.png">')
 	.appendTo($("#bottles-container"))
 	$("#bottles-container").sortable("refresh")
 	//Dynamic append
