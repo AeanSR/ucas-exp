@@ -1,0 +1,61 @@
+img{
+	width: 100%;
+	height: 100%;
+}
+
+.container .ui-block-game,
+.container .ui-block-submit{
+	width:100%;
+	float:left;
+	padding: 20px;
+}
+.container .ui-block-game{
+	height: 760px;
+	width: 60%;
+}
+.container .ui-block-submit{
+	height: 760px;
+	width: 20%;
+}
+
+ #bottles-container, #mice-container, .bottle-container { width: 100%;overflow: auto;}
+ #bottles-container{height: 65%}
+ #mice-container{height: 25%}
+ .bottle-container{top:36px;bottom: 0;height: 350px}
+ #bottles-container .bottles, #mice-container .mice,.bottle-container .bottle  { position:relative;margin: 3px 3px 3px 0;  float: left; width: 95px;  height:95px; z-index: 10}
+.bottle-container .bottle{width: 30px;  height:45px;}
+.bottle-container .bottle p{position:absolute;font-size: 4px; text-align: center;bottom:-1px;left:9px;}
+ #bottles-container .bottles p{position: absolute;font-size: 20px; text-align: center;top:-20px;right:10px;}
+
+.bottle-popup{
+	width: 400px;
+	height: 400px;
+}
+
+.step-score{
+	text-align: center;
+	font-size: 50px;
+}
+#SubmitBoard{height: 100%}
+.submit .bottle{
+	width:30%;
+	position: relative;
+}
+
+.submit .bottle p{
+	position: absolute;
+	font-size: 20px; 
+	text-align: center;
+	top:2px;
+	left:10px;
+	color:black;
+}
+.submit .bottle img{
+	width:30px;
+}
+
+.ui-selectable-helper {
+	position: absolute;
+	z-index: 1200;
+	border: 2px dotted black;
+}
