@@ -113,6 +113,7 @@ GameManager.prototype.createEmptyBottles=function(bottles_id){
 		    		    	_this.popupOpen = false
 		    		    	// Prevent bottle covered by the popup
 		    		    	$(this).parent().css('top','-2000px')
+		    		    	this.popup = $(this).parent()
 	    		    	}
 	    		}
 	    	},
@@ -139,8 +140,8 @@ GameManager.prototype.createEmptyBottles=function(bottles_id){
 	    			_this.addToBottles(_this.curDragList,_this.curDragBottles.split('-')[1])
 	    		}
 	    		if(!_this.popupOpen){
+	    			this.popup.popup("close")
 	    			$(this).parent().popup("close")
-	    			
 	    		}
 	    		
 	    		_this.curDragBottles = undefined
@@ -305,7 +306,7 @@ GameManager.prototype.isGameOver=function(){
 		$("#gameover .ui-btn").text("Continue")
 		this.historys.push('GameOver')
 		$("#gameover .ui-btn").click(function(){location.href = 'game.html'})
-		$("#gameover").popup("open")
+		setTimeout(function(){$("#gameover").popup("open")},1000)
 		return
 	}
 	if(flag){
@@ -315,7 +316,7 @@ GameManager.prototype.isGameOver=function(){
 		$("#gameover .ui-btn").text("Retry")
 		$("#gameover .ui-btn").click(function(){location.href = 'game.html'})
 		this.historys.push('GameOver')
-		$("#gameover").popup("open")	
+		setTimeout(function(){$("#gameover").popup("open")},1000)
 	}
 
 }
