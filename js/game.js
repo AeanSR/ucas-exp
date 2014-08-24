@@ -31,6 +31,7 @@ GameManager.prototype.create=function(){
     	appendTo: document.body,
     	accept: ".bottle",
     	drop:function(event,ui){
+    		console.log('1')
     		if(!_this.popupOpen){
     			_this.dropOnContainer = true
     		}
@@ -74,14 +75,13 @@ GameManager.prototype.createEmptyBottles=function(bottles_id){
 	.appendTo($("#bottles-container"))
 	$("#bottles-container").sortable("refresh")
 	//Dynamic append
-	popup = $('<div></div>',{"data-role":"popup",id:"bottles-"+bottles_id, class:"bottle-popup","overflow-y": "scroll"})
+	popup = $('<div></div>',{"data-role":"popup",id:"bottles-"+bottles_id, class:"bottle-popup"})
 	//.html('<input type="text" id="text-filter" data-form="ui-body-a" value=""><a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-btn-b ui-mini">Filter</a><div class="bottle-container"></div>')
 	.html('<div class="bottle-container"></div>')
 	popup.appendTo($.mobile.activePage).popup()
 	this.sorts = $("#bottles-"+bottles_id+" .bottle-container").sortable({
 	    	containment:"#GameBoard",
 	    	appendTo: document.body,
-	    	scroll: true,
 	    	start:function(event,ui){
 	    		_this.dragging = 'bottle'
 	    		_this.dropOnContainer = false
@@ -98,7 +98,7 @@ GameManager.prototype.createEmptyBottles=function(bottles_id){
 	    	},
 	    	out:function(event,ui){
 	    		if(ui.helper)
-	    		{	
+	    		{	// This hacks before change event
 	    			if (_this.popupOpen){
 		    			t = $(this).sortable('instance')
 		    			for (i = t.items.length - 1; i >= 0; i--) {
@@ -107,18 +107,18 @@ GameManager.prototype.createEmptyBottles=function(bottles_id){
 			    			if (itemElement == t.currentItem[0])
 			    			t._rearrange(event, item);
 			    			}
-		    			helper = ui.helper.detach().appendTo("body")
-		    			//helper = ui.helper.appendTo("body")
-		    		    	helper.html('<img src="imgs/bottles.svg">')
-		    		    	ui.helper = helper
-		    			ui.item =helper
-		    		    	_this.popupOpen = false 
-		    		    	$(this).parent().popup("close")
+
+		    		    	//ui.helper.html('<img src="imgs/bottle.png">')
+		    		    	//ui.item.html('<img src="imgs/bottles.svg">')
+		    		    	_this.popupOpen = false
+		    		    	// Prevent bottle covered by the popup
+		    		    	$(this).parent().css('top','-2000px')
 	    		    	}
 	    		}
 	    	},
 
 	    	stop:function(event,ui){
+	    		console.log(_this.dropOnContainer)
 	    		if(_this.dropOnMice || (_this.dropOnContainer && _this.dropOnBottles == 0))
 	    		{
 	    			_this.removeFromBottles(_this.curDragList,_this.curDragBottles)
@@ -138,7 +138,11 @@ GameManager.prototype.createEmptyBottles=function(bottles_id){
 	    			_this.removeFromBottles(_this.curDragList,_this.curDragBottles)
 	    			_this.addToBottles(_this.curDragList,_this.curDragBottles.split('-')[1])
 	    		}
-
+	    		if(!_this.popupOpen){
+	    			$(this).parent().popup("close")
+	    			
+	    		}
+	    		
 	    		_this.curDragBottles = undefined
 	    		_this.curDragList = []
 	    		_this.dropOnMice = false
@@ -156,6 +160,7 @@ GameManager.prototype.createEmptyBottles=function(bottles_id){
     	});
 	// TODO mobile axis
     	$("#bottles-container #"+bottles_id).click(function(event) {
+    		$("#bottles-"+this.id).css('top','auto')
     		$("#bottles-"+this.id).popup("open",{x:event.pageX+200,y:event.pageY+150});
    	 });
     	$("#bottles-container #"+bottles_id).droppable({
@@ -319,7 +324,7 @@ GameManager.prototype.isGameOver=function(){
     {
     	location.href = 'game.html'
     }
-
+    $(document).bind('touchmove', false);
     GM = new GameManager(2, 100 , 1);
 
  });
