@@ -16,6 +16,8 @@ function GameManager(mice, bottles, poisons) {
 };
 GameManager.prototype.create = function() {
 	var _this = this
+	//preload image
+	new Image().src= 'imgs/mouse-dead.png'
 	$(".submit").sortable()
 	$("#bottles-container").sortable({
 		start: function(event, ui) {
