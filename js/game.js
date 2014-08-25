@@ -10,8 +10,8 @@ function GameManager(mice, bottles, poisons) {
 	this.historys = []
 	this.submit_bottles = []
 	this.curDragList = []
+	this.popupClosed = true
 	this.create();
-
 
 };
 GameManager.prototype.create = function() {
@@ -123,7 +123,6 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 		},
 
 		stop: function(event, ui) {
-			console.log(_this.dropOnContainer)
 			if (_this.dropOnMice || (_this.dropOnContainer && _this.dropOnBottles == 0)) {
 				_this.removeFromBottles(_this.curDragList, _this.curDragBottles)
 				if (_this.isBottlesEmpty(_this.curDragBottles) == true) _this.RemoveBottles(_this.curDragBottles)
@@ -140,7 +139,7 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 				_this.addToBottles(_this.curDragList, _this.curDragBottles.split('-')[1])
 			}
 			if (!_this.popupOpen) {
-				this.popup.popup("close")
+				$(this).parent().on("popupafterclose",function(){_this.popupClosed = true})
 				$(this).parent().popup("close")
 			}
 
@@ -167,8 +166,8 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 		_this.mouse_move = true
 	});
 	$("#bottles-container #" + bottles_id).click(function(event) {
+		_this.popupClosed = false
 		// In case of firefox 
-
 		if(!_this.mouse_move){
 			$("#bottles-" + this.id).css('top', 'auto')
 			$("#bottles-" + this.id).popup("open", {
@@ -317,9 +316,7 @@ GameManager.prototype.isGameOver = function() {
 		$("#gameover .ui-btn").click(function() {
 			location.href = 'game.html'
 		})
-		setTimeout(function() {
-			$("#gameover").popup("open")
-		}, 1000)
+		this.Popup()
 		return
 	}
 	if (flag) {
@@ -331,11 +328,21 @@ GameManager.prototype.isGameOver = function() {
 			location.href = 'game.html'
 		})
 		this.historys.push('GameOver')
-		setTimeout(function() {
-			$("#gameover").popup("open")
-		}, 1000)
+		this.Popup()
+
 	}
 
+}
+GameManager.prototype.Popup = function() {
+	_this = this
+		if(_this.popupClosed)
+		{
+			$("#gameover").popup("open")
+		}
+		else{
+			setTimeout(function(){_this.Popup(_this)}, 500)
+			return		
+		}
 }
 $(function() {
 	if (location.href.search('#') != -1) {
