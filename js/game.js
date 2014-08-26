@@ -34,6 +34,7 @@ GameManager.prototype.create = function() {
 		appendTo: document.body,
 		accept: ".bottle",
 		drop: function(event, ui) {
+			console.log("Container dropped!")
 			if (!_this.popupOpen) {
 				_this.dropOnContainer = true
 			}
@@ -67,12 +68,14 @@ GameManager.prototype.createRandomPoison = function() {
 }
 
 GameManager.prototype.createEmptyBottles = function(bottles_id) {
+	console.log('bottles ' + bottles_id + ' has been created')
 	var _this = this
 	$("<div></div>", {
 		class: "bottles",
 		id: bottles_id
 	})
 		.html('<p>0</p><img src="imgs/bottles.png">')
+		.attr('tested',false)
 		.appendTo($("#bottles-container"))
 	$("#bottles-container").sortable("refresh")
 	//Dynamic append
@@ -81,12 +84,84 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 		id: "bottles-" + bottles_id,
 		class: "bottle-popup"
 	})
-	//.html('<input type="text" id="text-filter" data-form="ui-body-a" value=""><a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-btn-b ui-mini">Filter</a><div class="bottle-container"></div>')
 	.html('<div class="bottle-container"></div>')
 	popup.appendTo($.mobile.activePage).popup()
-	this.sorts = $("#bottles-" + bottles_id + " .bottle-container").sortable({
+	this.sorts = $("#bottles-" + bottles_id + " .bottle-container").selectable({
+		handle: "#bottles-" + bottles_id + " .bottle-container",
+		filter: ".bottle",
+		distance:10,
+		selected: function(event, ui) {
+			console.log('selected')
+			$(ui.selected).draggable("enable")
+			$(ui.selected).attr("select", true);
+			$(ui.selected).css("background-color", "grey");
+		}
+	});
+	// TODO mobile axis
+	$("#bottles-container #" + bottles_id).mousedown(function(event) {
+		_this.mouse_move = false
+	});
+	$("#bottles-container #" + bottles_id).mousemove(function(event) {
+		_this.mouse_move = true
+	});
+	$("#bottles-container #" + bottles_id).click(function(event) {
+		console.log('bottles ' + this.id + ' has been clicked')
+		_this.popupClosed = false
+		// In case of firefox 
+		if(!_this.mouse_move){
+
+			$("#bottles-" + this.id).css('visibility', 'visible')
+			$("#bottles-" + this.id).popup("open", {
+			x: event.pageX + 200,
+			y: event.pageY + 150
+		});
+		}
+
+	});
+	$("#bottles-container #" + bottles_id).droppable({
+		drop: function() {
+			if($(this).attr("tested")=="false")
+			_this.dropOnBottles = $(this)[0].id
+		}
+	})
+}
+
+GameManager.prototype.addToBottles = function(bottle_list, bottles) {
+	for (var i in bottle_list) {
+
+		$("<div></div>", {
+			class: "bottle",
+			id: bottle_list[i]
+			})
+		.attr("select", false)
+		.html("<p>" + bottle_list[i] + "</p>" + '<img src="imgs/bottle.png">')
+		.appendTo($("#bottles-" + bottles + " .bottle-container"))
+
+		$("#bottles-" + bottles + " .bottle-container #" + bottle_list[i]).click(function() {
+			console.log('click')
+			if ($(this).attr("select") == "true") {
+				$(this).attr("select", false);
+				$(this).draggable("disable")
+				$(this).css("background-color", "white");
+			} else {
+				$(this).attr("select", true);
+				$(this).draggable("enable")
+				$(this).css("background-color", "grey");
+			}
+		})
+		.mousedown(function(event) {
+			console.log('down')
+		})
+		.mousemove(function(event) {
+			console.log('move')
+		})
+		.mouseup(function(event) {
+			console.log('up')
+		})
+		.draggable({
 		containment: "#GameBoard",
-		appendTo: document.body,
+		appendTo: "#GameBoard",
+		distance: 20,
 		start: function(event, ui) {
 			_this.dragging = 'bottle'
 			_this.dropOnContainer = false
@@ -99,29 +174,14 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 			for (var x = 0; x < selectedDOMs.length; x++) {
 				_this.curDragList.push(parseInt(selectedDOMs[x].id))
 			}
+			_this.popupOpen = false
+			// Prevent bottle covered by the popup
+			$("#"+ _this.curDragBottles).css('visibility', 'hidden')
+			//$("#"+ _this.curDragBottles).popup("close")
+			ui.helper.css('visibility',"visible")
+			//this.popup = $("#"+ _this.curDragBottles)
 
 		},
-		out: function(event, ui) {
-			if (ui.helper) { // This hacks before change event
-				if (_this.popupOpen) {
-					t = $(this).sortable('instance')
-					for (i = t.items.length - 1; i >= 0; i--) {
-						item = t.items[i];
-						itemElement = item.item[0];
-						if (itemElement == t.currentItem[0])
-							t._rearrange(event, item);
-					}
-
-					//ui.helper.html('<img src="imgs/bottle.png">')
-					//ui.item.html('<img src="imgs/bottles.svg">')
-					_this.popupOpen = false
-					// Prevent bottle covered by the popup
-					$(this).parent().css('top', '-2000px')
-					this.popup = $(this).parent()
-				}
-			}
-		},
-
 		stop: function(event, ui) {
 			if (_this.dropOnMice || (_this.dropOnContainer && _this.dropOnBottles == 0)) {
 				_this.removeFromBottles(_this.curDragList, _this.curDragBottles)
@@ -139,8 +199,20 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 				_this.addToBottles(_this.curDragList, _this.curDragBottles.split('-')[1])
 			}
 			if (!_this.popupOpen) {
-				$(this).parent().on("popupafterclose",function(){_this.popupClosed = true})
-				$(this).parent().popup("close")
+				console.log(_this.curDragBottles)
+				$("#"+ _this.curDragBottles).on("popupafterclose",function(){_this.popupClosed = true})
+				$("#"+ _this.curDragBottles).popup('close')
+				$("#"+ _this.curDragBottles).popup('close')
+				$("#"+ _this.curDragBottles).popup('close')
+				$("#"+ _this.curDragBottles).popup('close')
+				$("#"+ _this.curDragBottles).popup('close')
+				$("#"+ _this.curDragBottles).popup('close')
+				$("#"+ _this.curDragBottles).popup('close')
+				$("#"+ _this.curDragBottles).popup('close')
+				$("#"+ _this.curDragBottles).popup('close')
+				$("#"+ _this.curDragBottles).popup('close')
+				$("#"+ _this.curDragBottles).popup('close')
+				
 			}
 
 			_this.curDragBottles = undefined
@@ -150,61 +222,10 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 			_this.dropOnContainer = false
 			_this.NeedUpdate = false
 		}
-	}).selectable({
-		handle: "#bottles-" + bottles_id + " .bottle-container",
-		filter: ".bottle",
-		selected: function(event, ui) {
-			$(ui.selected).attr("select", true);
-			$(ui.selected).css("background-color", "grey");
-		}
-	});
-	// TODO mobile axis
-	$("#bottles-container #" + bottles_id).mousedown(function(event) {
-		_this.mouse_move = false
-	});
-	$("#bottles-container #" + bottles_id).mousemove(function(event) {
-		_this.mouse_move = true
-	});
-	$("#bottles-container #" + bottles_id).click(function(event) {
-		_this.popupClosed = false
-		// In case of firefox 
-		if(!_this.mouse_move){
-			$("#bottles-" + this.id).css('top', 'auto')
-			$("#bottles-" + this.id).popup("open", {
-			x: event.pageX + 200,
-			y: event.pageY + 150
-		});
-		}
-
-	});
-	$("#bottles-container #" + bottles_id).droppable({
-		drop: function() {
-			_this.dropOnBottles = $(this)[0].id
-		}
-	})
-}
-
-GameManager.prototype.addToBottles = function(bottle_list, bottles) {
-	for (var i in bottle_list) {
-
-		$("<div></div>", {
-			class: "bottle",
-			id: bottle_list[i]
-		}).attr("select", false)
-			.html("<p>" + bottle_list[i] + "</p>" + '<img src="imgs/bottle.png">')
-			.appendTo($("#bottles-" + bottles + " .bottle-container"))
-		$("#bottles-" + bottles + " .bottle-container #" + bottle_list[i]).click(function() {
-			if ($(this).attr("select") == "true") {
-				$(this).attr("select", false);
-				$(this).css("background-color", "white");
-			} else {
-				$(this).attr("select", true);
-				$(this).css("background-color", "grey");
-			}
-		})
+	}).draggable("disable")
 	}
 	this.UpdateBottles("bottles-" + bottles)
-	$("#bottle-container").sortable("refresh")
+	//$("#bottle-container").sortable("refresh")
 }
 
 GameManager.prototype.removeFromBottles = function(bottle_list, bottles) {
@@ -234,6 +255,9 @@ GameManager.prototype.UpdateBottles = function(bottles) {
 GameManager.prototype.UsedBottles = function(bottles) {
 	target = $('#bottles-container #' + bottles.split('-')[1])
 	target.css("background-color", "grey")
+	target.unbind()
+	target.attr("tested",true)
+	//this.bottles = this.bottles - 
 }
 
 
@@ -253,8 +277,12 @@ GameManager.prototype.createMice = function(mouse_list) {
 					// Is alive?
 					if (_this.mouse_list[mouse]) {
 						if (_this.dragging == 'bottles') {
-							if (!_this.testMice(_this.curDragList, mouse))
+							a = $('#bottles-container #' + _this.curDragBottles.split('-')[1])
+							console.log(a)
+							if(a.attr('tested')=="false"){
+								if (!_this.testMice(_this.curDragList, mouse))
 								_this.UsedBottles(_this.curDragBottles)
+							}
 						} else {
 							if (_this.testMice(_this.curDragList, mouse)) {
 								_this.UsedBottles(_this.curDragBottles)
@@ -273,10 +301,11 @@ GameManager.prototype.createMice = function(mouse_list) {
 }
 GameManager.prototype.testMice = function(bottles_list, mouse) {
 	this.steps += 1
+	gameModel = new AdaptiveAdversary()
+
 	this.historys.push('Test bottles [' + bottles_list.toString() + '] to mouse ' + mouse)
 	$('#SubmitBoard .step-score').html(this.steps)
-	for (i in bottles_list) {
-		if (md5(bottles_list[i] + "This is a salt~~!@@!") in this.poison_list) {
+	if(gameModel.computerDecide(this.bottles, bottles_list.length, this.mice)[0]){
 			if (bottles_list.length == 1) {
 				flag = true
 				for (var x in this.submit_bottles) {
@@ -295,13 +324,19 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 			.html('<img src="imgs/mouse-dead.png">')
 			this.historys.push('Mouse ' + mouse + ' die.')
 			this.isGameOver()
+			delete GameModel
+			this.bottles = bottles_list.length
 			return true
-		}
 	}
 	$("#mice-container #" + mouse)
 		.animate() //Animate here
+	delete GameModel
+	// Kick off the healthy bottles
+	this.bottles = this.bottles - bottles_list.length
 	return false
 }
+
+
 GameManager.prototype.isGameOver = function() {
 	flag = true
 	for (x in this.mouse_list) {
@@ -344,6 +379,45 @@ GameManager.prototype.Popup = function() {
 			return		
 		}
 }
+
+function AdaptiveAdversary() {
+	this.mat=[]
+    	for(var i=0;i<101;++i)this.mat[i]=[0,0,0]
+}
+AdaptiveAdversary.prototype.computerDecide = function(bottles, selectedbottles, mice) {
+	if(bottles==selectedbottles)return [1,this.humanDecide(selectedbottles,mice-1)];
+	var a=this.humanDecide(bottles-selectedbottles,mice);
+	var b=this.humanDecide(selectedbottles,mice-1);
+	if(a>b)return [0,a];
+	return [1,b];
+}
+AdaptiveAdversary.prototype.humanDecide = function(bottles,mice){     
+    		if(bottles==1)return 0;
+    		if(mice==0){
+    			if(bottles>1)return 65535
+    			return 0
+    		}
+    		if(mice==1){
+    			return bottles-1
+    		}
+    		if(this.mat[bottles][mice]!=0){
+    			return this.mat[bottles][mice]
+    		}
+    		var min=65535
+    		var ind=0
+    		for (var i=1;i<=bottles;++i){
+    			
+    			var t1=this.computerDecide(bottles,i,mice)
+    			var t=t1[1]
+    			if(t<min){
+    				min=t
+    				ind=i
+    			}
+    		}
+    		this.mat[bottles][mice]=min+1
+    		return min+1;
+    }
+
 $(function() {
 	if (location.href.search('#') != -1) {
 		location.href = 'game.html'
