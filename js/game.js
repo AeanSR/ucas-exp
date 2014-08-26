@@ -29,17 +29,18 @@ GameManager.prototype.create = function() {
 				_this.curDragList.push(parseInt(selectedDOMs[x].id))
 			}
 		}
-	}).droppable({
-		containment: "document",
-		appendTo: document.body,
-		accept: ".bottle",
-		drop: function(event, ui) {
-			console.log("Container dropped!")
-			if (!_this.popupOpen) {
-				_this.dropOnContainer = true
-			}
-		}
 	})
+	// .droppable({
+	// 	containment: "document",
+	// 	appendTo: document.body,
+	// 	accept: ".bottle",
+	// 	drop: function(event, ui) {
+	// 		console.log("Container dropped!")
+	// 		if (!_this.popupOpen) {
+	// 			_this.dropOnContainer = true
+	// 		}
+	// 	}
+	// })
 	$("#bottles-container").disableSelection();
 
 
