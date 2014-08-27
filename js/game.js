@@ -292,7 +292,7 @@ GameManager.prototype.createMice = function(mouse_list) {
 GameManager.prototype.testMice = function(bottles_list, mouse) {
 	this.steps += 1
 	gameModel = new AdaptiveAdversary()
-
+	console.log('testing ' , this.bottles, bottles_list.length, this.mice)
 	this.historys.push('Test bottles [' + bottles_list.toString() + '] to mouse ' + mouse)
 	$('#SubmitBoard .step-score').html(this.steps)
 	if(gameModel.computerDecide(this.bottles, bottles_list.length, this.mice)[0]){
@@ -316,6 +316,8 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 			this.isGameOver()
 			delete GameModel
 			this.bottles = bottles_list.length
+			this.mice = this.mice - 1
+			console.log(this.bottles)
 			return true
 	}
 	$("#mice-container #" + mouse)
@@ -323,6 +325,7 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 	delete GameModel
 	// Kick off the healthy bottles
 	this.bottles = this.bottles - bottles_list.length
+	console.log(this.bottles)
 	return false
 }
 
