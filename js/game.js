@@ -337,7 +337,7 @@ GameManager.prototype.isGameOver = function() {
 	}
 	if (this.submit_bottles.length == this.poisons) {
 		$("#gameover h1").text("Great!")
-		$("#gameover #gameover-notice").text("You have passed the game successfully!")
+		$("#gameover #gameover-notice").text("You have passed the game successfully with " + this.steps + " steps!")
 		$("#gameover #gameover-content").text("The result has been submitted to the server. ")
 		$("#gameover .ui-btn").text("Continue")
 		this.historys.push('GameOver')
