@@ -1,19 +1,31 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="UTF-8">
 		<meta name="viewport" content="user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="format-detection" content="telephone=no">
 		<link rel="stylesheet" href="css/jquery.mobile-1.4.3.min.css" />
-
-		<link rel="stylesheet" href="css/style.css" />
+		<link rel="stylesheet" media="all and (max-device-width:568px)" href="css/style-mobile.css" />
+		<link rel="stylesheet" media="all and (min-device-width:569px)" href="css/style.css" />
 		<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
 		<script src="js/jquery.mobile-1.4.3.min.js"></script>
 		<script type="text/javascript" src="js/jquery-ui.js"></script>
 		<script type="text/javascript" src="js/jquery.ui.touch-punch.min.js"></script>
 		<script type="text/javascript" src="js/game.js"></script>
 		<script src="js/md5.min.js"></script>
+		<meta charset="UTF-8">
+		<script>
+		
+		if(window.width>600)
+		{
+			$(document).bind('touchmove', false);
+		}
+		else
+		{
+		$('meta[name=viewport]').attr("content","user-scalable=4.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=4.0")
+		}
+		</script>
+
 
 		
 

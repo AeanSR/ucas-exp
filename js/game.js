@@ -86,7 +86,7 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 		class: "bottle-popup"
 	})
 	.html('<div class="bottle-container"></div>')
-	popup.appendTo($.mobile.activePage).popup()
+	popup.appendTo($.mobile.activePage).popup({"afterclose":function(){_this.popupClosed = true}})
 	this.sorts = $("#bottles-" + bottles_id + " .bottle-container").selectable({
 		handle: "#bottles-" + bottles_id + " .bottle-container",
 		filter: ".bottle",
@@ -139,7 +139,6 @@ GameManager.prototype.addToBottles = function(bottle_list, bottles) {
 		.appendTo($("#bottles-" + bottles + " .bottle-container"))
 
 		$("#bottles-" + bottles + " .bottle-container #" + bottle_list[i]).click(function() {
-			console.log('click')
 			if ($(this).attr("select") == "true") {
 				$(this).attr("select", false);
 				$(this).draggable("disable")
@@ -149,15 +148,6 @@ GameManager.prototype.addToBottles = function(bottle_list, bottles) {
 				$(this).draggable("enable")
 				$(this).css("background-color", "grey");
 			}
-		})
-		.mousedown(function(event) {
-			console.log('down')
-		})
-		.mousemove(function(event) {
-			console.log('move')
-		})
-		.mouseup(function(event) {
-			console.log('up')
 		})
 		.draggable({
 		containment: "#GameBoard",
@@ -201,7 +191,7 @@ GameManager.prototype.addToBottles = function(bottle_list, bottles) {
 			}
 			if (!_this.popupOpen) {
 				console.log(_this.curDragBottles)
-				$("#"+ _this.curDragBottles).on("popupafterclose",function(){_this.popupClosed = true})
+				$("#"+ _this.curDragBottles)
 				$("#"+ _this.curDragBottles).popup('close')
 				$("#"+ _this.curDragBottles).popup('close')
 				$("#"+ _this.curDragBottles).popup('close')
@@ -279,7 +269,6 @@ GameManager.prototype.createMice = function(mouse_list) {
 					if (_this.mouse_list[mouse]) {
 						if (_this.dragging == 'bottles') {
 							a = $('#bottles-container #' + _this.curDragBottles.split('-')[1])
-							console.log(a)
 							if(a.attr('tested')=="false"){
 								if (!_this.testMice(_this.curDragList, mouse))
 								_this.UsedBottles(_this.curDragBottles)
@@ -364,6 +353,7 @@ GameManager.prototype.isGameOver = function() {
 			location.href = 'game.html'
 		})
 		this.historys.push('GameOver')
+		console.log('sorry')
 		this.Popup()
 
 	}
@@ -373,6 +363,7 @@ GameManager.prototype.Popup = function() {
 	_this = this
 		if(_this.popupClosed)
 		{
+			console.log('popup')
 			$("#gameover").popup("open")
 		}
 		else{
@@ -423,7 +414,7 @@ $(function() {
 	if (location.href.search('#') != -1) {
 		location.href = 'game.html'
 	}
-	$(document).bind('touchmove', false);
-	GM = new GameManager(2, 100, 1);
+	
+	GM = new GameManager(2, 32, 1);
 
 });
