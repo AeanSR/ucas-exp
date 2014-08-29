@@ -6,7 +6,6 @@ function NAGameManager(bottles) {
 	this.historys = []
 	this.popupClosed = true
 	this.create()
-	
 }
 NAGameManager.prototype.create = function() {
 	var _this = this
@@ -36,7 +35,7 @@ NAGameManager.prototype.createMouse = function() {
 		class: "mice",
 		id: _this.mice
 	})
-	.html('<p>0</p><img src="imgs/mouse-alive.png">')
+	.html('<p>0</p><img src="imgs/mouse-alive.png"><span class="ui-icon ui-icon-delete ui-btn-icon-left" style="display:none"></span> ')
 	.droppable({
 		drop: function(event, ui) {
 			bottle_id = parseInt(ui.helper[0].id)
@@ -51,18 +50,45 @@ NAGameManager.prototype.createMouse = function() {
 		}
 	})
 	.appendTo($("#mice-container"))
-
+	// Bind hover
+	mouse_dom.hover(
+		function(event){
+			$(this).find('span').show()
+		},
+		function(event){
+			$(this).find('span').hide()
+		});
 	// Bind click to popup
-	mouse_dom.click(function(event) {
-		console.log('mouse ' + this.id + ' has been clicked')
+
+	mouse_dom.find('img').click(function(event) {
+		console.log('mouse ' + $(this).parent()[0].id+ ' has been clicked')
 		_this.popupClosed = false
-		_this.showMousePopup(parseInt(this.id),event)
+		_this.showMousePopup(parseInt($(this).parent()[0].id),event)
+
+	});
+	mouse_dom.find('span').click(function(event) {
+		_this.mice -=1
+		new_result = {}
+		mouse = parseInt($(this).parent()[0].id)
+		_this.removeMouse(mouse)
+		j =0
+		for(var i in _this.result){
+			if(i!=mouse){
+				j++
+				new_result[j] = _this.result[i]
+				$('#mice-container #' +i)[0].id = j
+			}
+		}
+		delete _this.result
+		_this.result = new_result
 
 	});
 	// Record the content
 	_this.result[_this.mice] = []
 }
-
+NAGameManager.prototype.removeMouse = function(mouse) {
+	$('#mice-container #' +mouse).remove()
+}
 
 NAGameManager.prototype.addBottles = function(bottle_list) {
 	var _this = this

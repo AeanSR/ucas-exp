@@ -50,6 +50,11 @@ height:100%;
  	top:-30px;
  	right:10px;
  }
+ #mice-container .mice span{
+ 	position: absolute;
+ 	top:-8px;
+ 	left:-20px;
+ }
 
 #bottles-container .bottle{
 	width: 30px; 
