@@ -5,17 +5,16 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="format-detection" content="telephone=no">
 		<link rel="stylesheet" href="css/jquery.mobile-1.4.3.min.css" />
-		<link rel="stylesheet" media="all and (max-device-width:568px)" href="css/style-mobile.css" />
-		<link rel="stylesheet" media="all and (min-device-width:569px)" href="css/style.css" />
+		<!-- <link rel="stylesheet" media="all and (max-device-width:568px)" href="css/style-mobile.css" /> -->
+		<link rel="stylesheet" media="all and (min-device-width:569px)" href="css/na_style.css" />
 		<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
 		<script src="js/jquery.mobile-1.4.3.min.js"></script>
 		<script type="text/javascript" src="js/jquery-ui.js"></script>
 		<script type="text/javascript" src="js/jquery.ui.touch-punch.min.js"></script>
-		<script type="text/javascript" src="js/game.js"></script>
+		<script type="text/javascript" src="js/nonadaptive.js"></script>
 		<script src="js/md5.min.js"></script>
 		<meta charset="UTF-8">
 		<script>
-		
 		if(window.width>600)
 		{
 			$(document).bind('touchmove', false);
@@ -25,9 +24,6 @@
 		$('meta[name=viewport]').attr("content","user-scalable=4.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=4.0")
 		}
 		</script>
-
-
-		
 
 	</head>
 	<body>
@@ -46,17 +42,30 @@
 								<p>
 								<b>Mice</b>: Please drag the bottles or bottle to the mouse.
 								</p>
-								<div id="mice-container"></div>
+								<div style="width: 100%; ">
+									<div style="width:75%;position:absolute">
+										<div id="mice-container" style="width:100%;"></div>
+									</div>
+									<div class="buttons" style="float:right;width:20%">
+										<button class="ui-btn ui-icon-plus ui-btn-icon-left" id="button_add">Add Mouse</button>
+										<button class="ui-btn ui-icon-check ui-btn-icon-left" id="button_submit">Submit</button>
+									</div>
+								</div>
 					
 						</div>					
 					</div>
 					<div class="ui-block-submit ">
 						<div class="ui-body ui-body-b ui-corner-all"  id="SubmitBoard">
 							<b>Game Panel</b>
-							<p>Total Steps:</p>
-							<div class="step-score">0</div>
-							<p>Submit Results:</p>
-							<div class='submit'></div>
+							<p>Number of poisoned bottle:</p>
+							<div class="panel-number">1</div>
+							<p style="font-size:20px">Game introduction:</p>
+							<div class='introduction'>
+							<p>
+							Try to find the only poisoned bottle with the least mice. Note that 
+							you must arrange the bottles to each mouse, then submit the result. If your strategy covers all the situations, you win , otherwise, you lose.  
+							</p>
+							</div>
 
 						</div>
 					</div>
@@ -66,7 +75,7 @@
 			<div data-role="panel" data-position-fixed="true" data-display="push" data-theme="b" id="nav-panel">
 				<ul data-role="listview">
 					<li data-icon="delete"><a href="#" data-rel="close">Close menu</a></li>
-					<li><a href="#panel-fixed-page2">Introduction</a></li>
+					<li><a href="#panel-fixed-page2">Introduction</a></ li>
 					<li><a href="#panel-fixed-page2">Game</a></li>
 					<li><a href="#panel-fixed-page2">About</a></li>
 				</ul>
@@ -77,8 +86,17 @@
 				</div>
 				<div role="main" class="ui-content">
 				        <h3 class="ui-title" id="gameover-notice"></h3>
-				        <p> The poison bottle:</p>
-				        <div class='result'></div>
+				        <p> All situations:</p>
+				        <table data-role="table" id="result" class="ui-body-d ui-shadow table-stripe ui-responsive">
+					         <thead>
+					           <tr class="ui-bar-d">
+					             <th>Poisoned Bottle</th>
+					             <th>Dead mouses</th>
+					           </tr>
+					         </thead>
+					         <tbody>
+					         </tbody>
+				        </table>
 				        <p id="gameover-content"> The result has been submitted to the server. </p>
 				        <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow"></a>
 				    </div>

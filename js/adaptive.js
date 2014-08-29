@@ -342,7 +342,7 @@ GameManager.prototype.isGameOver = function() {
 		$("#gameover .ui-btn").text("Continue")
 		this.historys.push('GameOver')
 		$("#gameover .ui-btn").click(function() {
-			location.href = 'game.html'
+			location.href = 'adaptive.html'
 		})
 		this.Popup()
 		return
@@ -353,10 +353,9 @@ GameManager.prototype.isGameOver = function() {
 		$("#gameover #gameover-content").text("Please try again, this time won't be submitted.")
 		$("#gameover .ui-btn").text("Retry")
 		$("#gameover .ui-btn").click(function() {
-			location.href = 'game.html'
+			location.href = 'adaptive.html'
 		})
 		this.historys.push('GameOver')
-		console.log('sorry')
 		this.Popup()
 
 	}
@@ -415,7 +414,7 @@ AdaptiveAdversary.prototype.humanDecide = function(bottles,mice){
 
 $(function() {
 	if (location.href.search('#') != -1) {
-		location.href = 'game.html'
+		location.href = 'adaptive.html'
 	}
 	
 	GM = new GameManager(2, 32, 1);
