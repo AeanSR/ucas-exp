@@ -262,7 +262,7 @@ NAGameManager.prototype.Popup = function() {
 	_this = this
 		if(_this.popupClosed)
 		{
-			$("#gameover").popup("open")
+			$("#gameover").popup("open",{x:window.width/2,y:0})
 		}
 		else{
 			setTimeout(function(){_this.Popup(_this)}, 500)
