@@ -431,10 +431,10 @@ AdaptiveAdversary.prototype.humanDecide = function(bottles,mice){
     }
 
 $(function() {
+	$("body").iealert();
 	if (location.href.search('#') != -1) {
 		location.href = 'hybrid-adaptive.html'
 	}
-
 	GM = new HAGameManager(32,1);
 
 });

@@ -279,10 +279,10 @@ NAGameManager.prototype.getMouse = function(b) {
 
 
 $(function() {
+	$("body").iealert();
 	if (location.href.search('#') != -1) {
 		location.href = 'non-adaptive.html'
 	}
-	
 	GM = new NAGameManager(8);
 
 });
