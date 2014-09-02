@@ -22,26 +22,13 @@ HAGameManager.prototype.create = function() {
 		overlaping = res[1]
 		mouse1 = res[2]
 		mouse2 = res[3]
+		_this.nextWeek(mouse1, mouse2 ,overlaping)
 
-		if(Overlaps>_this.allow_overlap){
-			popup = $('<div></div>', {
-			"data-role": "popup",
-			id:"error"
-			})
-			.html('<p>Overlaped bottles are beyond ' + _this.allow_overlap +' bottles.</p>')
-			.appendTo($.mobile.activePage)
-			.popup({"afterclose":function(){$("#error").remove()}})
-			$("#error").popup("open")
+		if(_this.aa.bottles==1||_this.aa.mice ==0){
+			is_win=_this.aa.bottles==1
+			_this.isGameOver(is_win)
 		}
-		else{
-			_this.nextWeek(mouse1, mouse2 ,overlaping)
 
-			if(_this.aa.bottles==1||_this.aa.mice ==0){
-				is_win=_this.aa.bottles==1
-				_this.isGameOver(is_win)
-			}
-			
-		}
 	});
 	//preload image
 	new Image().src= 'imgs/mouse-dead.png'
@@ -382,7 +369,9 @@ AdaptiveAdversary.prototype.computerDecide = function(bottles, mouse1,mouse2 ,ov
 	var selectedbottles = mouse1+mouse2+overlaped
 	var mouse = (mouse1>mouse2)?mouse1:mouse2
 	var larger =  (mouse1>mouse2)?1:2
-
+	if(overlaped>1){
+		return [3,65535]
+	}
 	if(bottles==(selectedbottles)){
 		if((mouse1+mouse2)!=0)
 			return  [larger,this.humanDecide(selectedbottles,mice-1)]
