@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
+		<link rel="stylesheet" href="css/jquery.mobile-1.4.3.min.css" />
+		<!-- <link rel="stylesheet" media="all and (max-device-width:568px)" href="css/style-mobile.css" /> -->
+		<link rel="stylesheet" media="all and (min-device-width:569px)" href="css/na_style.css" />
+		<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+		<script src="js/jquery.mobile-1.4.3.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui.js"></script>
+		<script type="text/javascript" src="js/jquery.ui.touch-punch.min.js"></script>
+		<script type="text/javascript" src="js/hybridadaptive.js"></script>
+		<script src="js/md5.min.js"></script>
+		<meta charset="UTF-8">
+		<script>
+		if(window.width>600)
+		{
+			$(document).bind('touchmove', false);
+		}
+		else
+		{
+		$('meta[name=viewport]').attr("content","user-scalable=4.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=4.0")
+		}
+		</script>
+
+	</head>
+	<body>
+		<div data-role="page" id = "main-page">
+			<div data-role="header">
+				<a href="#nav-panel" data-icon="bars" data-iconpos="notext">Menu</a>
+				<a href="#add-form" data-icon="gear" data-iconpos="notext">Add</a>
+				<h1>Mice and poisons</h1>
+			</div>
+			<div data-role="content">
+				<div class="container">
+					<div class="ui-block-game ">
+						<div class="ui-body ui-body-b ui-corner-all"  style="height:100%" id="GameBoard">
+								<p><b> Bottles: </b></p>
+								<div id="bottles-container"></div>
+								<p>
+								<b>Mice</b>: Please drag the bottles or bottle to the mouse.
+								</p>
+								<div style="width: 100%; ">
+									<div style="width:75%;position:absolute">
+										<div id="mice-container" style="width:100%;"></div>
+									</div>
+									<div class="buttons" style="float:right;width:20%">
+										<button class="ui-btn ui-icon-check ui-btn-icon-left" id="button_submit">Next week</button>
+									</div>
+								</div>
+					
+						</div>					
+					</div>
+					<div class="ui-block-submit ">
+						<div class="ui-body ui-body-b ui-corner-all"  id="SubmitBoard">
+							<b>Game Panel</b>
+							<p>Weeks passed:</p>
+							<div class="step-score">0</div>
+							<p style="font-size:20px">Game introduction:</p>
+							<div class='introduction'>
+							<p>
+							Try to find the only poisoned bottle with the least weeks. Arrange
+							 the bottles to the mice, then click the "Next week" button and poisoned 
+							 bottles will effect in the next week. Note that you can only have one overlapped bottle of distinct mice.
+							</p>
+							</div>
+
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div data-role="panel" data-position-fixed="true" data-display="push" data-theme="b" id="nav-panel">
+				<ul data-role="listview">
+					<li data-icon="delete"><a href="#" data-rel="close">Close menu</a></li>
+					<li><a href="#panel-fixed-page2">Introduction</a></ li>
+					<li><a href="#panel-fixed-page2">Game</a></li>
+					<li><a href="#panel-fixed-page2">About</a></li>
+				</ul>
+			</div><!-- /panel -->
+			<div data-role="popup" id="gameover" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+				<div data-role="header" data-theme="a">
+				<h1></h1>
+				</div>
+				<div role="main" class="ui-content">
+				        <h3 class="ui-title" id="gameover-notice"></h3>
+				        <p id="gameover-content"> The result has been submitted to the server. </p>
+				        <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow"></a>
+				    </div>
+				</div>
+		</div>
+	</body>
+</html>

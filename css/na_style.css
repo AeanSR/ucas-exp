@@ -109,7 +109,15 @@ height:100%;
 #SubmitBoard{
 	height: 100%
 }
+.step-score{
+	text-align: center;
+	font-size: 50px;
+}
 
+.submit .bottle{
+	width:30%;
+	position: relative;
+}
 .submit .bottle{
 	width:30%;
 	position: relative;

@@ -17,10 +17,7 @@ NAGameManager.prototype.create = function() {
 	$("#button_submit").click(function(event) {
 		_this.gameOver(_this.testMice())
 	});
-	//preload image
-	new Image().src= 'imgs/mouse-dead.png'
 	// Initialize bottles container
-	$(".submit").sortable()
 	// Init data
 	for (var i = 1; i <= _this.bottles; i++) _this.bottle_list.push(i)
 	// Create bottles
