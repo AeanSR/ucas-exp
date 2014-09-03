@@ -65,10 +65,10 @@ height:100%;
 
 #bottles-container .bottle p{
 	position:absolute;
-	font-size: 1.2em;
+	font-size: 1em;
 	color:black;
 	text-align: center;
-	top:0px;right: 0px;bottom: 0px;left: 0px;
+	top:1px;right: 0px;bottom: 0px;left: 0px;
 	/*left:  20px;*/
 }
 
