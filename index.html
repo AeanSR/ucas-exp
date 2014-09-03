@@ -22,7 +22,32 @@
 				<h1>Introduction</h1>
 			</div>
 			<div data-role="content">
-				<h1>
+				<h1>Guide</h1>
+				<h2>Job Rule</h2>
+				<p>In this homework, you need complete all the three games as below. You can test 
+					the games in the <a href='#test' data-ajax="false">Games(Test Mode)</a> 
+					with unlimited times. In the formal <a href='#nav-panel'>
+					submit-mode</a>, <b>only <span style='color:red'>three times</span> are provided for you, the system will automatically take the highest score as your final score.</b></p>
+				<h2>Games(Test Mode)</h2>
+				<p>
+					In the test-mode, problem set is much easier than the submit-mode. So, to practise 
+					your algorithm/policy is very important here. After fully testing, you can be ready to 
+					finish a submit-mode(bottles are more).
+				</p>
+ 				<ul>
+					<li><a href='adaptive.html?test' data-ajax="false">Adaptive Game</a></li>
+						<b>Rule:</b> 2 mice, 1 poisoned bottle, mouse will die immediately when
+						drinks the poisoned bottle(counted as 1 step). <br>
+						<b>Target:</b> use the least steps.
+					<li><a href='non-adaptive.html?test' data-ajax="false">Non-Adaptive Game</a></li>
+						<b>Rule:</b> 1 poisoned bottle, limited to 1 step to find out the poisoned bottle.<br>
+						<b>Target:</b> use the least mice.
+					<li><a href='hybrid-adaptive.html?test' data-ajax="false">Hybrid-Adaptive Game</a></li>
+						<b>Rule:</b> 2 mice, 1 poisoned bottle, poisoned mouse will die a week later.<br>
+						<b>Target:</b> use the least weeks.
+				</ul>
+				<h2>Games(Submit Mode)</h2>
+				In case of misoperation, click <a href='#nav-panel'>here</a> and enter different games in submit mode.
 			</div>
 			<div data-role="panel" data-position-fixed="true" data-display="push" data-ajax="false" data-theme="b" id="nav-panel">
 				<ul data-role="listview">
