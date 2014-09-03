@@ -106,7 +106,7 @@ HAGameManager.prototype.addBottles = function(bottle_list) {
 			start:function(event,ui){
 				bottle_dom = $(this)
 				bottle_dom.attr('select','true')
-				bottle_dom.css('background-color','grey')			}
+				bottle_dom.css('background-color','#356799')			}
 		})
 		.appendTo($("#bottles-container"))
 		.click(function(event){
@@ -117,7 +117,7 @@ HAGameManager.prototype.addBottles = function(bottle_list) {
 			}
 			else{
 				bottle_dom.attr('select','true')
-				bottle_dom.css('background-color','grey')
+				bottle_dom.css('background-color','#356799')
 			}
 		})
 
