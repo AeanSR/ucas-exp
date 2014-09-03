@@ -1,6 +1,7 @@
-function NAGameManager(bottles) {
+function NAGameManager(bottles,is_test) {
 	this.mice = 0;
 	this.bottles = bottles;
+	this.is_test = is_test
 	this.bottle_list = []
 	this.result = {};
 	this.historys = []
@@ -9,6 +10,15 @@ function NAGameManager(bottles) {
 }
 NAGameManager.prototype.create = function() {
 	var _this = this
+	if(this.is_test){
+		$('#game-mode').text("Test Mode")
+		$('#game-times').text("Unlimited")
+		}
+	else{
+		// TODO ajax here
+		$('#game-mode').text("Submit Mode")
+		$('#game-times').text("3")
+	}
 	// Create mice.
 	_this.createMouse()
 	$("#button_add").click(function(event) {
@@ -222,24 +232,33 @@ NAGameManager.prototype.testMice = function() {
 
 }
 NAGameManager.prototype.gameOver = function(isWin) {
+	this.is_test?
+	newhref = 'non-adaptive.html':
+	newhref = 'non-adaptive.html?submit'
 	if(isWin){
 		$("#gameover h1").text("Great!")
 		$("#gameover #gameover-notice").text("You have passed the game successfully with " + this.mice + " mice!")
+		this.is_test?
+		$("#gameover #gameover-content").text("Test mode won't upload the results."):
 		$("#gameover #gameover-content").text("The result has been submitted to the server. ")
+		this.is_test?
+		$("#gameover .ui-btn").text("Retry"):
 		$("#gameover .ui-btn").text("Continue")
 		this.historys.push('GameOver')
 		$("#gameover .ui-btn").click(function() {
-			location.href = 'non-adaptive.html'
+			location.href = newhref
 		})
 		this.Popup()
 	}
 	else{
 		$("#gameover h1").text("Sorry!")
 		$("#gameover #gameover-notice").text("You can't find the poison!")
+		this.is_test?
+		$("#gameover #gameover-content").text("Test mode won't upload the results."):
 		$("#gameover #gameover-content").text("Please try again, this time won't be submitted.")
 		$("#gameover .ui-btn").text("Retry")
 		$("#gameover .ui-btn").click(function() {
-			location.href = 'non-adaptive.html'
+			location.href = newhref
 		})
 		this.historys.push('GameOver:lose')
 		this.Popup()
@@ -283,6 +302,11 @@ $(function() {
 	if (location.href.search('#') != -1) {
 		location.href = 'non-adaptive.html'
 	}
-	GM = new NAGameManager(8);
+	if (location.href.search('/?submit') != -1) {
+		GM = new NAGameManager(16, false);
+	}
+	else{
+		GM = new NAGameManager(8, true);
+	}
 
 });

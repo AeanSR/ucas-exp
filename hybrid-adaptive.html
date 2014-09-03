@@ -27,7 +27,7 @@
 		{
 		$('meta[name=viewport]').attr("content","user-scalable=4.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=4.0")
 		}
-		
+
 		</script>
 
 	</head>
@@ -61,8 +61,12 @@
 					<div class="ui-block-submit ">
 						<div class="ui-body ui-body-b ui-corner-all"  id="SubmitBoard">
 							<b>Game Panel</b>
+							<p>Game Mode:</p>
+							<div class='middle-text-large' id="game-mode"></div>
+							<p>Remaining Submit Times:</p>
+							<div class='middle-text-large' id="game-times"></div>
 							<p>Weeks passed:</p>
-							<div class="step-score">0</div>
+							<div class="middle-text-large" id="step-score">0</div>
 							<p style="font-size:20px">Game introduction:</p>
 							<div class='introduction'>
 							<p>
@@ -81,9 +85,9 @@
 				<ul data-role="listview">
 					<li data-icon="delete"><a href="#" data-rel="close">Close menu</a></li>
 					<li><a href="index.html" data-ajax="false">Introduction</a></li>
-					<li><a href="adaptive.html" data-ajax="false">Adaptive Game</a></li>
-					<li><a href="non-adaptive.html" data-ajax="false">Non-Adaptive Game</a></li>
-					<li><a href="hybrid-adaptive.html" data-ajax="false">Hybrid-Adaptive Game</a></li>
+					<li><a href="adaptive.html?submit" data-ajax="false">Adaptive Game</a></li>
+					<li><a href="non-adaptive.html?submit" data-ajax="false">Non-Adaptive Game</a></li>
+					<li><a href="hybrid-adaptive.html?submit" data-ajax="false">Hybrid-Adaptive Game</a></li>
 				</ul>
 			</div><!-- /panel -->
 			<div data-role="popup" id="gameover" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">

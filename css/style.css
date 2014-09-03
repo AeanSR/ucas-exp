@@ -74,11 +74,15 @@ height:100%;
 	width: 450px;
 	height: 340px;
 }
-
-.step-score{
+.middle-text{
+	text-align: center;
+	font-size: 30px;
+}
+.middle-text-large{
 	text-align: center;
 	font-size: 50px;
 }
+
 #SubmitBoard{
 	height: 100%
 }
