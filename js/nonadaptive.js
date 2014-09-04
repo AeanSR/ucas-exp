@@ -5,6 +5,7 @@ function NAGameManager(bottles,is_test) {
 	this.bottle_list = []
 	this.result = {};
 	this.historys = []
+	this.wrong = []
 	this.popupClosed = true
 	this.create()
 }
@@ -25,7 +26,9 @@ NAGameManager.prototype.create = function() {
 		_this.createMouse()
 	});
 	$("#button_submit").click(function(event) {
-		_this.gameOver(_this.testMice())
+		_this.testMice()
+		_this.submitAnswer()
+		//_this.gameOver(_this.testMice())
 	});
 	// Initialize bottles container
 	// Init data
@@ -120,7 +123,6 @@ NAGameManager.prototype.addBottles = function(bottle_list) {
 		.appendTo($("#bottles-container"))
 		.click(function(event){
 			bottle_dom = $(this)
-			console.log('click')
 			if(bottle_dom.attr('select')=='true'){
 				bottle_dom.attr('select','false')
 				bottle_dom.css('background-color','')
@@ -146,7 +148,6 @@ NAGameManager.prototype.addBottleToMouse = function(bottle_id, mouse) {
 		_this.result[mouse].push(bottle_id)
 	}
 	console.log("#mice-container #"  + mouse + " p")
-	console.log(_this.result[mouse].length)
 	$("#mice-container #"  + mouse + " p").text(_this.result[mouse].length)
 }
 
@@ -216,31 +217,51 @@ NAGameManager.prototype.testMice = function() {
 		}
 		this.tested[poison] = b
 	}
-	console.log(this.tested)
 	// Failed if two bottles are same.
-	unique = []
+	this.invert_list ={}
 	for(var bottle in this.tested){
-		if($.inArray(this.tested[bottle],unique)==-1){
-			unique.push(this.tested[bottle])
-		}
-		else{
-			return false
-		}
+		var m = this.tested[bottle]
+		if(this.invert_list[m]==undefined) this.invert_list[m] = []
+		this.invert_list[m].push(bottle)
 	}
-	return true
-
 
 }
-NAGameManager.prototype.gameOver = function(isWin) {
+NAGameManager.prototype.submitAnswer = function() {
+	var same = -1
+	for(var i in this.invert_list)
+	{
+		// Find two same
+		if(this.invert_list[i].length>1){
+			same = i
+			break
+		}
+	}
+
+	if(same!=-1){
+		// Should let the player fail
+		var dead_list = this.getMouse(same)
+		this.submitPopup(dead_list, this.invert_list[same], false)
+	}
+	else{
+		do{
+			var i = Math.ceil(Math.random()*this.bottles)
+			var m = this.tested[i]
+			var dead_list = this.getMouse(m)
+		}while(dead_list.length==0||dead_list.length==this.mice)
+		this.submitPopup(dead_list, [i], true)
+	}
+}
+NAGameManager.prototype.gameOver = function(isWin,u_bottle,c_bottle) {
 	this.is_test?
 	newhref = 'non-adaptive.html':
 	newhref = 'non-adaptive.html?submit'
+	$("#gameover-result").text("The poisoned bottle is " + u_bottle + ", your answer is bottle " + c_bottle)
 	if(isWin){
 		$("#gameover h1").text("Great!")
 		$("#gameover #gameover-notice").text("You have passed the game successfully with " + this.mice + " mice!")
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
-		$("#gameover #gameover-content").text("The result has been submitted to the server. ")
+		$("#gameover #gameover-content").text("The result will be submitted to the server. ")
 		this.is_test?
 		$("#gameover .ui-btn").text("Retry"):
 		$("#gameover .ui-btn").text("Continue")
@@ -248,7 +269,7 @@ NAGameManager.prototype.gameOver = function(isWin) {
 		$("#gameover .ui-btn").click(function() {
 			location.href = newhref
 		})
-		this.Popup()
+		this.Popup("#gameover")
 	}
 	else{
 		$("#gameover h1").text("Sorry!")
@@ -261,35 +282,58 @@ NAGameManager.prototype.gameOver = function(isWin) {
 			location.href = newhref
 		})
 		this.historys.push('GameOver:lose')
-		this.Popup()
-	}
-	for(var bottle in this.tested){
-		html = '<tr><th>' + bottle + '</th><td>'
-		list = this.getMouse(this.tested[bottle])
-		for(var i in list){
-			if(list[i])
-			html += i + ' '
-		}
-		html += '</td></tr>'
-		$("#result tbody").append(html)
+		this.Popup("#gameover")
 	}
 }
-NAGameManager.prototype.Popup = function() {
+NAGameManager.prototype.submitPopup = function(dead_list, bottles,isWin) {
+	_this = this
+	if(dead_list.length>0){
+		$("#dead-mouse").text(dead_list.toString())
+	}
+	else{
+		$("#dead-mouse").text("None")
+	}
+	$("#submit-popup .ui-btn").click(function(event) {
+		var u_bottle = $("#input-bottle").val()
+		if(u_bottle!=""){
+			$("#submit-popup").popup("close")
+			if(isWin){
+				isCorrect =  u_bottle==bottles[0]
+				_this.gameOver(isCorrect,u_bottle, bottles[0])
+			}
+			else{
+				u_bottle ==bottles[0]?_this.gameOver(false,u_bottle,bottles[1]):_this.gameOver(false,u_bottle,bottles[0])
+			}
+
+		}
+
+	});
+	this.Popup("#submit-popup")
+}
+NAGameManager.prototype.Popup = function(selector) {
+	console.log(selector)
 	_this = this
 		if(_this.popupClosed)
-		{
-			$("#gameover").popup("open",{x:window.width/2,y:0})
+		{	
+			_this.popupClosed =false
+			$(selector).popup({
+				afterclose:function(){
+					_this.popupClosed = true
+				}
+			})
+			.popup("open")
 		}
 		else{
-			setTimeout(function(){_this.Popup(_this)}, 500)
+			setTimeout(function(){_this.Popup(selector)}, 500)
 			return		
 		}
 }
 NAGameManager.prototype.getMouse = function(b) {
-	deadMouse = {}
-	console.log(b)
+	deadMouse = []
 	for(var mouse=1;mouse<=this.mice;mouse++){
-		deadMouse[mouse] = b % 2
+		if(b % 2 ==1){
+			deadMouse.push(mouse)
+		}
 		b = Math.floor(b/2)
 	}
 	return deadMouse

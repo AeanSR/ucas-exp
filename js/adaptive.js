@@ -105,7 +105,7 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 			console.log('selected')
 			$(ui.selected).draggable("enable")
 			$(ui.selected).attr("select", true);
-			$(ui.selected).css("background-color", "grey");
+			$(ui.selected).css("background-color", "#356799");
 		}
 	});
 	// TODO mobile axis
@@ -156,7 +156,7 @@ GameManager.prototype.addToBottles = function(bottle_list, bottles) {
 			} else {
 				$(this).attr("select", true);
 				$(this).draggable("enable")
-				$(this).css("background-color", "grey");
+				$(this).css("background-color", "#356799");
 			}
 		})
 		.draggable({
@@ -255,7 +255,7 @@ GameManager.prototype.UpdateBottles = function(bottles) {
 
 GameManager.prototype.UsedBottles = function(bottles) {
 	target = $('#bottles-container #' + bottles.split('-')[1])
-	target.css("background-color", "grey")
+	target.css("background-color", "#356799")
 	target.unbind()
 	target.attr("tested",true)
 	//this.bottles = this.bottles - 

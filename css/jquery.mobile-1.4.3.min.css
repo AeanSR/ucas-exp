@@ -4106,13 +4106,13 @@ button[disabled],
 }
 html .ui-bar-a,html .ui-page-theme-a .ui-bar-inherit,html .ui-bar-a .ui-bar-inherit,html .ui-body-a .ui-bar-inherit,html body .ui-group-theme-a .ui-bar-inherit{background:#2c3e50;border-color:#2c3e50;color:#fff;font-weight:bold}
 html .ui-bar-a{border-width:1px;border-style:solid}
-html .ui-overlay-a,html .ui-page-theme-a,html .ui-page-theme-a .ui-panel-wrapper{background:#f9f9f9;border-color:#bbb;color:#333}
+html .ui-overlay-a,html .ui-page-theme-a,html .ui-page-theme-a .ui-panel-wrapper{background:#3A7FA5;border-color:#bbb;color:#FFF}
 html .ui-body-a,html .ui-page-theme-a .ui-body-inherit,html .ui-bar-a .ui-body-inherit,html .ui-body-a .ui-body-inherit,html body .ui-group-theme-a .ui-body-inherit,html .ui-panel-page-container-a{background:#fff;border-color:#2c3e50;color:#333}
 html .ui-body-a{border-width:1px;border-style:solid}
-html .ui-page-theme-a a,html .ui-bar-a a,html .ui-body-a a,html body .ui-group-theme-a a{color:#4e6d8d;font-weight:bold}
-html .ui-page-theme-a a:visited,html .ui-bar-a a:visited,html .ui-body-a a:visited,html body .ui-group-theme-a a:visited{color:#4e6d8d}
-html .ui-page-theme-a a:hover,html .ui-bar-a a:hover,html .ui-body-a a:hover,html body .ui-group-theme-a a:hover{color:#4e6d8d}
-html .ui-page-theme-a a:active,html .ui-bar-a a:active,html .ui-body-a a:active,html body .ui-group-theme-a a:active{color:#4e6d8d}
+html .ui-page-theme-a a,html .ui-bar-a a,html .ui-body-a a,html body .ui-group-theme-a a{color:#61AEFF;font-weight:bold}
+html .ui-page-theme-a a:visited,html .ui-bar-a a:visited,html .ui-body-a a:visited,html body .ui-group-theme-a a:visited{color:#012F5F}
+html .ui-page-theme-a a:hover,html .ui-bar-a a:hover,html .ui-body-a a:hover,html body .ui-group-theme-a a:hover{color:#61AEFF}
+html .ui-page-theme-a a:active,html .ui-bar-a a:active,html .ui-body-a a:active,html body .ui-group-theme-a a:active{color:#61AEFF}
 html .ui-page-theme-a .ui-btn,html .ui-bar-a .ui-btn,html .ui-body-a .ui-btn,html body .ui-group-theme-a .ui-btn,html body .ui-btn.ui-btn-a,html .ui-page-theme-a .ui-btn:visited,html .ui-bar-a .ui-btn:visited,html .ui-body-a .ui-btn:visited,html body .ui-group-theme-a .ui-btn:visited,html body .ui-btn.ui-btn-a:visited{background:#2c3e50;border-color:#2c3e50;color:#fff}
 html .ui-page-theme-a .ui-btn:hover,html .ui-bar-a .ui-btn:hover,html .ui-body-a .ui-btn:hover,html body .ui-group-theme-a .ui-btn:hover,html body .ui-btn.ui-btn-a:hover{background:#4e6d8d;border-color:#4e6d8d;color:#fff}
 html .ui-page-theme-a .ui-btn:active,html .ui-bar-a .ui-btn:active,html .ui-body-a .ui-btn:active,html body .ui-group-theme-a .ui-btn:active,html body .ui-btn.ui-btn-a:active{background:#4e6d8d;border-color:#4e6d8d;color:#fff}
