@@ -116,18 +116,18 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 		_this.mouse_move = true
 	});
 	$("#bottles-container #" + bottles_id).click(function(event) {
-		console.log('bottles ' + this.id + ' has been clicked')
-		_this.popupClosed = false
 		// In case of firefox 
 		if(!_this.mouse_move){
+			console.log('bottles ' + this.id + ' has been clicked')
+			_this.popupClosed = false
 
-			$("#bottles-" + this.id).css('visibility', 'visible')
-			$("#bottles-" + this.id).popup("open", {
-			x: event.pageX + 200,
-			y: event.pageY + 150
-		});
+				$("#bottles-" + this.id).css('visibility', 'visible')
+				$("#bottles-" + this.id).popup("open", {
+				x: event.pageX + 200,
+				y: event.pageY + 150
+			});
+
 		}
-
 	});
 	$("#bottles-container #" + bottles_id).droppable({
 		drop: function() {
@@ -361,7 +361,7 @@ GameManager.prototype.isGameOver = function() {
 		$("#gameover .ui-btn").click(function() {
 			location.href = newhref
 		})
-		this.Popup()
+		this.Popup("#gameover")
 		return
 	}
 	if (flag) {
@@ -377,24 +377,32 @@ GameManager.prototype.isGameOver = function() {
 			location.href = newhref
 		})
 		this.historys.push('GameOver')
-		this.Popup()
+		this.Popup("#gameover")
 
 	}
 
 }
-GameManager.prototype.Popup = function() {
+GameManager.prototype.Popup = function(selector) {
+	console.log(selector)
 	_this = this
 		if(_this.popupClosed)
-		{
-			console.log('popup')
-			$("#gameover").popup("open")
+		{	
+			_this.popupClosed =false
+			$(selector).popup({
+				afteropen:function(){
+					_this.popupClosed = false
+				},
+				afterclose:function(){
+					_this.popupClosed = true
+				}
+			})
+			.popup("open")
 		}
 		else{
-			setTimeout(function(){_this.Popup(_this)}, 500)
+			setTimeout(function(){_this.Popup(selector)}, 500)
 			return		
 		}
 }
-
 function AdaptiveAdversary() {
 	this.mat=[]
     	for(var i=0;i<101;++i)this.mat[i]=[0,0,0]
