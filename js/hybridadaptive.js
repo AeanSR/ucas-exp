@@ -8,7 +8,9 @@ function HAGameManager(bottles, allow_overlap,is_test) {
 	this.popupClosed = true
 	this.allow_overlap = allow_overlap
 	this.weeks = 0
+	this.is_win = false
 	this.aa = new AdaptiveAdversary(bottles,2)
+	this.c_bottle = this.aa.filter(this.aa.rest([],[],[]))
 	this.create()
 }
 HAGameManager.prototype.create = function() {
@@ -26,20 +28,49 @@ HAGameManager.prototype.create = function() {
 	_this.createMouse()
 	_this.createMouse()
 
-	$("#button_submit").click(function(event) {
+	$("#button_nextweek").click(function(event) {
+		_this.appendHistory()
 		res = _this.judgeOverlap()
 		Overlaps = res[0]
 		overlaping = res[1]
 		mouse1 = res[2]
 		mouse2 = res[3]
 		_this.nextWeek(mouse1, mouse2 ,overlaping)
-
-		if(_this.aa.bottles==1||_this.aa.mice ==0){
-			is_win=_this.aa.bottles==1
-			_this.isGameOver(is_win)
+		_this.c_bottle = _this.aa.filter(_this.aa.rest([],[],[]))
+		if(_this.c_bottle.length==1)
+			_this.is_win = true
+		if(_this.aa.mice ==0){
+			_this.Popup("#submit-popup")
 		}
 
 	});
+
+	$("#button_history").click(function(event) {
+		_this.Popup("#history")
+	})
+	$("#button_submit").click(function(event) {
+		_this.Popup("#submit-popup")
+	})
+	$("#submit-popup .ui-btn").click(function(event) {
+		var u_bottle = $("#input-bottle").val()
+		if(u_bottle!=""){
+			$("#submit-popup").popup("close")
+			console.log("a", _this.is_Win)
+			if(_this.is_win){
+				isCorrect =  u_bottle== _this.c_bottle[0]
+				_this.isGameOver(isCorrect,u_bottle, _this.c_bottle[0])
+			}
+			else{
+				u_bottle ==_this.c_bottle[0]?
+				_this.isGameOver(false,u_bottle,_this.c_bottle[1]):
+				_this.isGameOver(false,u_bottle,_this.c_bottle[0])
+			}
+
+		}
+	});
+	$("#button_submit").click(function(event) {
+		_this.Popup("#submit_popup")
+	})
 	//preload image
 	new Image().src= 'imgs/mouse-dead.png'
 	// Initialize bottles container
@@ -49,8 +80,23 @@ HAGameManager.prototype.create = function() {
 	// Create bottles
 	_this.addBottles(_this.bottle_list)
 }
-
-
+HAGameManager.prototype.appendHistory = function() {
+	var html = ""
+	for(var i=1;i<=this.mice;i++){
+		if(i==1)html += "<tr><th rowspan='2'>" +this.weeks + "</th>" 
+		else html += "<tr>" 
+		html += "<td>" + i +"</td>"
+		var tmp = "<td>"
+		for(var j in this.result[i]){
+			tmp += this.result[i][j] + "     "
+		}
+		tmp += "</td>"
+		html += tmp
+		html += "</tr>"
+	}
+	
+	$("#history-table tbody").append(html)
+}
 HAGameManager.prototype.createMouse = function() {
 	_this = this
 	_this.mice += 1
@@ -106,18 +152,18 @@ HAGameManager.prototype.addBottles = function(bottle_list) {
 			start:function(event,ui){
 				bottle_dom = $(this)
 				bottle_dom.attr('select','true')
-				bottle_dom.css('background-color','#356799')			}
+				bottle_dom.find('img').attr("src","imgs/bottle-select.jpg")		}
 		})
 		.appendTo($("#bottles-container"))
 		.click(function(event){
 			bottle_dom = $(this)
 			if(bottle_dom.attr('select')=='true'){
 				bottle_dom.attr('select','false')
-				bottle_dom.css('background-color','')
+				bottle_dom.find('img').attr("src","imgs/bottle.png")
 			}
 			else{
 				bottle_dom.attr('select','true')
-				bottle_dom.css('background-color','#356799')
+				bottle_dom.find('img').attr("src","imgs/bottle-select.jpg")
 			}
 		})
 
@@ -150,7 +196,7 @@ HAGameManager.prototype.clearAllselect = function() {
 	selected_doms = $("#bottles-container .bottle[select=true]")
 	for(var i=0;i<selected_doms.length;i++){
 		$(selected_doms[i]).attr('select','false')
-		$(selected_doms[i]).css('background-color','')
+		$(selected_doms[i]).find('img').attr("src","imgs/bottle.png")
 	}
 }
 HAGameManager.prototype.killMouse = function(mouse) {
@@ -194,7 +240,7 @@ HAGameManager.prototype.showMousePopup = function(mouse,event) {
 		y: event.pageY + 150
 		});
 }
-
+// Deprecated
 HAGameManager.prototype.updateTestedBottle = function(updated_list) {
 	for(var i in updated_list){
 		$("#bottles-container #" + i )
@@ -215,7 +261,7 @@ HAGameManager.prototype.nextWeek = function(mouse1,mouse2,overlaps) {
 		this.killMouse(1)
 		this.killMouse(2)
 	}
-	this.updateTestedBottle(this.aa.tested_bottle)
+	//this.updateTestedBottle(this.aa.tested_bottle)
 	for(var i=1;i<=this.mice;i++){
 		n = this.result[i].length
 		for(var j=0;j<n;j++){
@@ -260,10 +306,12 @@ HAGameManager.prototype.judgeOverlap = function() {
 	return [overlaps,overlapping,mouse1, mouse2]
 }
 
-HAGameManager.prototype.isGameOver = function(isWin) {
+HAGameManager.prototype.isGameOver = function(isWin,u_bottle,c_bottle) {
+	console.log(isWin)
 	this.is_test?
 	newhref = 'hybrid-adaptive.html':
 	newhref = 'hybrid-adaptive.html?submit'
+	$("#gameover-result").text("The poisoned bottle is " + c_bottle + ", your answer is bottle " + u_bottle)
 	if(isWin){
 		$("#gameover h1").text("Great!")
 		$("#gameover #gameover-notice").text("You have passed the game successfully with " + this.weeks + " weeks!")
@@ -277,30 +325,42 @@ HAGameManager.prototype.isGameOver = function(isWin) {
 		$("#gameover .ui-btn").click(function() {
 			location.href = newhref
 		})
-		this.Popup()
+		this.Popup("#gameover")
 	}
 	else{
 		$("#gameover h1").text("Sorry!")
 		$("#gameover #gameover-notice").text("You didn't find the poison!")
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
-		$("#gameover #gameover-content").text("Please try again, this time won't be submitted.")
+		$("#gameover #gameover-content").text("The result has been submitted to the server. ")
+		this.is_test?
+		$("#gameover .ui-btn").text("Retry"):
+		$("#gameover .ui-btn").text("Continue")
 		$("#gameover .ui-btn").text("Retry")
 		$("#gameover .ui-btn").click(function() {
 			location.href = newhref
 		})
 		this.historys.push('GameOver:lose')
-		this.Popup()
+		this.Popup("#gameover")
 	}
 }
-HAGameManager.prototype.Popup = function() {
+HAGameManager.prototype.Popup = function(selector) {
 	_this = this
 		if(_this.popupClosed)
 		{
-			$("#gameover").popup("open")
+			$(selector).popup({
+				afteropen:function(){
+					_this.popupClosed = false
+				},				
+				afterclose:function(){
+					_this.popupClosed = true
+				}
+			})
+			.popup("open")
+
 		}
 		else{
-			setTimeout(function(){_this.Popup(_this)}, 500)
+			setTimeout(function(){_this.Popup(selector)}, 500)
 			return		
 		}
 }
@@ -452,8 +512,8 @@ AdaptiveAdversary.prototype.humanDecide = function(bottles,mice){
 
 $(function() {
 	$("body").iealert();
-	if (location.href.search('#') != -1) {
-		location.href = 'hybrid-adaptive.html'
+	if ((index = location.href.search('#')) != -1) {
+		location.href = location.href.substr(0,index)
 	}
 	if (location.href.search('/?submit') != -1) {
 		GM = new HAGameManager(32,1,false);

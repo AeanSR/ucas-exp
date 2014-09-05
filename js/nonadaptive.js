@@ -118,18 +118,21 @@ NAGameManager.prototype.addBottles = function(bottle_list) {
 			start:function(event,ui){
 				bottle_dom = $(this)
 				bottle_dom.attr('select','true')
-				bottle_dom.css('background-color','#356799')			}
+				bottle_dom.find('img').attr("src","imgs/bottle-select.jpg")
+
+				//bottle_dom.css('background-color','#356799')			
+			}
 		})
 		.appendTo($("#bottles-container"))
 		.click(function(event){
 			bottle_dom = $(this)
 			if(bottle_dom.attr('select')=='true'){
 				bottle_dom.attr('select','false')
-				bottle_dom.css('background-color','')
+				bottle_dom.find('img').attr("src","imgs/bottle.png")
 			}
 			else{
 				bottle_dom.attr('select','true')
-				bottle_dom.css('background-color','#356799')
+				bottle_dom.find('img').attr("src","imgs/bottle-select.jpg")
 			}
 		})
 
@@ -163,7 +166,7 @@ NAGameManager.prototype.clearAllselect = function() {
 	selected_doms = $("#bottles-container .bottle[select=true]")
 	for(var i=0;i<selected_doms.length;i++){
 		$(selected_doms[i]).attr('select','false')
-		$(selected_doms[i]).css('background-color','')
+		$(selected_doms[i]).find('img').attr("src","imgs/bottle.png")
 	}
 }
 
@@ -255,7 +258,7 @@ NAGameManager.prototype.gameOver = function(isWin,u_bottle,c_bottle) {
 	this.is_test?
 	newhref = 'non-adaptive.html':
 	newhref = 'non-adaptive.html?submit'
-	$("#gameover-result").text("The poisoned bottle is " + u_bottle + ", your answer is bottle " + c_bottle)
+	$("#gameover-result").text("The poisoned bottle is " + c_bottle + ", your answer is bottle " + u_bottle)
 	if(isWin){
 		$("#gameover h1").text("Great!")
 		$("#gameover #gameover-notice").text("You have passed the game successfully with " + this.mice + " mice!")
@@ -276,8 +279,10 @@ NAGameManager.prototype.gameOver = function(isWin,u_bottle,c_bottle) {
 		$("#gameover #gameover-notice").text("You can't find the poison!")
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
-		$("#gameover #gameover-content").text("Please try again, this time won't be submitted.")
-		$("#gameover .ui-btn").text("Retry")
+		$("#gameover #gameover-content").text("The result has been submitted to the server. ")
+		this.is_test?
+		$("#gameover .ui-btn").text("Retry"):
+		$("#gameover .ui-btn").text("Continue")
 		$("#gameover .ui-btn").click(function() {
 			location.href = newhref
 		})
@@ -317,6 +322,9 @@ NAGameManager.prototype.Popup = function(selector) {
 		{	
 			_this.popupClosed =false
 			$(selector).popup({
+				afteropen:function(){
+					_this.popupClosed = false
+				},
 				afterclose:function(){
 					_this.popupClosed = true
 				}
@@ -343,8 +351,8 @@ NAGameManager.prototype.getMouse = function(b) {
 
 $(function() {
 	$("body").iealert();
-	if (location.href.search('#') != -1) {
-		location.href = 'non-adaptive.html'
+	if ((index = location.href.search('#')) != -1) {
+		location.href = location.href.substr(0,index)
 	}
 	if (location.href.search('/?submit') != -1) {
 		GM = new NAGameManager(16, false);

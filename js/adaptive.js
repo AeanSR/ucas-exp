@@ -369,8 +369,10 @@ GameManager.prototype.isGameOver = function() {
 		$("#gameover #gameover-notice").text("All mice have died!")
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
-		$("#gameover #gameover-content").text("Please try again, this time won't be submitted.")
-		$("#gameover .ui-btn").text("Retry")
+		$("#gameover #gameover-content").text("The result has been submitted to the server. ")
+		this.is_test?
+		$("#gameover .ui-btn").text("Retry"):
+		$("#gameover .ui-btn").text("Continue")
 		$("#gameover .ui-btn").click(function() {
 			location.href = newhref
 		})
@@ -433,8 +435,8 @@ AdaptiveAdversary.prototype.humanDecide = function(bottles,mice){
 
 $(function() {
 	$("body").iealert();
-	if (location.href.search('#') != -1) {
-		location.href = 'adaptive.html'
+	if ((index = location.href.search('#')) != -1) {
+		location.href = location.href.substr(0,index)
 	}
 	if (location.href.search('/?submit') != -1) {
 		GM = new GameManager(2, 32, 1,false);
