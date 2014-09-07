@@ -7,19 +7,12 @@ function NAGameManager(bottles,is_test) {
 	this.historys = []
 	this.wrong = []
 	this.popupClosed = true
+	this.Ajax = new modAjax(2,this)
 	this.create()
 }
 NAGameManager.prototype.create = function() {
 	var _this = this
-	if(this.is_test){
-		$('#game-mode').text("Test Mode")
-		$('#game-times').text("Unlimited")
-		}
-	else{
-		// TODO ajax here
-		$('#game-mode').text("Submit Mode")
-		$('#game-times').text("3")
-	}
+	this.Ajax.getinfo(this.getSuccessHandler, this.getErrorHandler)
 	// Create mice.
 	_this.createMouse()
 	$("#button_add").click(function(event) {
@@ -36,7 +29,53 @@ NAGameManager.prototype.create = function() {
 	// Create bottles
 	_this.addBottles(_this.bottle_list)
 }
-
+NAGameManager.prototype.getSuccessHandler = function(data) {
+	console.log(data)
+	name = data["name"]
+	GM.Ajax.gameLoop = data["curLoop"]
+	if(GM.Ajax.gameLoop>2 && !GM.is_test) {
+		$("#error-notice").text("Sorry, your challenges have been used up.But you can still play the test mode.")
+		$("#error-popup").popup("open")
+	}
+	$("#login_info").text(name)
+	$("#best-score").text(data["bestScore"])
+	GM.setPanel()
+}
+NAGameManager.prototype.getErrorHandler = function() {
+	if(!GM.is_test){
+		$("#error-popup").popup("open")
+	}
+	else{
+		GM.setPanel()
+	}
+}
+NAGameManager.prototype.putSuccessHandler = function(data) {
+	if(data==true){
+		$("#gameover .ui-btn").text("Continue")
+	}
+	else{
+		$("#gameover .ui-btn").text("Retry(Submit Failed)")
+	}
+	$("#gameover .ui-btn").click(function() {
+		location.href = newhref
+	})
+}
+NAGameManager.prototype.putErrorHandler = function() {
+	$("#gameover .ui-btn").text("Retry(Submit Failed)")
+	$("#gameover .ui-btn").click(function() {
+		location.href = newhref
+	})
+}
+NAGameManager.prototype.setPanel = function() {
+	if(this.is_test){
+		$('#game-mode').text("Test Mode")
+		$('#game-times').text("Unlimited")
+		}
+	else{
+		$('#game-mode').text("Submit Mode")
+		$('#game-times').text(3-GM.Ajax.gameLoop)
+	}
+}
 
 NAGameManager.prototype.createMouse = function() {
 	_this = this
@@ -206,10 +245,16 @@ NAGameManager.prototype.showMousePopup = function(mouse,event) {
 		y: event.pageY + 150
 		});
 }
-
+NAGameManager.prototype.toJSON = function() {
+	var history = ""
+	for(var mouse=1;mouse<=this.mice;mouse++){
+		history = history + mouse + ":" + this.result[mouse].toString() + ";"
+	}
+	return history
+}
 NAGameManager.prototype.testMice = function() {
 	this.tested = {}
-	this.historys.push(this.result)
+	this.historys.push(this.toJSON(this.result))
 	for(var poison=1;poison<=this.bottles;poison++){
 		b = 0
 		for(var mouse=1;mouse<=this.mice;mouse++)
@@ -265,14 +310,21 @@ NAGameManager.prototype.gameOver = function(isWin,u_bottle,c_bottle) {
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
 		$("#gameover #gameover-content").text("The result will be submitted to the server. ")
-		this.is_test?
-		$("#gameover .ui-btn").text("Retry"):
-		$("#gameover .ui-btn").text("Continue")
+		if(this.is_test){
+			$("#gameover .ui-btn").text("Retry")
+			$("#gameover .ui-btn").click(function() {
+				location.href = newhref
+			})
+		}
+		else{
+			$("#gameover .ui-btn").text("Uploading...")
+			this.Ajax.putinfo(this.mice,this.historys.toString(),
+				this.putSuccessHandler,this.putErrorHandler)
+		}
 		this.historys.push('GameOver')
-		$("#gameover .ui-btn").click(function() {
-			location.href = newhref
-		})
 		this.Popup("#gameover")
+		this.Ajax.putinfo(this.mice,this.historys.toString(),
+			this.putSuccessHandler,this.putErrorHandler)
 	}
 	else{
 		$("#gameover h1").text("Sorry!")
@@ -280,12 +332,17 @@ NAGameManager.prototype.gameOver = function(isWin,u_bottle,c_bottle) {
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
 		$("#gameover #gameover-content").text("The result has been submitted to the server. ")
-		this.is_test?
-		$("#gameover .ui-btn").text("Retry"):
-		$("#gameover .ui-btn").text("Continue")
-		$("#gameover .ui-btn").click(function() {
-			location.href = newhref
-		})
+		if(this.is_test){
+			$("#gameover .ui-btn").text("Retry")
+			$("#gameover .ui-btn").click(function() {
+				location.href = newhref
+			})
+		}
+		else{
+			$("#gameover .ui-btn").text("Uploading...")
+			this.Ajax.putinfo(-1,this.historys.toString(),
+				this.putSuccessHandler,this.putErrorHandler)
+		}
 		this.historys.push('GameOver:lose')
 		this.Popup("#gameover")
 	}
@@ -349,7 +406,7 @@ NAGameManager.prototype.getMouse = function(b) {
 
 
 
-$(function() {
+$( document ).on( "pagecreate", "#main-page", function() {
 	$("body").iealert();
 	if ((index = location.href.search('#')) != -1) {
 		location.href = location.href.substr(0,index)

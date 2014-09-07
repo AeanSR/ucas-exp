@@ -12,20 +12,13 @@ function GameManager(mice, bottles, poisons,is_test) {
 	this.submit_bottles = []
 	this.curDragList = []
 	this.popupClosed = true
+	this.Ajax = new modAjax(1,this)
 	this.create();
 
 };
 GameManager.prototype.create = function() {
 	var _this = this
-	if(this.is_test){
-		$('#game-mode').text("Test Mode")
-		$('#game-times').text("Unlimited")
-		}
-	else{
-		// TODO ajax here
-		$('#game-mode').text("Submit Mode")
-		$('#game-times').text("3")
-	}
+	this.Ajax.getinfo(this.getSuccessHandler, this.getErrorHandler)
 	//preload image
 	new Image().src= 'imgs/mouse-dead.png'
 	$(".submit").sortable()
@@ -59,11 +52,56 @@ GameManager.prototype.create = function() {
 	for (var i = 1; i <= this.bottles; i++) this.bottle_list.push(i)
 	this.addToBottles(this.bottle_list, this.curBottles)
 	this.curBottles += 1
-	this.createRandomPoison()
 	for (var i = 1; i <= this.mice; i++) this.mouse_list[i] = true
 	this.createMice(this.mouse_list)
 }
-
+GameManager.prototype.getSuccessHandler = function(data) {
+	console.log(data)
+	name = data["name"]
+	GM.Ajax.gameLoop = data["curLoop"]
+	if(GM.Ajax.gameLoop>2 && !GM.is_test) {
+		$("#error-notice").text("Sorry, your challenges have been used up.But you can still play the test mode.")
+		$("#error-popup").popup("open")
+	}
+	$("#login_info").text(name)
+	$("#best-score").text(data["bestScore"])
+	GM.setPanel()
+}
+GameManager.prototype.getErrorHandler = function() {
+	if(!GM.is_test){
+		$("#error-popup").popup("open")
+	}
+	else{
+		GM.setPanel()
+	}
+}
+GameManager.prototype.putSuccessHandler = function(data) {
+	if(data==true){
+		$("#gameover .ui-btn").text("Continue")
+	}
+	else{
+		$("#gameover .ui-btn").text("Retry(Submit Failed)")
+	}
+	$("#gameover .ui-btn").click(function() {
+		location.href = newhref
+	})
+}
+GameManager.prototype.putErrorHandler = function() {
+	$("#gameover .ui-btn").text("Retry(Submit Failed)")
+	$("#gameover .ui-btn").click(function() {
+		location.href = newhref
+	})
+}
+GameManager.prototype.setPanel = function() {
+	if(this.is_test){
+		$('#game-mode').text("Test Mode")
+		$('#game-times').text("Unlimited")
+		}
+	else{
+		$('#game-mode').text("Submit Mode")
+		$('#game-times').text(3-GM.Ajax.gameLoop)
+	}
+}
 GameManager.prototype.createRandomPoison = function() {
 	for (var i = 0; i < this.poisons; i++) {
 		poison = md5(Math.ceil(Math.random() * 100) + "This is a salt~~!@@!")
@@ -312,7 +350,6 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 					if (bottles_list[0] == this.submit_bottles[x]) flag = false
 				}
 				if (flag) {
-					$(".submit").append('<div class="bottle"><img src="imgs/bottle.png"><p>' + bottles_list[0] + '</p></div>')
 					$("#gameover .result").append("<p>" + bottles_list[0] + "</p>")
 					this.submit_bottles.push(bottles_list[0])
 				}
@@ -353,14 +390,20 @@ GameManager.prototype.isGameOver = function() {
 		$("#gameover #gameover-notice").text("You have passed the game successfully with " + this.steps + " steps!")
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
-		$("#gameover #gameover-content").text("The result has been submitted to the server. ")
-		this.is_test?
-		$("#gameover .ui-btn").text("Retry"):
-		$("#gameover .ui-btn").text("Continue")
+		$("#gameover #gameover-content").text("The result will be submitted to the server. ")
 		this.historys.push('GameOver')
-		$("#gameover .ui-btn").click(function() {
-			location.href = newhref
-		})
+		if(this.is_test){
+			$("#gameover .ui-btn").text("Retry")
+			$("#gameover .ui-btn").click(function() {
+				location.href = newhref
+			})
+		}
+		else{
+			$("#gameover .ui-btn").text("Uploading...")
+			this.Ajax.putinfo(this.steps,this.historys.toString(),
+				this.putSuccessHandler,this.putErrorHandler)
+		}
+
 		this.Popup("#gameover")
 		return
 	}
@@ -369,17 +412,22 @@ GameManager.prototype.isGameOver = function() {
 		$("#gameover #gameover-notice").text("All mice have died!")
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
-		$("#gameover #gameover-content").text("The result has been submitted to the server. ")
-		this.is_test?
-		$("#gameover .ui-btn").text("Retry"):
-		$("#gameover .ui-btn").text("Continue")
-		$("#gameover .ui-btn").click(function() {
-			location.href = newhref
-		})
+		$("#gameover #gameover-content").text("The result will be submitted to the server. ")
+		if(this.is_test){
+			$("#gameover .ui-btn").text("Retry")
+			$("#gameover .ui-btn").click(function() {
+				location.href = newhref
+			})
+		}
+		else{
+			$("#gameover .ui-btn").text("Uploading...")
+			this.Ajax.putinfo(-1,this.historys.toString(),
+				this.putSuccessHandler,this.putErrorHandler)
+		}
 		this.historys.push('GameOver')
-		this.Popup("#gameover")
-
+		this.Popup("#gameover")	
 	}
+	
 
 }
 GameManager.prototype.Popup = function(selector) {
