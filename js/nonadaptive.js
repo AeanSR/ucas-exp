@@ -5,7 +5,6 @@ function NAGameManager(bottles,is_test) {
 	this.bottle_list = []
 	this.result = {};
 	this.historys = {}
-	this.historys['results'] = []
 	this.wrong = []
 	this.popupClosed = true
 	this.Ajax = new modAjax(2,this)
