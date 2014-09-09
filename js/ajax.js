@@ -1,4 +1,4 @@
-document.domain = "ucas.com" 
+//document.domain = "ucas.com" 
 function modAjax(gameId,GameManager){
 	this.gameId = gameId
 	this.gameLoop = -1
