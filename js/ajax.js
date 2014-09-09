@@ -31,7 +31,7 @@ modAjax.prototype.putinfo = function(score, history,on_Success,on_Error) {
 		data:{"gameId":this.gameId,
 		"gameLoop":this.gameLoop,
 		"gameScore":score,
-		"gameHist":history
+		"gameHist":JSON.stringify(history)
 		},
 		dataType:"json",
 		xhrFields: {

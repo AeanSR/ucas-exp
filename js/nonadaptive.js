@@ -4,7 +4,8 @@ function NAGameManager(bottles,is_test) {
 	this.is_test = is_test
 	this.bottle_list = []
 	this.result = {};
-	this.historys = []
+	this.historys = {}
+	this.historys['results'] = []
 	this.wrong = []
 	this.popupClosed = true
 	this.Ajax = new modAjax(2,this)
@@ -254,7 +255,7 @@ NAGameManager.prototype.toJSON = function() {
 }
 NAGameManager.prototype.testMice = function() {
 	this.tested = {}
-	this.historys.push(this.toJSON(this.result))
+	this.historys['results'] = this.result
 	for(var poison=1;poison<=this.bottles;poison++){
 		b = 0
 		for(var mouse=1;mouse<=this.mice;mouse++)
@@ -303,6 +304,7 @@ NAGameManager.prototype.gameOver = function(isWin,u_bottle,c_bottle) {
 	this.is_test?
 	newhref = 'non-adaptive.html':
 	newhref = 'non-adaptive.html?submit'
+	this.historys['submit'] = {"user":u_bottle,"correct":c_bottle}
 	$("#gameover-result").text("The poisoned bottle is " + c_bottle + ", your answer is bottle " + u_bottle)
 	if(isWin){
 		$("#gameover h1").text("Great!")
@@ -318,13 +320,10 @@ NAGameManager.prototype.gameOver = function(isWin,u_bottle,c_bottle) {
 		}
 		else{
 			$("#gameover .ui-btn").text("Uploading...")
-			this.Ajax.putinfo(this.mice,this.historys.toString(),
+			this.Ajax.putinfo(this.mice,this.historys,
 				this.putSuccessHandler,this.putErrorHandler)
 		}
-		this.historys.push('GameOver')
 		this.Popup("#gameover")
-		this.Ajax.putinfo(this.mice,this.historys.toString(),
-			this.putSuccessHandler,this.putErrorHandler)
 	}
 	else{
 		$("#gameover h1").text("Sorry!")
@@ -340,10 +339,9 @@ NAGameManager.prototype.gameOver = function(isWin,u_bottle,c_bottle) {
 		}
 		else{
 			$("#gameover .ui-btn").text("Uploading...")
-			this.Ajax.putinfo(-1,this.historys.toString(),
+			this.Ajax.putinfo(-1,this.historys,
 				this.putSuccessHandler,this.putErrorHandler)
 		}
-		this.historys.push('GameOver:lose')
 		this.Popup("#gameover")
 	}
 }
@@ -406,10 +404,11 @@ NAGameManager.prototype.getMouse = function(b) {
 
 
 
-$( document ).on( "pagecreate", "#main-page", function() {
+$(function() {
 	$("body").iealert();
 	if ((index = location.href.search('#')) != -1) {
 		location.href = location.href.substr(0,index)
+		return
 	}
 	if (location.href.search('/?submit') != -1) {
 		GM = new NAGameManager(16, false);

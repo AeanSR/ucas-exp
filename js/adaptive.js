@@ -8,7 +8,8 @@ function GameManager(mice, bottles, poisons,is_test) {
 	this.mouse_list = {}
 	this.curBottles = 1
 	this.steps = 0
-	this.historys = []
+	this.historys = {}
+	this.historys['results'] = []
 	this.submit_bottles = []
 	this.curDragList = []
 	this.popupClosed = true
@@ -134,7 +135,8 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 		class: "bottle-popup"
 	})
 	.html('<div class="bottle-container"></div>')
-	popup.appendTo($.mobile.activePage).popup({"afterclose":function(){_this.popupClosed = true}})
+	var page = $(':mobile-pagecontainer').pagecontainer('getActivePage');
+	popup.appendTo(page).popup({"afterclose":function(){_this.popupClosed = true}})
 	this.sorts = $("#bottles-" + bottles_id + " .bottle-container").selectable({
 		handle: "#bottles-" + bottles_id + " .bottle-container",
 		filter: ".bottle",
@@ -341,7 +343,7 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 	this.steps += 1
 	gameModel = new AdaptiveAdversary()
 	console.log('testing ' , this.bottles, bottles_list.length, this.mice)
-	this.historys.push('Test bottles [' + bottles_list.toString() + '] to mouse ' + mouse)
+	this.historys['results'].push(bottles_list.toString() + 'to mouse ' + mouse)
 	$('#SubmitBoard #step-score').html(this.steps)
 	if(gameModel.computerDecide(this.bottles, bottles_list.length, this.mice)[0]){
 			if (bottles_list.length == 1) {
@@ -359,7 +361,6 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 			$("#mice-container #" + mouse)
 				.animate() //Animate here
 			.html('<img src="imgs/mouse-dead.png">')
-			this.historys.push('Mouse ' + mouse + ' die.')
 			this.isGameOver()
 			delete GameModel
 			this.bottles = bottles_list.length
@@ -391,7 +392,6 @@ GameManager.prototype.isGameOver = function() {
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
 		$("#gameover #gameover-content").text("The result will be submitted to the server. ")
-		this.historys.push('GameOver')
 		if(this.is_test){
 			$("#gameover .ui-btn").text("Retry")
 			$("#gameover .ui-btn").click(function() {
@@ -400,7 +400,7 @@ GameManager.prototype.isGameOver = function() {
 		}
 		else{
 			$("#gameover .ui-btn").text("Uploading...")
-			this.Ajax.putinfo(this.steps,this.historys.toString(),
+			this.Ajax.putinfo(this.steps,this.historys,
 				this.putSuccessHandler,this.putErrorHandler)
 		}
 
@@ -421,10 +421,9 @@ GameManager.prototype.isGameOver = function() {
 		}
 		else{
 			$("#gameover .ui-btn").text("Uploading...")
-			this.Ajax.putinfo(-1,this.historys.toString(),
+			this.Ajax.putinfo(-1,this.historys,
 				this.putSuccessHandler,this.putErrorHandler)
 		}
-		this.historys.push('GameOver')
 		this.Popup("#gameover")	
 	}
 	
@@ -488,18 +487,16 @@ AdaptiveAdversary.prototype.humanDecide = function(bottles,mice){
     		this.mat[bottles][mice]=min+1
     		return min+1;
     }
-
 $(function() {
-	$("body").iealert();
 	if ((index = location.href.search('#')) != -1) {
 		location.href = location.href.substr(0,index)
+		return
 	}
+	$("body").iealert();
 	if (location.href.search('/?submit') != -1) {
 		GM = new GameManager(2, 32, 1,false);
 	}
 	else{
 		GM = new GameManager(2, 16, 1,true);
 	}
-	
-
 });

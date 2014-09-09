@@ -4,7 +4,8 @@ function HAGameManager(bottles, allow_overlap,is_test) {
 	this.is_test = is_test
 	this.bottle_list = []
 	this.result = {};
-	this.historys = []
+	this.historys = {}
+	this.historys['results'] = []
 	this.popupClosed = true
 	this.allow_overlap = allow_overlap
 	this.weeks = 0
@@ -22,6 +23,9 @@ HAGameManager.prototype.create = function() {
 	_this.createMouse()
 
 	$("#button_nextweek").click(function(event) {
+		copied = {}
+		$.extend(true,copied,_this.result)
+		_this.historys['results'].push(copied)
 		_this.appendHistory()
 		res = _this.judgeOverlap()
 		Overlaps = res[0]
@@ -348,7 +352,7 @@ HAGameManager.prototype.judgeOverlap = function() {
 }
 
 HAGameManager.prototype.isGameOver = function(isWin,u_bottle,c_bottle) {
-	console.log(isWin)
+	this.historys['submit'] = {"user":u_bottle,"correct":c_bottle}
 	this.is_test?
 	newhref = 'hybrid-adaptive.html':
 	newhref = 'hybrid-adaptive.html?submit'
@@ -367,10 +371,9 @@ HAGameManager.prototype.isGameOver = function(isWin,u_bottle,c_bottle) {
 		}
 		else{
 			$("#gameover .ui-btn").text("Uploading...")
-			this.Ajax.putinfo(this.weeks,this.historys.toString(),
+			this.Ajax.putinfo(this.weeks,this.historys,
 				this.putSuccessHandler,this.putErrorHandler)
 		}
-		this.historys.push('GameOver:win')
 		this.Popup("#gameover")
 	}
 	else{
@@ -387,10 +390,9 @@ HAGameManager.prototype.isGameOver = function(isWin,u_bottle,c_bottle) {
 		}
 		else{
 			$("#gameover .ui-btn").text("Uploading...")
-			this.Ajax.putinfo(-1,this.historys.toString(),
+			this.Ajax.putinfo(-1,this.historys,
 				this.putSuccessHandler,this.putErrorHandler)
 		}
-		this.historys.push('GameOver:lose')
 		this.Popup("#gameover")
 	}
 }
@@ -560,10 +562,11 @@ AdaptiveAdversary.prototype.humanDecide = function(bottles,mice){
     		return min+1;
     }
 
-$( document ).on( "pagecreate", "#main-page", function() {
+$(function() {
 	$("body").iealert();
 	if ((index = location.href.search('#')) != -1) {
 		location.href = location.href.substr(0,index)
+		return
 	}
 	if (location.href.search('/?submit') != -1) {
 		GM = new HAGameManager(32,1,false);
