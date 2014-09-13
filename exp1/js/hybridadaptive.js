@@ -91,7 +91,7 @@ HAGameManager.prototype.getSuccessHandler = function(data) {
 }
 HAGameManager.prototype.getErrorHandler = function() {
 	if(!GM.is_test){
-		$("#error-popup").popup("open")
+		setTimeout(function(){$("#error-popup").popup("open")},1000)
 	}
 	else{
 		GM.setPanel()
