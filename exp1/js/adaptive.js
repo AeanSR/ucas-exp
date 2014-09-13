@@ -343,7 +343,7 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 	this.steps += 1
 	gameModel = new AdaptiveAdversary()
 	console.log('testing ' , this.bottles, bottles_list.length, this.mice)
-	this.historys['results'].push(bottles_list.toString() + 'to mouse ' + mouse)
+	this.historys['results'].push(bottles_list.toString() + ' to mouse ' + mouse)
 	$('#SubmitBoard #step-score').html(this.steps)
 	if(gameModel.computerDecide(this.bottles, bottles_list.length, this.mice)[0]){
 			if (bottles_list.length == 1) {

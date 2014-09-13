@@ -11,18 +11,28 @@
 		<script src="http://code.jquery.com/mobile/1.4.3/jquery.mobile-1.4.3.min.js"></script>
 		<script src="js/iealert.min.js" type="text/javascript"></script>
   		<link rel="stylesheet" type="text/css" href="css/iealert/style.css" />
+  		<script src="js/ajax.js"></script>
 		<script>
 			$(function() {
 				$("body").iealert();
 			})
+			Ajax = new modAjax(1,this)
+			Ajax.getinfo(getSuccessHandler,getErrorHandler)
+			function getSuccessHandler(data){
+				name = data["name"]
+				$("#login_info").text(name)
+			}
+			function getErrorHandler(data){
+				alert('You need login the course website first!')
+			}
 		</script>
 	</head>
 	<body>
 		<div data-role="page">
 			<div data-role="header">
 				<a href="#nav-panel" data-icon="bars" data-iconpos="notext">Menu</a>
-				<a href="#add-form" data-icon="gear" data-iconpos="notext">Add</a>
 				<h1>Introduction</h1>
+				<a href="#" data-icon="user" data-iconpos="left" id="login_info">Not login</a>
 			</div>
 			<div data-role="content">
 				<h1>Guide</h1>
