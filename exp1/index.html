@@ -48,13 +48,21 @@
 					finish a submit-mode(bottles are more).
 				</p>
  				<ul>
-					<li><a href='adaptive.html' data-ajax="false">Adaptive Game</a></li>
+					<li><a href='adaptive.html?testA' data-ajax="false">Adaptive Game 1</a></li>
 						<b>Rule:</b> 2 mice, 1 poisoned bottle, mouse will die immediately when
 						drinks the poisoned bottle(counted as 1 step). <br>
 						<b>Target:</b> use the least steps.<br>
 						<b>Introduction:</b>
 						<p>
-						Try to find the only poisoned bottle with the least steps. If your strategy covers all the situations, you win , otherwise, you lose.  
+						Try to find the only poisoned bottle with the least steps. If your strategy covers all the situations, you win , otherwise, you lose.   The best results will be counted.
+						</p>
+					<li><a href='adaptive.html?testN' data-ajax="false">Adaptive Game 2</a></li>
+						<b>Rule:</b> 2 mice, 1 poisoned bottle, mouse will die immediately when
+						drinks the poisoned bottle(counted as 1 step). <br>
+						<b>Target:</b> use the least steps.<br>
+						<b>Introduction:</b>
+						<p>
+						Try to find the only poisoned bottle with the least steps. If your strategy covers all the situations, you win , otherwise, you lose.  The average results will be counted.
 						</p>
 					<li><a href='non-adaptive.html' data-ajax="false">Non-Adaptive Game</a></li>
 						<b>Rule:</b> 1 poisoned bottle, limited to 1 step to find out the poisoned bottle.<br>
@@ -81,7 +89,8 @@
 				<ul data-role="listview">
 					<li data-icon="delete"><a href="#" data-rel="close">Close menu</a></li>
 					<li><a href="index.html" data-ajax="false">Introduction</a></li>
-					<li><a href="adaptive.html?submit" data-ajax="false">Adaptive Game</a></li>
+					<li><a href="adaptive.html?submitA" data-ajax="false">Adaptive Game 1</a></li>
+					<li><a href="adaptive.html?submitN" data-ajax="false">Adaptive Game 2</a></li>
 					<li><a href="non-adaptive.html?submit" data-ajax="false">Non-Adaptive Game</a></li>
 					<li><a href="hybrid-adaptive.html?submit" data-ajax="false">Hybrid-Adaptive Game</a></li>
 				</ul>

@@ -36,7 +36,7 @@
 	</head>
 	<body>
 		<div data-role="page" id = "main-page">
-			<div data-role="header">
+			<div data-role="header" id="header">
 				<a href="#nav-panel" data-icon="bars" data-iconpos="notext">Menu</a>
 				<h1>Adaptive Game</h1>
 				<a href="#" data-icon="user" data-iconpos="left" id="login_info">Not login</a>
@@ -63,7 +63,7 @@
 							<div class='middle-text-large' id="game-times"></div>
 							<p>Total Steps:</p>
 							<div class="middle-text-large" id="step-score">0</div>
-							<p>Best Steps:</p>
+							<p id="best-scores">Best Steps:</p>
 							<div class="middle-text-large" id="best-score"></div>
 
 						</div>
@@ -75,7 +75,8 @@
 				<ul data-role="listview">
 					<li data-icon="delete"><a href="#" data-rel="close">Close menu</a></li>
 					<li><a href="index.html" data-ajax="false">Introduction</a></li>
-					<li><a href="adaptive.html?submit" data-ajax="false">Adaptive Game</a></li>
+					<li><a href="adaptive.html?submitA" data-ajax="false">Adaptive Game 1</a></li>
+					<li><a href="adaptive.html?submitN" data-ajax="false">Adaptive Game 2</a></li>
 					<li><a href="non-adaptive.html?submit" data-ajax="false">Non-Adaptive Game</a></li>
 					<li><a href="hybrid-adaptive.html?submit" data-ajax="false">Hybrid-Adaptive Game</a></li>
 				</ul>

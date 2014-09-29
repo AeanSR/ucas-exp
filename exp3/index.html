@@ -1,0 +1,33 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script type="text/javascript" src="js/jquery-1.11.1.min.js" charset="utf-8"></script>
+		<link rel="stylesheet" href="css/jquery.mobile-1.4.3.min.css" />
+		<link rel="stylesheet" href="css/style.css" />
+		<script type="text/javascript" src="js/jquery.mobile-1.4.3.min.js" charset="utf-8"></script>
+		<script type="text/javascript" src="js/paper-full.min.js"  charset="utf-8"></script>
+		<script type="text/javascript" src="js/byzantine.js" charset="utf-8"></script>
+
+		<script type="text/paperscript" canvas="canvas" src="js/render.pjs" id="script" ></script>
+	</head>
+	<body>
+		<div data-role="page" id = "main-page">
+			<div data-role="header">
+				<h1>系统角度实验:三国战纪</h1>
+				<a href="#" data-icon="user" data-iconpos="left" id="login_info">Not login</a>
+			</div>
+			<div data-role="content" id="container">
+				<div class="Left">
+					<div class="ui-body ui-body-b ui-corner-all"  id="Main">
+						<div class="canvas">
+							<canvas resize="true" id="canvas"></canvas>
+						</div>
+					</div>
+					<div class="ui-body ui-body-b ui-corner-all"  id="Console"></div>
+				</div>
+				<div class="ui-body ui-body-b ui-corner-all"  id="ControlBoard"></div>
+			</div>
+		</div>
+
+	</body>
+</html>

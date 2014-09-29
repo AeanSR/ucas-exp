@@ -1,8 +1,9 @@
-function GameManager(mice, bottles, poisons,is_test) {
+function GameManager(mice, bottles, poisons,is_test, is_adversary) {
 	this.mice = mice;
 	this.bottles = bottles;
 	this.poisons = poisons;
 	this.is_test =is_test
+	this.is_adversary = is_adversary
 	this.bottle_list = []
 	this.poison_list = {}
 	this.mouse_list = {}
@@ -13,12 +14,22 @@ function GameManager(mice, bottles, poisons,is_test) {
 	this.submit_bottles = []
 	this.curDragList = []
 	this.popupClosed = true
-	this.Ajax = new modAjax(1,this)
 	this.create();
-
 };
 GameManager.prototype.create = function() {
 	var _this = this
+	if(this.is_adversary){
+		$('#header h1').text('Adaptive Game 1')
+		$('#error-popup .ui-btn').attr('href','adaptive.html?testA')
+		$('#best-scores').text('Best Steps:')
+		this.Ajax = new modAjax(1,this)
+	}
+	else {
+		$('#header h1').text('Adaptive Game 2')
+		$('#error-popup .ui-btn').attr('href','adaptive.html?testN')
+		$('#best-scores').text('Average Steps:')
+		this.Ajax = new modAjax(4,this)
+	}
 	this.Ajax.getinfo(this.getSuccessHandler, this.getErrorHandler)
 	//preload image
 	new Image().src= 'imgs/mouse-dead.png'
@@ -47,7 +58,7 @@ GameManager.prototype.create = function() {
 	// })
 	$("#bottles-container").disableSelection();
 
-
+	this.createRandomPoison()
 	this.createEmptyBottles(this.curBottles);
 	// Init data
 	for (var i = 1; i <= this.bottles; i++) this.bottle_list.push(i)
@@ -105,7 +116,7 @@ GameManager.prototype.setPanel = function() {
 }
 GameManager.prototype.createRandomPoison = function() {
 	for (var i = 0; i < this.poisons; i++) {
-		poison = md5(Math.ceil(Math.random() * 100) + "This is a salt~~!@@!")
+		poison = md5(Math.ceil(Math.random() *  this.bottles) + "This is a salt~~!@@!")
 		//poison = md5(1 + "This is a salt~~!@@!")
 		if (!(poison in this.poison_list)) {
 			this.poison_list[poison] = 0;
@@ -345,7 +356,8 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 	console.log('testing ' , this.bottles, bottles_list.length, this.mice)
 	this.historys['results'].push(bottles_list.toString() + ' to mouse ' + mouse)
 	$('#SubmitBoard #step-score').html(this.steps)
-	if(gameModel.computerDecide(this.bottles, bottles_list.length, this.mice)[0]){
+	if(this.is_adversary){
+		if(gameModel.computerDecide(this.bottles, bottles_list.length, this.mice)[0]){
 			if (bottles_list.length == 1) {
 				flag = true
 				for (var x in this.submit_bottles) {
@@ -367,14 +379,55 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 			this.mice = this.mice - 1
 			console.log(this.bottles)
 			return true
+		}
+		$("#mice-container #" + mouse)
+			.animate() //Animate here
+		delete GameModel
+		// Kick off the healthy bottles
+		this.bottles = this.bottles - bottles_list.length
+		console.log(this.bottles)
+		return false
 	}
-	$("#mice-container #" + mouse)
-		.animate() //Animate here
-	delete GameModel
-	// Kick off the healthy bottles
-	this.bottles = this.bottles - bottles_list.length
-	console.log(this.bottles)
-	return false
+	else{
+		found =false
+		for(var k in bottles_list){
+			poison = md5(bottles_list[k]+ "This is a salt~~!@@!") 
+			if(poison in this.poison_list){
+				found = true
+			}
+		}
+		if(found){
+			if (bottles_list.length == 1) {
+				flag = true
+				for (var x in this.submit_bottles) {
+					if (bottles_list[0] == this.submit_bottles[x]) flag = false
+				}
+				if (flag) {
+					$("#gameover .result").append("<p>" + bottles_list[0] + "</p>")
+					this.submit_bottles.push(bottles_list[0])
+				}
+
+			}
+			this.mouse_list[mouse] = false
+			$("#mice-container #" + mouse)
+				.animate() //Animate here
+			.html('<img src="imgs/mouse-dead.png">')
+			this.isGameOver()
+			delete GameModel
+			this.bottles = bottles_list.length
+			this.mice = this.mice - 1
+			console.log(this.bottles)
+			return true
+		}
+		$("#mice-container #" + mouse)
+			.animate() //Animate here
+		delete GameModel
+		// Kick off the healthy bottles
+		this.bottles = this.bottles - bottles_list.length
+		console.log(this.bottles)
+		return false
+	}
+
 }
 
 
@@ -384,8 +437,11 @@ GameManager.prototype.isGameOver = function() {
 		if (this.mouse_list[x]) flag = false
 	}
 	this.is_test?
-	newhref = 'adaptive.html':
+	newhref = 'adaptive.html?test':
 	newhref = 'adaptive.html?submit'
+	this.is_adversary?
+	newhref += 'A':
+	newhref += 'N'
 	if (this.submit_bottles.length == this.poisons) {
 		$("#gameover h1").text("Great!")
 		$("#gameover #gameover-notice").text("You have passed the game successfully with " + this.steps + " steps!")
@@ -493,10 +549,19 @@ $(function() {
 		return
 	}
 	$("body").iealert();
-	if (location.href.search('/?submit') != -1) {
-		GM = new GameManager(2, 32, 1,false);
+	if (location.href.search('/?submitA') != -1) {
+		GM = new GameManager(2, 32, 1,false, true);
+	}
+	else if(location.href.search('/?submitN') != -1){
+		GM = new GameManager(2, 32, 1,false, false);
+	}
+	else if(location.href.search('/?testA') != -1){
+		GM = new GameManager(2, 16, 1,true, true);
+	}
+	else if(location.href.search('/?testN') != -1){
+		GM = new GameManager(2, 16, 1,true, false);
 	}
 	else{
-		GM = new GameManager(2, 16, 1,true);
+		console.log('Input error.')
 	}
 });

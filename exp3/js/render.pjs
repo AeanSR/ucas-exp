@@ -1,0 +1,168 @@
+var hitOptions = {
+	segments: true,
+	stroke: false,
+	fill: true,
+	tolerance: 5
+};
+var conPosition = [
+	[0, 48],
+	[48, 0],
+	[-48, 0],
+	[0, -48]
+]
+var segment, item, connection, endPoint;
+connections = {}
+var movePath = false;
+var connId;
+var previousGroup;
+DAG = new Array(new Array(),new Array());
+
+function Connector(point, item) {
+	this.group = new Group()
+	this.group.name = 'connector';
+	// Container
+	this.container = new Path.Rectangle({
+		point: [0, 0],
+		size: [100, 100],
+		radius: 20,
+		fillColor: 'grey',
+		position: point,
+		opacity: 0.5
+	})
+	this.group.addChild(this.container)
+	// connect points
+	for (var i = 0; i < conPosition.length; i++) {
+		this.group.addChild(
+			new Path.Circle({
+				center: new Point(conPosition[i]) + point,
+				radius: 3,
+				strokeColor: 'blue',
+				name: 'connectpoint',
+				visible: false
+			})
+		)
+	}
+}
+
+function onMouseDown(event) {
+	segment = item = connId = null;
+	var hitResult = project.hitTest(event.point, hitOptions);
+	if (!hitResult)
+		return;
+	if (hitResult) {
+		//console.log(hitResult.type)
+		if (hitResult.type == 'segment') {
+			segment = hitResult.segment;
+			if (segment.path.name != 'connectpoint') return
+			connId = segment.path.parent.children[0].id
+			connection = new Path();
+			connection.sendToBack();
+			connection.strokeColor = 'red'
+			startPoint = segment.path.position
+			connection.add(startPoint);
+			endPoint = new Point(event.point);
+			connection.add(endPoint);
+			if (!(connId in connections)) connections[connId] = []
+			connections[connId].push(connection.firstSegment)
+		}
+		if (hitResult.type == 'fill') {
+			item = hitResult.item;
+			connId = item.id
+		}
+	}
+}
+
+
+
+function onMouseMove(event) {
+	if (event.item && event.item.name == 'connector') {
+		showConnectpoint(event.item)
+		previousGroup = event.item;
+	} else {
+		if (previousGroup)
+			hideConnectpoint(previousGroup)
+	}
+}
+
+function onMouseDrag(event) {
+	var hitResult = project.hitTest(event.point, hitOptions);
+	if (hitResult) {
+		if (hitResult.type == 'fill') {
+			group = hitResult.item.parent;
+			if (previousGroup)
+				hideConnectpoint(previousGroup)
+			showConnectpoint(group)
+			previousGroup = group
+		}
+	}
+	if (segment && segment.path.name == 'connectpoint') {
+		connection.lastSegment.point += event.delta;
+	} else if (item && item.parent.name == 'connector') {
+		item.parent.position += event.delta;
+		// Move the connect points.
+		if (connId in connections)
+			for (var i in connections[connId]) {
+				connections[connId][i].point += event.delta;
+			}
+	}
+}
+
+function onMouseUp(event) {
+	var hitResult = project.hitTest(event.point, hitOptions);
+	if (!hitResult) {
+		//return;
+	}
+	else{
+		console.log(hitResult.type)
+		if (hitResult.type == 'segment') {
+			segment = hitResult.segment;
+			console.log(segment.path.name)
+			if (segment.path.name == 'connectpoint') {
+				connection.lastSegment = segment.path.position
+				newconnId = segment.path.parent.children[0].id
+				if(connId !=newconnId){
+					line = new Path.Line({
+						from:connection.firstSegment.point,
+						to:connection.lastSegment.point,
+						strokeColor:'black',
+						strokeWidth: 2
+						})
+					line.sendToBack()
+					connections[connId].push(line.firstSegment)
+					if (!(newconnId in connections)) connections[newconnId] = []
+					connections[newconnId].push(line.lastSegment)
+					addEdge(connId, newconnId)
+				}
+
+				//connection = null
+			}
+		}
+	}
+	if (connection)
+		connection.remove();
+}
+
+function showConnectpoint(group) {
+	for (i = 1; i < 5; i++) {
+		group.children[i].visible = true;
+	}
+}
+
+function hideConnectpoint(group) {
+	for (i = 1; i < 5; i++) {
+		group.children[i].visible = false;
+	}
+}
+function addEdge(point1, point2){
+	point1<=point2?DAG[point1] = point2:DAG[point2] = point1
+}
+
+onResize = function() {
+	view.viewSize.width = view.element.clientWidth;
+	view.viewSize.height = view.element.clientHeight;
+
+}
+
+objects = []
+objects.push(new Connector(new Point(50, 50)))
+objects.push(new Connector(new Point(300, 100)))
