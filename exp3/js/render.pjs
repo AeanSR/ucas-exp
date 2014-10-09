@@ -27,12 +27,15 @@ function Connector(point, item) {
 		radius: 20,
 		fillColor: 'grey',
 		position: point,
-		opacity: 0.5
+		opacity: 0.5,
+		name: 'backgroud'
 	})
 	this.group.addChild(this.container)
+	this.connectGroup = new Group({name: 'connectpoints'})
+
 	// connect points
 	for (var i = 0; i < conPosition.length; i++) {
-		this.group.addChild(
+		this.connectGroup.addChild(
 			new Path.Circle({
 				center: new Point(conPosition[i]) + point,
 				radius: 3,
@@ -42,6 +45,17 @@ function Connector(point, item) {
 			})
 		)
 	}
+	this.group.addChild(this.connectGroup)
+	// add content
+	if(item){
+		item.fitBounds(new Rectangle({
+			point:[10,10],
+			size:[80,80]
+		}))
+		this.group.addChild(item)
+		item.sendToBack()
+	}
+		
 }
 
 function onMouseDown(event) {
@@ -54,7 +68,7 @@ function onMouseDown(event) {
 		if (hitResult.type == 'segment') {
 			segment = hitResult.segment;
 			if (segment.path.name != 'connectpoint') return
-			connId = segment.path.parent.children[0].id
+			connId = segment.path.parent.parent.children['backgroud'].id
 			connection = new Path();
 			connection.sendToBack();
 			connection.strokeColor = 'red'
@@ -143,15 +157,17 @@ function onMouseUp(event) {
 }
 
 function showConnectpoint(group) {
-	for (i = 1; i < 5; i++) {
-		group.children[i].visible = true;
+	for (i = 0; i < 4; i++) {
+		group.children['connectpoints'].children[i].visible = true;
 	}
+	group.children['backgroud'].visible = true;
 }
 
 function hideConnectpoint(group) {
-	for (i = 1; i < 5; i++) {
-		group.children[i].visible = false;
+	for (i = 0; i < 4; i++) {
+		group.children['connectpoints'].children[i].visible = false;
 	}
+	group.children['backgroud'].visible = false;
 }
 function addEdge(point1, point2){
 	point1<=point2?DAG[point1] = point2:DAG[point2] = point1
@@ -163,6 +179,11 @@ onResize = function() {
 
 }
 
+var raster = new Raster({
+    source: 'imgs/liubei.jpg',
+});
+
 objects = []
-objects.push(new Connector(new Point(50, 50)))
+objects.push(new Connector(new Point(50, 50), raster))
 objects.push(new Connector(new Point(300, 100)))
+
