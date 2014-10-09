@@ -70,12 +70,13 @@ GameManager.prototype.create = function() {
 GameManager.prototype.getSuccessHandler = function(data) {
 	console.log(data)
 	name = data["name"]
+	group = data["group"]
 	GM.Ajax.gameLoop = data["curLoop"]
 	if(GM.Ajax.gameLoop>2 && !GM.is_test) {
 		$("#error-notice").text("Sorry, your challenges have been used up.But you can still play the test mode.")
 		$("#error-popup").popup("open")
 	}
-	$("#login_info").text(name)
+	$("#login_info").text("姓名：" + name + " 组号：" + group)
 	$("#best-score").text(data["bestScore"])
 	GM.setPanel()
 }
