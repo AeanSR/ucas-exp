@@ -49,7 +49,7 @@ function Connector(point, item) {
 	// add content
 	if(item){
 		item.fitBounds(new Rectangle({
-			point:[10,10],
+			point:point - [40,40],
 			size:[80,80]
 		}))
 		this.group.addChild(item)
@@ -133,7 +133,7 @@ function onMouseUp(event) {
 			console.log(segment.path.name)
 			if (segment.path.name == 'connectpoint') {
 				connection.lastSegment = segment.path.position
-				newconnId = segment.path.parent.children[0].id
+				newconnId = segment.path.parent.parent.children['backgroud'].id
 				if(connId !=newconnId){
 					line = new Path.Line({
 						from:connection.firstSegment.point,
@@ -160,14 +160,14 @@ function showConnectpoint(group) {
 	for (i = 0; i < 4; i++) {
 		group.children['connectpoints'].children[i].visible = true;
 	}
-	group.children['backgroud'].visible = true;
+	group.children['backgroud'].opacity = 0.5;
 }
 
 function hideConnectpoint(group) {
 	for (i = 0; i < 4; i++) {
 		group.children['connectpoints'].children[i].visible = false;
 	}
-	group.children['backgroud'].visible = false;
+	group.children['backgroud'].opacity = 0;
 }
 function addEdge(point1, point2){
 	point1<=point2?DAG[point1] = point2:DAG[point2] = point1
@@ -182,8 +182,16 @@ onResize = function() {
 var raster = new Raster({
     source: 'imgs/liubei.jpg',
 });
+var raster2 = new Raster({
+    source: 'imgs/liubei.jpg',
+});
+var raster3 = new Raster({
+    source: 'imgs/zhangfei.jpg',
+});
+
 
 objects = []
 objects.push(new Connector(new Point(50, 50), raster))
-objects.push(new Connector(new Point(300, 100)))
+objects.push(new Connector(new Point(300, 100), raster2))
+objects.push(new Connector(new Point(200, 50), raster3))
 
