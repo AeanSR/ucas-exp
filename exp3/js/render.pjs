@@ -27,7 +27,7 @@ function Connector(point, item) {
 		radius: 20,
 		fillColor: 'grey',
 		position: point,
-		opacity: 0.5,
+		opacity: 0,
 		name: 'backgroud'
 	})
 	this.group.addChild(this.container)
@@ -183,15 +183,32 @@ var raster = new Raster({
     source: 'imgs/liubei.jpg',
 });
 var raster2 = new Raster({
-    source: 'imgs/liubei.jpg',
+    source: 'imgs/zhaoyun.jpg',
 });
 var raster3 = new Raster({
     source: 'imgs/zhangfei.jpg',
 });
+var army =  new Group();
+army.addChild(new PointText({
+	fillColor : 'black',
+	content : '士兵'
+	}))
 
+var food =  new Group();
+food.addChild(new PointText({
+	fillColor : 'black',
+	content : '粮食'
+	}))
+var weather =  new Group();
+weather.addChild(new PointText({
+	fillColor : 'black',
+	content : '天气'
+	}))
 
 objects = []
 objects.push(new Connector(new Point(50, 50), raster))
 objects.push(new Connector(new Point(300, 100), raster2))
 objects.push(new Connector(new Point(200, 50), raster3))
-
+objects.push(new Connector(new Point(300, 200), army))
+objects.push(new Connector(new Point(400, 300), food))
+objects.push(new Connector(new Point(500, 200), weather))
