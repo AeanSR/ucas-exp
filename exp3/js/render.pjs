@@ -176,7 +176,6 @@ function addEdge(point1, point2){
 onResize = function() {
 	view.viewSize.width = view.element.clientWidth;
 	view.viewSize.height = view.element.clientHeight;
-
 }
 
 var raster = new Raster({

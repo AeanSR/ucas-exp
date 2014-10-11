@@ -52,6 +52,55 @@ Army.prototype.nextHour = function(){
 	this.supply -= Math.floor(Math.random()*200)
 };
 
+
+
+function GameManager(){
+	var _this = this
+	this.Ajax = new modAjax(1,this);
+	this.Ajax.getinfo(this.getSuccessHandler, this.getErrorHandler);
+	this.sock = new SockJS('http://127.0.0.1:8888/api/exp3');
+	this.sock.onopen = function() {
+	     console.log('Established the connection.');
+	     _this.sock.send(_this.getLoginJson(_this.userId))
+	 };
+	 this.sock.onmessage = function(e) {
+	     console.log('message', e.data);
+	 };
+	 this.sock.onclose = function() {
+	     console.log('close');
+	 };
+}
+GameManager.prototype.getLoginJson = function(userId){
+	return JSON.stringify({
+	    "data_type": "login",
+	    "data": {
+	    	"userId": userId
+    	}})
+}
+GameManager.prototype.getMsgJson = function(to, data, type){
+	return JSON.stringify({
+	    "data_type": type,
+	    "to": to ,
+	    "data": data
+	})
+
+}
+
+GameManager.prototype.getSuccessHandler = function(data) {
+	GM.name = data["name"]
+	GM.group = data["group"]
+	GM.userId = data["userId"]
+	$("#login_info").text("姓名：" + GM.name + " 组号：" + GM.group)
+	console.log(data)
+}
+GameManager.prototype.getErrorHandler = function() {
+	setTimeout(function(){$("#error-popup").popup("open")},1000)
+}
+
+
 $(function(){
 	a = new Army()
+	GM = new GameManager()
 });
+
+
