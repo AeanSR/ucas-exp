@@ -10,11 +10,20 @@ var conPosition = [
 	[-48, 0],
 	[0, -48]
 ]
+var LIUBEI = "刘备";
+var ZHANGFEI = "张飞";
+var ZHAOYUN = "赵云";
+var GUANYU = "关羽";
+var ZHUGELIANG = "诸葛亮";
+
 var segment, item, connection, endPoint;
 connections = {}
 var movePath = false;
 var connId;
 var previousGroup;
+var avatars_url = ['imgs/liubei.jpg','imgs/zhangfei.jpg','imgs/zhaoyun.jpg','imgs/guanyu.jpg','imgs/zhugeliang.jpg']
+var avatars_name = [LIUBEI,ZHANGFEI,ZHAOYUN,GUANYU,ZHUGELIANG];
+
 DAG = new Array(new Array(),new Array());
 
 function Connector(point, item) {
@@ -173,41 +182,201 @@ function addEdge(point1, point2){
 	point1<=point2?DAG[point1] = point2:DAG[point2] = point1
 }
 
+initStep2 = function (id){
+	onResize()
+	console.log(view.center)
+	var temp = new Raster({
+		source: 'imgs/crown.png',
+	})
+	temp.fitBounds(new Rectangle({
+			point:pos_crwon[id],
+			size:[30,30]
+		}))
+	temp.rotate(30)
+	showLegend()
+	view.draw()
+}
+setStep2 = function(from, to, ready){
+	if(from!=to)
+		edges[from][to].strokeColor = ready?"green":"red"
+	else{
+		avatars[from].fillColor = ready?"green":"red"
+	}
+	view.draw()
+}
+resetStep2 = function(){
+	for(var i=0;i<5;i++){
+		for (var j=0; j<5; j++) {
+			if(i!=j)
+			edges[i][j].strokeColor = 'grey';
+		};
+		avatars[i].fillColor = 'grey';
+	}
+	view.draw()
+}
+showLegend = function(){
+	var temp = new Raster({
+		source: 'imgs/crown.png',
+	})
+	temp.fitBounds(new Rectangle({
+			point:[20,10],
+			size:[30,30]
+		}))
+	new PointText({
+		position:[80,30],
+ 		fillColor : 'black',
+ 		content : '您控制的角色'
+ 	})
+	new Path.Line({
+		from: [20,50],
+		to:[50,50],
+		strokeColor:'grey',
+		strokeWidth: 2
+	}).lineBy(
+	    new Point({
+	        angle: 160,
+	        length:10
+	    })
+	)
+	new PointText({
+		position:[80,50],
+ 		fillColor : 'black',
+ 		content : '信鸽可通过的路径'
+ 	})
+
+	new Path.Line({
+		from: [20,70],
+		to:[50,70],
+		strokeColor:'green',
+		strokeWidth: 2
+	}).lineBy(
+	    new Point({
+	        angle: 160,
+	        length:10
+	    })
+	)
+	new PointText({
+		position:[80,70],
+ 		fillColor : 'black',
+ 		content : '起点玩家声称终点玩家为就绪状态'
+ 	})
+
+	new Path.Line({
+		from: [20,90],
+		to:[50,90],
+		strokeColor:'red',
+		strokeWidth: 2
+	}).lineBy(
+	    new Point({
+	        angle: 160,
+	        length:10
+	    })
+	)
+	new PointText({
+		position:[80,90],
+ 		fillColor : 'black',
+ 		content : '起点玩家声称终点玩家为整备状态'
+ 	})
+
+}
+
 onResize = function() {
 	view.viewSize.width = view.element.clientWidth;
 	view.viewSize.height = view.element.clientHeight;
 }
 
-var raster = new Raster({
-    source: 'imgs/liubei.jpg',
-});
-var raster2 = new Raster({
-    source: 'imgs/zhaoyun.jpg',
-});
-var raster3 = new Raster({
-    source: 'imgs/zhangfei.jpg',
-});
-var army =  new Group();
-army.addChild(new PointText({
-	fillColor : 'black',
-	content : '士兵'
-	}))
+refreshCanvas =function(){
+	view.draw()
+}
 
-var food =  new Group();
-food.addChild(new PointText({
-	fillColor : 'black',
-	content : '粮食'
-	}))
-var weather =  new Group();
-weather.addChild(new PointText({
-	fillColor : 'black',
-	content : '天气'
-	}))
+// var raster = new Raster({
+//     source: 'imgs/liubei.jpg',
+// });
+// var raster2 = new Raster({
+//     source: 'imgs/zhaoyun.jpg',
+// });
+// var raster3 = new Raster({
+//     source: 'imgs/zhangfei.jpg',
+// });
+// var army =  new Group();
+// army.addChild(new PointText({
+// 	fillColor : 'black',
+// 	content : '士兵'
+// 	}))
 
-objects = []
-objects.push(new Connector(new Point(50, 50), raster))
-objects.push(new Connector(new Point(300, 100), raster2))
-objects.push(new Connector(new Point(200, 50), raster3))
-objects.push(new Connector(new Point(300, 200), army))
-objects.push(new Connector(new Point(400, 300), food))
-objects.push(new Connector(new Point(500, 200), weather))
+// var food =  new Group();
+// food.addChild(new PointText({
+// 	fillColor : 'black',
+// 	content : '粮食'
+// 	}))
+// var weather =  new Group();
+// weather.addChild(new PointText({
+// 	fillColor : 'black',
+// 	content : '天气'
+// 	}))
+
+// objects = []
+// objects.push(new Connector(new Point(50, 50), raster))
+// objects.push(new Connector(new Point(300, 100), raster2))
+// objects.push(new Connector(new Point(200, 50), raster3))
+// objects.push(new Connector(new Point(300, 200), army))
+// objects.push(new Connector(new Point(400, 300), food))
+// objects.push(new Connector(new Point(500, 200), weather))
+
+onResize()
+var createArray2D = function(m,n){
+	array = {}
+	for(var x=0;x<m;x++){
+		array[x] = {}
+		for(var y=0;y<n;y++){
+			array[x][y] = null;
+		}
+	}
+	return array
+}
+
+edges = createArray2D(5,5)
+pos_crwon = {}
+avatars = {}
+poly5in = new Path.RegularPolygon(view.center,5,170)
+poly5in.segments[0].point
+for(var i=0;i<5;i++){
+	for(var j=0;j<5;j++){
+		if(i!=j){
+			var vector = (poly5in.segments[j].point - poly5in.segments[i].point).normalize(1)
+			var vert_vector = vector.rotate(90)*3
+			var line = new Path.Line({
+				from:poly5in.segments[i].point + vert_vector + vector*20,
+				to:poly5in.segments[j].point + vert_vector - vector*20,
+				strokeColor:'grey',
+				strokeWidth: 2
+			})
+			line.lineBy(
+			    new Point({
+			        angle:vector.getAngle()+160,
+			        length:20
+			    })
+			)
+			edges[i][j] = line;
+		}
+	}
+}
+poly5out = new Path.RegularPolygon(view.center,5,200)
+for(var i=0;i<5;i++){
+	s = poly5out.segments[i].point
+	var r = new Raster({
+    source: avatars_url[i],
+    position: s
+	});
+	r.scale(0.5)
+	pos_crwon[i] = new Point(r.bounds.x + r.bounds.width-10, r.bounds.y-20)
+	avatars[i] = new Path.Rectangle({
+		position: s,
+		size: [r.bounds.width+10,r.bounds.height+10],
+		radius: 20,
+		fillColor: 'grey'
+	})
+	avatars[i].sendToBack();
+}
+
+
