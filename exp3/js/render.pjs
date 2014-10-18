@@ -181,7 +181,6 @@ function hideConnectpoint(group) {
 function addEdge(point1, point2){
 	point1<=point2?DAG[point1] = point2:DAG[point2] = point1
 }
-
 initStep2 = function (id){
 	onResize()
 	console.log(view.center)
@@ -195,6 +194,16 @@ initStep2 = function (id){
 	temp.rotate(30)
 	showLegend()
 	view.draw()
+}
+setAttack = function (id, attack){
+	var temp = new Raster({
+		source: attack==true?'imgs/attack.png':'imgs/shield.png',
+	})
+	temp.fitBounds(new Rectangle({
+			point:pos_crwon[id] +[26,0],
+			size:[30,30]
+		}))
+	attacks[id] = temp
 }
 setStep2 = function(from, to, ready){
 	if(from!=to)
@@ -211,6 +220,11 @@ resetStep2 = function(){
 			edges[i][j].strokeColor = 'grey';
 		};
 		avatars[i].fillColor = 'grey';
+		if((i in attacks)&&(attacks[i]!=null)){
+			console.log('here')
+			attacks[i].remove()
+			attacks[i] = null
+		}
 	}
 	view.draw()
 }
@@ -277,7 +291,30 @@ showLegend = function(){
  		fillColor : 'black',
  		content : '起点玩家声称终点玩家为整备状态'
  	})
-
+ 	var temp = new Raster({
+		source: 'imgs/attack.png',
+	})
+	temp.fitBounds(new Rectangle({
+			point:[20,100],
+			size:[20,20]
+		}))
+	new PointText({
+		position:[80,110],
+ 		fillColor : 'black',
+ 		content : '该角色发起攻击'
+ 	})
+ 	var temp = new Raster({
+		source: 'imgs/shield.png',
+	})
+	temp.fitBounds(new Rectangle({
+			point:[20,120],
+			size:[20,20]
+		}))
+	new PointText({
+		position:[80,130],
+ 		fillColor : 'black',
+ 		content : '该角色拒绝攻击'
+ 	})
 }
 
 onResize = function() {
@@ -338,6 +375,7 @@ var createArray2D = function(m,n){
 edges = createArray2D(5,5)
 pos_crwon = {}
 avatars = {}
+attacks = {}
 poly5in = new Path.RegularPolygon(view.center,5,170)
 poly5in.segments[0].point
 for(var i=0;i<5;i++){

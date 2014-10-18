@@ -22,8 +22,7 @@
 			</div>
 			<div data-role="content" id="container">
 				<div class="Left">
-					<div class="ui-body ui-body-b ui-corner-all"  id="Main">
-						<div class="canvas">
+					<div class="ui-body ui-body-b ui-corner-all"  id="Main">						<div class="canvas">
 							<canvas resize="true" id="canvas"></canvas>
 						</div>
 					</div>
@@ -49,6 +48,8 @@
 					</div>
 					<p>军队状态</p>
 					<div class="middle-text-large" id="ready-status">待命</div>
+					<p>身份</p>
+					<div class="middle-text-large" id="traitor-status">未知</div>
 					<p>当前天数</p>
 					<div class="middle-text-large" id="current-day">0</div>
 					<p>释放信鸽</p>
@@ -67,6 +68,14 @@
 				        <h3 class="ui-title" id="error-notice">您必须先登陆作业系统才能进行该游戏.</h3>
 				    </div>
 			</div>
+			<div data-role="popup" id="pause-popup" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+				<div data-role="header" data-theme="b">
+				<h1>请等待！</h1>
+				</div>
+				<div role="main" class="ui-content">
+				        <h3 class="ui-title" id="error-notice">待所有玩家都在线后方可进行游戏，目前游戏暂停。</h3>
+				    </div>
+			</div>
 			<div data-role="panel" data-position-fixed="true" data-display="push" data-ajax="false" data-theme="b" id="send-panel">
 				<p>您要传信给：</p>
 				<fieldset data-role="controlgroup" id="receivers"></fieldset>
@@ -75,6 +84,8 @@
 				</div>
 				<a href="#" data-rel="close" data-role="button" data-corners="false" id="confirm-send">确定</a>
 			</div>
+			
+
 		</div>
 
 	</body>

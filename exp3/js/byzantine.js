@@ -71,6 +71,7 @@ function GameManager(){
 	     var msg = $.parseJSON(e.data)
 	     if(msg['data_type'] == 'notify'){
 	     	if(msg['data']['event'] == 'start'){
+	     		$("#pause-popup").popup("close")
 	     		_this.day = msg['data']['day']
 	     		_this.log("",'人员就位，游戏开始，今天是第' + _this.day + '天。' , 'sys')
 	     		_this.interval = parseInt(msg['data']['interval'])
@@ -80,10 +81,19 @@ function GameManager(){
 	     	}
 	     	else if(msg['data']['event'] == 'sync'){
 	     		_this.day = msg['data']['day']
+	     		_this.isTraitor = msg['data']['isTraitor']
 	     		_this.log("",'新的一天到来，今天是第' + _this.day + '天。' , 'sys')
 	     		_this.sync()
 	     		_this.report()
 	     		_this.startTimer()
+	     	}
+	     	else if(msg['data']['event'] == 'gameresult'){
+	     		if(msg['data']['win'] ){
+	     			_this.log("",'今天平安渡过，所有将军做出了正确的决策。' , 'sys')
+	     		}
+	     		else{
+	     			_this.log("",'败仗！看来我们之中出了一个叛徒。' , 'sys')
+	     		}
 	     	}
 	     }
 	     else if(msg['data_type'] == 'update'){   
@@ -94,16 +104,22 @@ function GameManager(){
 	     		$('#userlist ul').append('<li><span style="color:green">' + _this.userlist[userId]['name'] + '</span></li>'):
 	     		$('#userlist ul').append('<li><span style="color:grey">' + _this.userlist[userId]['name']  + '</span></li>')
 	     	}
+	     	_this.log("",msg['event']==true?"有人加入了游戏":"有人离开了游戏，游戏暂停。" , 'sys')
+	     	if(msg['event']==false){
+	     		$("#pause-popup").popup("open")
+	     	}
 	      }
 	     else if(msg['data_type'] == 'message'){
 	     	_this.log(msg['from'],msg['data'],'game')
 	     }
 	     else if(msg['data_type'] == 'attack'){
 	     	_this.log(msg['from'],msg['data']==true?"发起攻击":"拒绝攻击",'attack')
+	     	setAttack(parseInt(msg['from']),msg['data'])
 	     }
 	     else if(msg['data_type'] == 'auth'){
 	     	if(msg['data']['notify']=='success'){
 	     		_this.id = parseInt(msg['data']['id'])
+	     		_this.isTraitor = msg['data']['isTraitor']
 	     		_this.messages = msg['data']['messages']
 	     		$('#current-messages').text(_this.messages)
 		     	$('#receivers').text("")
@@ -160,7 +176,7 @@ function GameManager(){
 	$('#attack').click(function(){
 		_this.sock.send(_this.getMsgJson(0, true, 'attack'))
 	})
-	$('#not-attack').click(function(){
+	$('#notattack').click(function(){
 		_this.sock.send(_this.getMsgJson(0, false, 'attack'))
 	})
 }
@@ -210,6 +226,7 @@ GameManager.prototype.getSuccessHandler = function(data) {
 	GM.group = data["group"]
 	GM.userId = data["userId"]
 	$("#login_info").text("姓名：" + GM.name + " 组号：" + GM.group)
+	$("#pause-popup").popup("open")
 }
 GameManager.prototype.getErrorHandler = function() {
 	setTimeout(function(){$("#error-popup").popup("open")},1000)
@@ -227,6 +244,7 @@ GameManager.prototype.sync = function(){
 	}
 	resetStep2()
 	$("#current-day").text(this.day)
+	$('#traitor-status').text(this.isTraitor==false?"忠臣":"奸臣")
 }
 GameManager.prototype.report = function(){
 	this.sock.send(this.getMsgJson(0,{"ready":this.ready},'report'))
