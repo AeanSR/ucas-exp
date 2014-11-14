@@ -32,7 +32,10 @@
 								<div id="log" class="ui-body ui-body-a ui-corner-all" style="width: 100%; height:90%; overflow:auto;background-color:#A4CAE1;"></div>							
 							</div>
 							<div class="ui-block-b" style="width:5%;"></div>
-							<div class="ui-block-c" style="width:15%;">
+							<div class="ui-block-c" style="width:15%;display:none;" id='console-stage1'>
+								<a href="#" data-role="button" data-corners="false" id="make">开始构建部队</a>
+							</div>
+							<div class="ui-block-c" style="width:15%;display:none;" id='console-stage2'>
 									<a href="#send-panel" data-role="button" data-corners="false" id="send">释放信鸽</a>
 									<a href="#" data-role="button" data-corners="false" id="attack">实施攻击</a>
 									<a href="#" data-role="button" data-corners="false" id="notattack">拒绝攻击</a>
@@ -46,16 +49,18 @@
 						<ul>
 						</ul>
 					</div>
-					<p>军队状态</p>
-					<div class="middle-text-large" id="ready-status">待命</div>
-					<p>身份</p>
-					<div class="middle-text-large" id="traitor-status">未知</div>
-					<p>当前天数</p>
-					<div class="middle-text-large" id="current-day">0</div>
-					<p>释放信鸽</p>
-					<div class="middle-text-large" id="current-messages">0</div>
-					<p>距进入下一天还有</p>
-					<div class="middle-text-large" id="rest-time">0</div>
+					<div style="display:none" id='control-stage2'>
+						<p>军队状态</p>
+						<div class="middle-text-large" id="ready-status">待命</div>
+						<p>身份</p>
+						<div class="middle-text-large" id="traitor-status">未知</div>
+						<p>当前天数</p>
+						<div class="middle-text-large" id="current-day">0</div>
+						<p>释放信鸽</p>
+						<div class="middle-text-large" id="current-messages">0</div>
+						<p>距进入下一天还有</p>
+						<div class="middle-text-large" id="rest-time">0</div>
+					</div>
 
 
 				</div>
@@ -73,9 +78,40 @@
 				<h1>请等待！</h1>
 				</div>
 				<div role="main" class="ui-content">
-				        <h3 class="ui-title" id="error-notice">待所有玩家都在线后方可进行游戏，目前游戏暂停。</h3>
+				        <h3 class="ui-title" id="error-notice">待所有玩家都在线且完成构建阶段后方可进行游戏，目前游戏暂停。</h3>
 				    </div>
 			</div>
+
+			<div data-role="panel" data-position-fixed="true" data-display="push" data-ajax="false" data-theme="b" id="condition-panel">
+				<p>当同时满足以下条件时军队状态转为就绪：</p>
+				<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+					<a href="#" class="ui-btn ui-corner-all">粮食</a>
+				    <select id="food-op">
+				        <option value="smaller">不大于</option>
+				        <option value="larger">大于</option>
+				    </select>
+				    <input type="text" id="food-val" value="" data-inline="true" data-wrapper-class="controlgroup-textinput ui-btn" />
+				</fieldset>
+				<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+					<a href="#" class="ui-btn ui-corner-all">兵力</a>
+				    <select id="troops-op">
+				        <option value="smaller">不大于</option>
+				        <option value="larger">大于</option>
+				    </select>
+				    <input type="text" id="troops-val" value="" data-inline="true" data-wrapper-class="controlgroup-textinput ui-btn" />
+				</fieldset>
+				<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+					<a href="#" class="ui-btn ui-corner-all">天气</a>
+					<a href="#" class="ui-btn ui-corner-all">等于</a>
+				    <select id="weather-val">
+				        <option value="SUNNY">晴天</option>
+				        <option value="RAINY">雨天</option>
+				        <option value="CLOUDY">阴天</option>
+				    </select>
+				</fieldset>
+				<a href="#" data-rel="close" data-role="button" data-corners="false" id="confirm-condition">确定</a>
+			</div>
+
 			<div data-role="panel" data-position-fixed="true" data-display="push" data-ajax="false" data-theme="b" id="send-panel">
 				<p>您要传信给：</p>
 				<fieldset data-role="controlgroup" id="receivers"></fieldset>
@@ -85,7 +121,17 @@
 				<a href="#" data-rel="close" data-role="button" data-corners="false" id="confirm-send">确定</a>
 			</div>
 			
-
+			<div style="visibility:hidden;width:0;height:0;">
+				<img src="imgs/attack.png" id='img-attack'>
+				<img src="imgs/shield.png" id='img-shield'>
+				<img src="imgs/crown.png" id='img-crown'>
+				<img src="imgs/zhangfei.jpg" id='zhangfei'>
+				<img src="imgs/liubei.jpg" id='liubei'>
+				<img src="imgs/zhaoyun.jpg" id='zhaoyun'>
+				<img src="imgs/zhugeliang.jpg" id='zhugeliang'>
+				<img src="imgs/guanyu.jpg" id='guanyu'>
+				<img src="imgs/message.png" id='message'>
+			</div>
 		</div>
 
 	</body>

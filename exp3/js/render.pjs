@@ -5,10 +5,10 @@ var hitOptions = {
 	tolerance: 5
 };
 var conPosition = [
-	[0, 48],
-	[48, 0],
-	[-48, 0],
-	[0, -48]
+	[0, 1],
+	[1, 0],
+	[-1, 0],
+	[0, -1]
 ]
 var LIUBEI = "刘备";
 var ZHANGFEI = "张飞";
@@ -19,20 +19,41 @@ var ZHUGELIANG = "诸葛亮";
 var segment, item, connection, endPoint;
 connections = {}
 var movePath = false;
+var isDragging = false;
 var connId;
 var previousGroup;
-var avatars_url = ['imgs/liubei.jpg','imgs/zhangfei.jpg','imgs/zhaoyun.jpg','imgs/guanyu.jpg','imgs/zhugeliang.jpg']
+var mainBody;
+var textLineItems = {}
+var avatars_url = ['liubei','zhangfei','zhaoyun','guanyu','zhugeliang']
 var avatars_name = [LIUBEI,ZHANGFEI,ZHAOYUN,GUANYU,ZHUGELIANG];
+var dragElem = null;
+numInBody = 0
+DAG = {}
+var createArray2D = function(m,n){
+	array = {}
+	for(var x=0;x<m;x++){
+		array[x] = {}
+		for(var y=0;y<n;y++){
+			array[x][y] = null;
+		}
+	}
+	return array
+}
 
-DAG = new Array(new Array(),new Array());
+edges = createArray2D(5,5)
+pos_crwon = {}
+avatars = {}
+attacks = {}
 
-function Connector(point, item) {
+
+
+function Connector(point,size,item,connectable) {
 	this.group = new Group()
 	this.group.name = 'connector';
 	// Container
 	this.container = new Path.Rectangle({
 		point: [0, 0],
-		size: [100, 100],
+		size: size,
 		radius: 20,
 		fillColor: 'grey',
 		position: point,
@@ -41,25 +62,28 @@ function Connector(point, item) {
 	})
 	this.group.addChild(this.container)
 	this.connectGroup = new Group({name: 'connectpoints'})
-
-	// connect points
-	for (var i = 0; i < conPosition.length; i++) {
-		this.connectGroup.addChild(
-			new Path.Circle({
-				center: new Point(conPosition[i]) + point,
-				radius: 3,
-				strokeColor: 'blue',
-				name: 'connectpoint',
-				visible: false
-			})
-		)
+	if(connectable){
+		// connect points
+		for (var i = 0; i < conPosition.length; i++) {
+			this.connectGroup.addChild(
+				new Path.Circle({
+					center: new Point(conPosition[i])*size/2 + point,
+					radius: 3,
+					strokeColor: 'blue',
+					name: 'connectpoint',
+					visible: false
+				})
+			)
+		}
+		this.group.addChild(this.connectGroup)
 	}
-	this.group.addChild(this.connectGroup)
+
 	// add content
+	innerSize = new Size(size) - new Size(20,20)
 	if(item){
 		item.fitBounds(new Rectangle({
-			point:point - [40,40],
-			size:[80,80]
+			point:point - innerSize/2,
+			size: innerSize
 		}))
 		this.group.addChild(item)
 		item.sendToBack()
@@ -68,6 +92,7 @@ function Connector(point, item) {
 }
 
 function onMouseDown(event) {
+	isDragging = false;
 	segment = item = connId = null;
 	var hitResult = project.hitTest(event.point, hitOptions);
 	if (!hitResult)
@@ -78,6 +103,7 @@ function onMouseDown(event) {
 			segment = hitResult.segment;
 			if (segment.path.name != 'connectpoint') return
 			connId = segment.path.parent.parent.children['backgroud'].id
+			to =  segment.path.parent.parent.firstChild.name
 			connection = new Path();
 			connection.sendToBack();
 			connection.strokeColor = 'red'
@@ -108,18 +134,20 @@ function onMouseMove(event) {
 }
 
 function onMouseDrag(event) {
+	isDragging = true
 	var hitResult = project.hitTest(event.point, hitOptions);
-	if (hitResult) {
-		if (hitResult.type == 'fill') {
-			group = hitResult.item.parent;
-			if (previousGroup)
-				hideConnectpoint(previousGroup)
-			showConnectpoint(group)
-			previousGroup = group
-		}
-	}
+	dragElem = null;
 	if (segment && segment.path.name == 'connectpoint') {
 		connection.lastSegment.point += event.delta;
+		if (hitResult) {
+			if (hitResult.type == 'fill') {
+				group = hitResult.item.parent;
+				if (previousGroup)
+					hideConnectpoint(previousGroup)
+				showConnectpoint(group)
+				previousGroup = group
+			}
+		}
 	} else if (item && item.parent.name == 'connector') {
 		item.parent.position += event.delta;
 		// Move the connect points.
@@ -127,6 +155,16 @@ function onMouseDrag(event) {
 			for (var i in connections[connId]) {
 				connections[connId][i].point += event.delta;
 			}
+		if (hitResult && !item.parent.children['mainBody']) {
+			if (hitResult.type == 'fill') {
+				group = hitResult.item.parent;
+				if(group.children['mainBody']){
+					dragElem = item.parent  
+					console.log('find body')
+				}
+
+			}
+		}
 	}
 }
 
@@ -136,13 +174,13 @@ function onMouseUp(event) {
 		//return;
 	}
 	else{
-		console.log(hitResult.type)
 		if (hitResult.type == 'segment') {
 			segment = hitResult.segment;
 			console.log(segment.path.name)
 			if (segment.path.name == 'connectpoint') {
 				connection.lastSegment = segment.path.position
 				newconnId = segment.path.parent.parent.children['backgroud'].id
+				from =  segment.path.parent.parent.firstChild.name
 				if(connId !=newconnId){
 					line = new Path.Line({
 						from:connection.firstSegment.point,
@@ -154,19 +192,31 @@ function onMouseUp(event) {
 					connections[connId].push(line.firstSegment)
 					if (!(newconnId in connections)) connections[newconnId] = []
 					connections[newconnId].push(line.lastSegment)
-					addEdge(connId, newconnId)
+					addEdge(from, to)
 				}
 
 				//connection = null
 			}
 		}
+		else if(hitResult.type == 'fill'){
+			group = hitResult.item.parent;
+			if(dragElem){
+				addElem(mainBody, dragElem)
+				console.log('drop elem')
+			}
+			if(!isDragging && group.children['mainBody'])
+			$("#condition-panel").panel("open")
+
+		}
 	}
+	dragElem = null;
 	if (connection)
 		connection.remove();
 }
 
 function showConnectpoint(group) {
 	for (i = 0; i < 4; i++) {
+		if(group.children['connectpoints'])
 		group.children['connectpoints'].children[i].visible = true;
 	}
 	group.children['backgroud'].opacity = 0.5;
@@ -174,19 +224,144 @@ function showConnectpoint(group) {
 
 function hideConnectpoint(group) {
 	for (i = 0; i < 4; i++) {
+		if(group.children['connectpoints'])
 		group.children['connectpoints'].children[i].visible = false;
 	}
 	group.children['backgroud'].opacity = 0;
 }
 function addEdge(point1, point2){
-	point1<=point2?DAG[point1] = point2:DAG[point2] = point1
+	point1<=point2?DAG[point1 + '-' + point2] = 1 :DAG[point2 + '-' + point1] = 1
 }
+
+function addElem(body, elem){
+	e = elem.firstChild
+	if(body.children['line-' + e.name]){
+		textLine = body.children['line-' + e.name ]
+		if(!(e.name in textLineItems)){
+			textLine.content = textLine.content.split(':')[0] + ":"
+			textLineItems[e.name] = 0
+		}
+		body.addChild(e)
+		e.position = body.children['line-' + e.name].position +[60,0]+ new Point([20,0])*textLineItems[e.name]
+		e.size =[60,60]
+		elem.remove()
+		textLineItems[e.name] +=1
+		numInBody ++;
+	}
+}
+initStep1 = function(id){
+	var commander = new Raster(avatars_url[id]);
+	commander.name = 'commander'
+	var message = new Raster('message');
+	message.name = 'actions'
+	var attack = new Raster('img-attack');
+	attack.name = 'actions'
+	var shield = new Raster('img-shield');
+	shield.name = 'actions'
+
+	var troops =  new Group();
+	troops.name = "army"
+	troops.addChild(new PointText({
+		fillColor : 'black',
+		content : '士兵'
+		}))
+
+	var food =  new Group();
+	food.name = "food"
+	food.addChild(new PointText({
+		fillColor : 'black',
+		content : '粮食'
+		}))
+	var weather =  new Group();
+	weather.name = 'weather'
+	weather.addChild(new PointText({
+		fillColor : 'black',
+		content : '天气'
+		}))
+	mainBody =  new Group({name:"mainBody"});
+	mainBody.addChild(new PointText({
+		fillColor : 'black',
+		name: 'line-commander',
+		content : '司令:请拖动至此处',
+		position: [0,-20]
+		}))
+	mainBody.addChild(new PointText({
+		fillColor : 'black',
+		name: 'line-message',
+		content : '状态:请拖动至此处',
+		position: [0,0]
+		}))
+	mainBody.addChild(new PointText({
+		fillColor : 'black',
+		name: 'line-actions',
+		content : '动作:请拖动至此处',
+		position: [0,20]
+		}))
+	mainBody.addChild(new PointText({
+		fillColor : 'black',
+		name : 'conditions',
+		content : '条件:点击此处修改',
+		position: [0,40]
+		}))
+	objects = []
+	objects.push(new Connector(new Point(300, 50), [100,100],commander,false))
+	objects.push(new Connector(new Point(300, 170), [100,100],message,false))
+	objects.push(new Connector(new Point(300, 290), [100,100],attack,false))
+	objects.push(new Connector(new Point(300, 410), [100,100],shield,false))
+
+	objects.push(new Connector(new Point(100, 100), [100,100],troops,true))
+	objects.push(new Connector(new Point(100, 220), [100,100],food,true))
+	objects.push(new Connector(new Point(100, 340), [100,100],weather,true))
+	objects.push(new Connector(view.center, [200,300],mainBody,true))
+
+}
+
+
+
 initStep2 = function (id){
 	onResize()
+	project.activeLayer.removeChildren()
+	view.draw()
 	console.log(view.center)
-	var temp = new Raster({
-		source: 'imgs/crown.png',
-	})
+
+	poly5in = new Path.RegularPolygon(view.center,5,170)
+	for(var i=0;i<5;i++){
+		for(var j=0;j<5;j++){
+			if(i!=j){
+				var vector = (poly5in.segments[j].point - poly5in.segments[i].point).normalize(1)
+				var vert_vector = vector.rotate(90)*3
+				var line = new Path.Line({
+					from:poly5in.segments[i].point + vert_vector + vector*20,
+					to:poly5in.segments[j].point + vert_vector - vector*20,
+					strokeColor:'grey',
+					strokeWidth: 2
+				})
+				line.lineBy(
+				    new Point({
+				        angle:vector.getAngle()+160,
+				        length:20
+				    })
+				)
+				edges[i][j] = line;
+			}
+		}
+	}
+	poly5out = new Path.RegularPolygon(view.center,5,200)
+	for(var i=0;i<5;i++){
+		s = poly5out.segments[i].point
+		var r = new Raster(avatars_url[i]);
+		r.position = s;
+		r.scale(0.5)
+		pos_crwon[i] = new Point(r.bounds.x + r.bounds.width-10, r.bounds.y-20)
+		avatars[i] = new Path.Rectangle({
+			position: s,
+			size: [r.bounds.width+10,r.bounds.height+10],
+			radius: 20,
+			fillColor: 'grey'
+		})
+		avatars[i].sendToBack();
+	}
+	var temp = new Raster('img-crown')
 	temp.fitBounds(new Rectangle({
 			point:pos_crwon[id],
 			size:[30,30]
@@ -196,9 +371,7 @@ initStep2 = function (id){
 	view.draw()
 }
 setAttack = function (id, attack){
-	var temp = new Raster({
-		source: attack==true?'imgs/attack.png':'imgs/shield.png',
-	})
+	var temp = new Raster(attack==true?'img-attack':'img-shield')
 	temp.fitBounds(new Rectangle({
 			point:pos_crwon[id] +[26,0],
 			size:[30,30]
@@ -221,7 +394,6 @@ resetStep2 = function(){
 		};
 		avatars[i].fillColor = 'grey';
 		if((i in attacks)&&(attacks[i]!=null)){
-			console.log('here')
 			attacks[i].remove()
 			attacks[i] = null
 		}
@@ -229,9 +401,7 @@ resetStep2 = function(){
 	view.draw()
 }
 showLegend = function(){
-	var temp = new Raster({
-		source: 'imgs/crown.png',
-	})
+	var temp = new Raster('img-crown')
 	temp.fitBounds(new Rectangle({
 			point:[20,10],
 			size:[30,30]
@@ -291,9 +461,7 @@ showLegend = function(){
  		fillColor : 'black',
  		content : '起点玩家声称终点玩家为整备状态'
  	})
- 	var temp = new Raster({
-		source: 'imgs/attack.png',
-	})
+ 	var temp = new Raster('img-attack')
 	temp.fitBounds(new Rectangle({
 			point:[20,100],
 			size:[20,20]
@@ -303,9 +471,7 @@ showLegend = function(){
  		fillColor : 'black',
  		content : '该角色发起攻击'
  	})
- 	var temp = new Raster({
-		source: 'imgs/shield.png',
-	})
+ 	var temp = new Raster('img-shield')
 	temp.fitBounds(new Rectangle({
 			point:[20,120],
 			size:[20,20]
@@ -326,95 +492,9 @@ refreshCanvas =function(){
 	view.draw()
 }
 
-// var raster = new Raster({
-//     source: 'imgs/liubei.jpg',
-// });
-// var raster2 = new Raster({
-//     source: 'imgs/zhaoyun.jpg',
-// });
-// var raster3 = new Raster({
-//     source: 'imgs/zhangfei.jpg',
-// });
-// var army =  new Group();
-// army.addChild(new PointText({
-// 	fillColor : 'black',
-// 	content : '士兵'
-// 	}))
-
-// var food =  new Group();
-// food.addChild(new PointText({
-// 	fillColor : 'black',
-// 	content : '粮食'
-// 	}))
-// var weather =  new Group();
-// weather.addChild(new PointText({
-// 	fillColor : 'black',
-// 	content : '天气'
-// 	}))
-
-// objects = []
-// objects.push(new Connector(new Point(50, 50), raster))
-// objects.push(new Connector(new Point(300, 100), raster2))
-// objects.push(new Connector(new Point(200, 50), raster3))
-// objects.push(new Connector(new Point(300, 200), army))
-// objects.push(new Connector(new Point(400, 300), food))
-// objects.push(new Connector(new Point(500, 200), weather))
 
 onResize()
-var createArray2D = function(m,n){
-	array = {}
-	for(var x=0;x<m;x++){
-		array[x] = {}
-		for(var y=0;y<n;y++){
-			array[x][y] = null;
-		}
-	}
-	return array
-}
 
-edges = createArray2D(5,5)
-pos_crwon = {}
-avatars = {}
-attacks = {}
-poly5in = new Path.RegularPolygon(view.center,5,170)
-poly5in.segments[0].point
-for(var i=0;i<5;i++){
-	for(var j=0;j<5;j++){
-		if(i!=j){
-			var vector = (poly5in.segments[j].point - poly5in.segments[i].point).normalize(1)
-			var vert_vector = vector.rotate(90)*3
-			var line = new Path.Line({
-				from:poly5in.segments[i].point + vert_vector + vector*20,
-				to:poly5in.segments[j].point + vert_vector - vector*20,
-				strokeColor:'grey',
-				strokeWidth: 2
-			})
-			line.lineBy(
-			    new Point({
-			        angle:vector.getAngle()+160,
-			        length:20
-			    })
-			)
-			edges[i][j] = line;
-		}
-	}
-}
-poly5out = new Path.RegularPolygon(view.center,5,200)
-for(var i=0;i<5;i++){
-	s = poly5out.segments[i].point
-	var r = new Raster({
-    source: avatars_url[i],
-    position: s
-	});
-	r.scale(0.5)
-	pos_crwon[i] = new Point(r.bounds.x + r.bounds.width-10, r.bounds.y-20)
-	avatars[i] = new Path.Rectangle({
-		position: s,
-		size: [r.bounds.width+10,r.bounds.height+10],
-		radius: 20,
-		fillColor: 'grey'
-	})
-	avatars[i].sendToBack();
-}
+
 
 

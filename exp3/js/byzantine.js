@@ -5,7 +5,7 @@ var NOT_READY = 0;
 var WEATHERS = 3;
 var SUNNY = 0;
 var RAINY = 1;
-var SNOWY = 2;
+var CLOUDY = 2;
 
 var LIUBEI = "刘备";
 var ZHANGFEI = "张飞";
@@ -17,46 +17,57 @@ function Army(){
 	this.globalTime = 0;
 	this.transferCondition = "";   // 定义转换为Ready的条件表达式, 后经eval判断
 	//  上下文
-	this.ArmyID = 0,  // 军队编号
 	this.generalName =  LIUBEI,      // 将领名称
 	this.troops =  5000,     // 5000人
-	this.weahter =  SUNNY,       // SUNNY:晴天, RAINY:雨天, SNOWY: 雪天
-	this.armyStatus =  NOT_READY,	//  NOT_READY: 未就绪, READY: 就绪
+	this.weahter =  SUNNY,       // SUNNY:晴天, RAINY:雨天, CLOUDY: 雪天
 	this.supply =  5000	//  粮食斤数
 }
-/*
-*	Action: 攻击
-*/
-Army.prototype.actionAttack = function(){
-
-};
-/*
-*	Action: 通信
-*/
-Army.prototype.actionCommunicate = function(){
-
-};
-
-/*
-*	Action: 就绪
-*/
-Army.prototype.actionReady = function(){
-
-};
 
 /*
 *	下一小时, 更新上下文
 */
-Army.prototype.nextHour = function(){
+
+Army.prototype.nextDay = function(){
 	this.weahter = Math.floor(Math.random()*WEATHERS)
 	this.supply -= Math.floor(Math.random()*200)
 };
-
+Army.prototype.chkReady = function(){
+	console.log(eval(this.transferCondition))
+}
+Army.prototype.chkCorrect = function(){
+	var n = 0;
+	if(this.transferCondition!="") n++    // 1
+	var newDAG = jQuery.extend(true, {}, DAG)
+	console.log(newDAG)
+	if('army-mainBody' in newDAG){
+		delete newDAG['army-mainBody']
+		n++
+	}
+	if('mainBody-weather' in newDAG){
+		delete newDAG['mainBody-weather']
+		n++
+	}
+	if('food-mainBody' in DAG){
+		delete newDAG['food-mainBody']
+		n++
+	}
+	if($.map(newDAG, function(n, i) { return i; }).length!=0){
+		alert()
+		n =-1  //dummy
+	}
+	if(numInBody == 4){
+		n++;
+	}
+	console.log('correct:',n)
+	if(n==5)return true
+	else return false
+}
 
 
 function GameManager(){
 	var _this = this
 	this.day = 0
+	this.army = new Army()
 	this.namemap = [LIUBEI,ZHANGFEI,ZHAOYUN,GUANYU,ZHUGELIANG]
 	this.restTime = 0
 	this.Ajax = new modAjax(1,this);
@@ -71,7 +82,7 @@ function GameManager(){
 	     var msg = $.parseJSON(e.data)
 	     if(msg['data_type'] == 'notify'){
 	     	if(msg['data']['event'] == 'start'){
-	     		$("#pause-popup").popup("close")
+	     		setTimeout(function(){$("#pause-popup").popup("close")},500)
 	     		_this.day = msg['data']['day']
 	     		_this.log("",'人员就位，游戏开始，今天是第' + _this.day + '天。' , 'sys')
 	     		_this.interval = parseInt(msg['data']['interval'])
@@ -105,7 +116,7 @@ function GameManager(){
 	     		$('#userlist ul').append('<li><span style="color:grey">' + _this.userlist[userId]['name']  + '</span></li>')
 	     	}
 	     	_this.log("",msg['event']==true?"有人加入了游戏":"有人离开了游戏，游戏暂停。" , 'sys')
-	     	if(msg['event']==false){
+	     	if(msg['event']==false && _this.stage == 1){
 	     		$("#pause-popup").popup("open")
 	     	}
 	      }
@@ -121,32 +132,16 @@ function GameManager(){
 	     		_this.id = parseInt(msg['data']['id'])
 	     		_this.isTraitor = msg['data']['isTraitor']
 	     		_this.messages = msg['data']['messages']
-	     		$('#current-messages').text(_this.messages)
-		     	$('#receivers').text("")
-		     	$('#send-content').text("")
-		     	var x=0;
-		     	for(var x=0;x<5;x++){
-		     		if(x!=_this.id){
-		     			var html ='<input type="checkbox" name="'+ x +'" id="c1-' + x + '" data-mini="true"><label for="c1-'+ x + '">'+ _this.namemap[x] + '</label>'
-		     			$('#receivers').append(html)
-		     		}
-		     		$('#receivers').trigger('create')
-		     		var html = ''
-						+ '<fieldset class="ui-grid-a" name="' + x + '">'
-						+ '<div class="ui-block-a">'
-					    + '<input type="checkbox" name="'+ x +'" id="checkbox-' +x + '" data-mini="true">'
-					    + '<label for="checkbox-' + x +'">'+ _this.namemap[x] + '</label>'
-						+ '</div>'
-					    + '<div class="ui-block-b">'
-					    + '<select id="flipswitch-'+ x + '" style="position:relative" data-role="flipswitch"><option value="NOT_READY">等待</option><option value="READY">就绪</option></select>'
-						+ '</div>'
-						+ '</fieldset>'
-		      		$('#send-content').append(html)
-		     	}
-		     	$('#receivers').trigger('create')
-		     	$('#send-content').trigger('create')
-	     		initStep2(_this.id)
 	     		_this.name = _this.namemap[_this.id]
+	     		_this.stage = msg['data']['stage']
+	     		_this.initStage2()
+	     		if(_this.stage==0){
+	     			_this.initStage1()
+	     		}
+	     		else{
+	     			_this.moveStage2()
+	     		}
+	     		
 	     		//_this.sock.send(_this.getMsgJson(0,{"generalname":_this.name},'register'))
 	     	}
 	     }
@@ -154,6 +149,42 @@ function GameManager(){
 	 this.sock.onclose = function() {
 	     console.log('close');
 	 };
+}
+
+GameManager.prototype.getNameList = function(){
+	u = []
+	for(var user in this.userlist){
+		u.push(this.userlist[user]["name"])
+	}
+	return u
+}
+GameManager.prototype.initStage2 = function(){
+	_this = this
+	$('#current-messages').text(_this.messages)
+ 	$('#receivers').text("")
+ 	$('#send-content').text("")
+ 	var x=0;
+ 	for(var x=0;x<5;x++){
+ 		if(x!=_this.id){
+ 			var html ='<input type="checkbox" name="'+ x +'" id="c1-' + x + '" data-mini="true"><label for="c1-'+ x + '">'+ _this.namemap[x] + '</label>'
+ 			$('#receivers').append(html)
+ 		}
+ 		$('#receivers').trigger('create')
+ 		var html = ''
+			+ '<fieldset class="ui-grid-a" name="' + x + '">'
+			+ '<div class="ui-block-a">'
+		    + '<input type="checkbox" name="'+ x +'" id="checkbox-' +x + '" data-mini="true">'
+		    + '<label for="checkbox-' + x +'">'+ _this.namemap[x] + '</label>'
+			+ '</div>'
+		    + '<div class="ui-block-b">'
+		    + '<select id="flipswitch-'+ x + '" style="position:relative" data-role="flipswitch"><option value="NOT_READY">等待</option><option value="READY">就绪</option></select>'
+			+ '</div>'
+			+ '</fieldset>'
+  		$('#send-content').append(html)
+ 	}
+ 	$('#receivers').trigger('create')
+ 	$('#send-content').trigger('create')
+
 	$('#confirm-send').click(function(){
 		var receivers = []
 		var sendContent = {}
@@ -181,13 +212,41 @@ function GameManager(){
 	})
 }
 
-GameManager.prototype.getNameList = function(){
-	u = []
-	for(var user in this.userlist){
-		u.push(this.userlist[user]["name"])
-	}
-	return u
+GameManager.prototype.moveStage2 = function(){
+
+	$('#console-stage1').css('display','none')
+	$('#console-stage2').css('display','block')
+	$('#control-stage2').css('display','block')
+	setTimeout(function(){$("#pause-popup").popup("open")},500)
+	initStep2(_this.id)
 }
+
+GameManager.prototype.initStage1 = function(){
+	_this = this
+	$('#console-stage1').css('display','block')
+	$("#confirm-condition").click(function(){
+		if(parseInt($("#food-val").val())!=NaN && parseInt($("#troops-val").val())!=NaN){
+			_this.army.transferCondition = "this.ready = " +
+			"this.supply" + ($("#food-op").val()=="smaller"?"<=":">") + parseInt($("#food-val").val()) + '&&' +
+			"this.troops" + ($("#troops-op").val()=="smaller"?"<=":">") + parseInt($("#troops-val").val()) + '&&' +
+			"this.weahter" + "==" + $("#weather-val").val();
+		}
+	})
+	$('#make').click(function(){
+		if(_this.army.chkCorrect()){
+			_this.log('','部队构建完毕，等待战斗！','sys')
+			_this.sock.send(_this.getMsgJson(0, true, 'nextstage'))
+			_this.moveStage2()
+			_this.stage = 1
+		}
+		else{
+			_this.log('','部队一盘散沙，不能成军，请重下军令！','sys')
+
+		}
+	})
+	initStep1(_this.id)
+}
+
 GameManager.prototype.startTimer = function(){
 	_self = this
 	this.restTime = this.interval;
@@ -226,7 +285,6 @@ GameManager.prototype.getSuccessHandler = function(data) {
 	GM.group = data["group"]
 	GM.userId = data["userId"]
 	$("#login_info").text("姓名：" + GM.name + " 组号：" + GM.group)
-	$("#pause-popup").popup("open")
 }
 GameManager.prototype.getErrorHandler = function() {
 	setTimeout(function(){$("#error-popup").popup("open")},1000)
