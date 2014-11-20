@@ -220,7 +220,7 @@ GameManager.prototype.moveStage2 = function(){
 	$('#console-stage2').css('display','block')
 	$('#control-stage2').css('display','block')
 	setTimeout(function(){$("#pause-popup").popup("open")},500)
-	_this.waitPaperjs(initStep2)
+	_this.waitPaperjs("initStep2")
 }
 
 GameManager.prototype.initStage1 = function(){
@@ -246,7 +246,7 @@ GameManager.prototype.initStage1 = function(){
 
 		}
 	})
-	_this.waitPaperjs(initStep1)
+	_this.waitPaperjs("initStep1")
 }
 
 GameManager.prototype.startTimer = function(){
@@ -345,9 +345,19 @@ GameManager.prototype.name2id = function(id){
 }
 GameManager.prototype.waitPaperjs = function(fun) {
 	_this = this
-		if(fun!=undefined)
+	ok = false
+	if(initStep1){
+		ok = true
+	}
+		if(ok)
 		{	
-			fun(_this.id)
+			if(fun=="initStep1")
+			{
+				initStep1(_this.id)
+			}
+			else if (fun=="initStep2"){
+				initStep2(_this.id)
+			}
 		}
 		else{
 			setTimeout(function(){_this.waitPaperjs(fun)}, 500)
