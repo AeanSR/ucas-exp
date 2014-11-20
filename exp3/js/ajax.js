@@ -4,7 +4,7 @@ function modAjax(gameId,GameManager){
 	this.gameLoop = -1
 	this.GameManager = gameId
 	//this.url = "http://ucas-2014.tk:8888/"
-	this.url = "http://ucas-2014.tk"
+	this.url = "http://ucas-2014.tk/"
 }
 
 modAjax.prototype.getinfo = function(on_Success,on_Error) {
