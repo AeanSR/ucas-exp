@@ -346,8 +346,12 @@ GameManager.prototype.name2id = function(id){
 GameManager.prototype.waitPaperjs = function(fun) {
 	_this = this
 	ok = false
-	if(initStep1){
-		ok = true
+	try{
+		if(initStep1){
+			ok = true
+		}
+	}catch(e){
+		
 	}
 		if(ok)
 		{	
