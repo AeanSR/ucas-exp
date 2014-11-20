@@ -72,8 +72,8 @@ function GameManager(){
 	this.restTime = 0
 	this.Ajax = new modAjax(5,this);
 	this.Ajax.getinfo(this.getSuccessHandler, this.getErrorHandler);
-	//this.sock = new SockJS('http://127.0.0.1:8888/api/exp3');
-	this.sock = new SockJS('http://ucas-2014.tk/api/exp3');
+	this.sock = new SockJS('http://127.0.0.1:8888/api/exp3');
+	//this.sock = new SockJS('http://ucas-2014.tk/api/exp3');
 
 	this.sock.onopen = function() {
 	     console.log('Established the connection.');
@@ -220,7 +220,7 @@ GameManager.prototype.moveStage2 = function(){
 	$('#console-stage2').css('display','block')
 	$('#control-stage2').css('display','block')
 	setTimeout(function(){$("#pause-popup").popup("open")},500)
-	initStep2(_this.id)
+	_this.waitPaperjs(initStep2)
 }
 
 GameManager.prototype.initStage1 = function(){
@@ -246,7 +246,7 @@ GameManager.prototype.initStage1 = function(){
 
 		}
 	})
-	initStep1(_this.id)
+	_this.waitPaperjs(initStep1)
 }
 
 GameManager.prototype.startTimer = function(){
@@ -343,7 +343,17 @@ GameManager.prototype.id2name = function(id){
 GameManager.prototype.name2id = function(id){
 	return null
 }
-
+GameManager.prototype.waitPaperjs = function(fun) {
+	_this = this
+		if(fun!=undefined)
+		{	
+			fun(_this.id)
+		}
+		else{
+			setTimeout(function(){_this.waitPaperjs(fun)}, 500)
+			return		
+		}
+}
 $(function(){
 	if ((index = location.href.search('#')) != -1) {
 		location.href = location.href.substr(0,index)
