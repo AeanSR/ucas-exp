@@ -55,7 +55,7 @@ Army.prototype.chkCorrect = function(){
 		alert()
 		n =-1  //dummy
 	}
-	if(numInBody == 4){
+	if(numInBody == 6){
 		n++;
 	}
 	console.log('correct:',n)
@@ -343,6 +343,10 @@ GameManager.prototype.name2id = function(id){
 }
 
 $(function(){
+	if ((index = location.href.search('#')) != -1) {
+		location.href = location.href.substr(0,index)
+		return
+	}
 	a = new Army()
 	GM = new GameManager()
 });

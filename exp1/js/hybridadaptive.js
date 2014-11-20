@@ -245,7 +245,7 @@ HAGameManager.prototype.clearAllselect = function() {
 	}
 }
 HAGameManager.prototype.killMouse = function(mouse) {
-		$("#mice-container #" + r).html('<img src="imgs/mouse-dead.png">')
+		$("#mice-container #" + mouse).html('<img src="imgs/mouse-dead.png">')
 		.unbind('click')
 		.droppable("disable")}
 
@@ -381,7 +381,7 @@ HAGameManager.prototype.isGameOver = function(isWin,u_bottle,c_bottle) {
 		$("#gameover #gameover-notice").text("You didn't find the poison!")
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
-		$("#gameover #gameover-content").text("The result has been submitted to the server. ")
+		$("#gameover #gameover-content").text("The result will be submitted to the server. The steps will be conunted as the number of bottles.")
 		if(this.is_test){
 			$("#gameover .ui-btn").text("Retry")
 			$("#gameover .ui-btn").click(function() {
@@ -390,7 +390,7 @@ HAGameManager.prototype.isGameOver = function(isWin,u_bottle,c_bottle) {
 		}
 		else{
 			$("#gameover .ui-btn").text("Uploading...")
-			this.Ajax.putinfo(-1,this.historys,
+			this.Ajax.putinfo(this.bottles,this.historys,
 				this.putSuccessHandler,this.putErrorHandler)
 		}
 		this.Popup("#gameover")

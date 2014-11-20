@@ -22,12 +22,14 @@ GameManager.prototype.create = function() {
 		$('#header h1').text('Adaptive Game 1')
 		$('#error-popup .ui-btn').attr('href','adaptive.html?testA')
 		$('#best-scores').text('Best Steps:')
+		this.totaltimes = 3
 		this.Ajax = new modAjax(1,this)
 	}
 	else {
 		$('#header h1').text('Adaptive Game 2')
 		$('#error-popup .ui-btn').attr('href','adaptive.html?testN')
 		$('#best-scores').text('Average Steps:')
+		this.totaltimes = 5
 		this.Ajax = new modAjax(4,this)
 	}
 	this.Ajax.getinfo(this.getSuccessHandler, this.getErrorHandler)
@@ -72,7 +74,7 @@ GameManager.prototype.getSuccessHandler = function(data) {
 	name = data["name"]
 	group = data["group"]
 	GM.Ajax.gameLoop = data["curLoop"]
-	if(GM.Ajax.gameLoop>2 && !GM.is_test) {
+	if(GM.Ajax.gameLoop>GM.totaltimes-1 && !GM.is_test) {
 		$("#error-notice").text("Sorry, your challenges have been used up.But you can still play the test mode.")
 		$("#error-popup").popup("open")
 	}
@@ -112,7 +114,7 @@ GameManager.prototype.setPanel = function() {
 		}
 	else{
 		$('#game-mode').text("Submit Mode")
-		$('#game-times').text(3-GM.Ajax.gameLoop)
+		$('#game-times').text(this.totaltimes-GM.Ajax.gameLoop)
 	}
 }
 GameManager.prototype.createRandomPoison = function() {
@@ -469,7 +471,7 @@ GameManager.prototype.isGameOver = function() {
 		$("#gameover #gameover-notice").text("All mice have died!")
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
-		$("#gameover #gameover-content").text("The result will be submitted to the server. ")
+		$("#gameover #gameover-content").text("The result will be submitted to the server. The steps will be conunted as the number of bottles.")
 		if(this.is_test){
 			$("#gameover .ui-btn").text("Retry")
 			$("#gameover .ui-btn").click(function() {
@@ -478,7 +480,7 @@ GameManager.prototype.isGameOver = function() {
 		}
 		else{
 			$("#gameover .ui-btn").text("Uploading...")
-			this.Ajax.putinfo(-1,this.historys,
+			this.Ajax.putinfo(this.bottles,this.historys,
 				this.putSuccessHandler,this.putErrorHandler)
 		}
 		this.Popup("#gameover")	

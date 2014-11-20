@@ -47,7 +47,7 @@ attacks = {}
 
 
 
-function Connector(point,size,item,connectable) {
+function Connector(point,size,item,connectable,color, connectname) {
 	this.group = new Group()
 	this.group.name = 'connector';
 	// Container
@@ -55,9 +55,10 @@ function Connector(point,size,item,connectable) {
 		point: [0, 0],
 		size: size,
 		radius: 20,
-		fillColor: 'grey',
+		fillColor: color,
+		strokeColor: 'black',
 		position: point,
-		opacity: 0,
+		opacity: 0.2,
 		name: 'backgroud'
 	})
 	this.group.addChild(this.container)
@@ -227,7 +228,7 @@ function hideConnectpoint(group) {
 		if(group.children['connectpoints'])
 		group.children['connectpoints'].children[i].visible = false;
 	}
-	group.children['backgroud'].opacity = 0;
+	group.children['backgroud'].opacity = 0.2;
 }
 function addEdge(point1, point2){
 	point1<=point2?DAG[point1 + '-' + point2] = 1 :DAG[point2 + '-' + point1] = 1
@@ -242,8 +243,9 @@ function addElem(body, elem){
 			textLineItems[e.name] = 0
 		}
 		body.addChild(e)
-		e.position = body.children['line-' + e.name].position +[60,0]+ new Point([20,0])*textLineItems[e.name]
-		e.size =[60,60]
+		//e.position = body.children['line-' + e.name].position +[60,0]+ new Point([20,0])*textLineItems[e.name]
+		//e.fitBounds[60,60]
+		e.fitBounds(body.children['line-' + e.name].bounds.topLeft +[60,0]+ new Point([40,0])*textLineItems[e.name],[25,25])
 		elem.remove()
 		textLineItems[e.name] +=1
 		numInBody ++;
@@ -258,6 +260,10 @@ initStep1 = function(id){
 	attack.name = 'actions'
 	var shield = new Raster('img-shield');
 	shield.name = 'actions'
+	var ready = new Raster('img-ready');
+	ready.name = 'message'
+	var notready = new Raster('img-notready');
+	notready.name = 'message'
 
 	var troops =  new Group();
 	troops.name = "army"
@@ -279,6 +285,12 @@ initStep1 = function(id){
 		content : '天气'
 		}))
 	mainBody =  new Group({name:"mainBody"});
+	mainBody.addChild(new PointText({
+		fillColor : 'black',
+		name: 'line-army',
+		content : avatars_name[id] + '部队',
+		position: [0,-50]
+		}))
 	mainBody.addChild(new PointText({
 		fillColor : 'black',
 		name: 'line-commander',
@@ -304,15 +316,17 @@ initStep1 = function(id){
 		position: [0,40]
 		}))
 	objects = []
-	objects.push(new Connector(new Point(300, 50), [100,100],commander,false))
-	objects.push(new Connector(new Point(300, 170), [100,100],message,false))
-	objects.push(new Connector(new Point(300, 290), [100,100],attack,false))
-	objects.push(new Connector(new Point(300, 410), [100,100],shield,false))
+	objects.push(new Connector(new Point(300, 50), [100,100],commander,false,'green', "关羽"))
+	objects.push(new Connector(new Point(300, 170), [100,100],message,false,'green'))
+	objects.push(new Connector(new Point(300, 290), [100,100],attack,false,'green'))
+	objects.push(new Connector(new Point(300, 410), [100,100],shield,false,'green'))
+	objects.push(new Connector(new Point(450, 150), [100,100],ready,false,'green'))
+	objects.push(new Connector(new Point(450, 300), [100,100],notready,false,'green'))
 
-	objects.push(new Connector(new Point(100, 100), [100,100],troops,true))
-	objects.push(new Connector(new Point(100, 220), [100,100],food,true))
-	objects.push(new Connector(new Point(100, 340), [100,100],weather,true))
-	objects.push(new Connector(view.center, [200,300],mainBody,true))
+	objects.push(new Connector(new Point(100, 100), [100,100],troops,true,'blue'))
+	objects.push(new Connector(new Point(100, 220), [100,100],food,true,'blue'))
+	objects.push(new Connector(new Point(100, 340), [100,100],weather,true,'blue'))
+	objects.push(new Connector(new Point(650, 200), [200,300],mainBody,true,'red'))
 
 }
 

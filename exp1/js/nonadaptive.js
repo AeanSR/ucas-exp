@@ -332,7 +332,7 @@ NAGameManager.prototype.gameOver = function(isWin,u_bottle,c_bottle) {
 		$("#gameover #gameover-notice").text("You can't find the poison!")
 		this.is_test?
 		$("#gameover #gameover-content").text("Test mode won't upload the results."):
-		$("#gameover #gameover-content").text("The result has been submitted to the server. ")
+		$("#gameover #gameover-content").text("The result will be submitted to the server. The scores will be conunted as the number of bottles.")
 		if(this.is_test){
 			$("#gameover .ui-btn").text("Retry")
 			$("#gameover .ui-btn").click(function() {
@@ -341,7 +341,7 @@ NAGameManager.prototype.gameOver = function(isWin,u_bottle,c_bottle) {
 		}
 		else{
 			$("#gameover .ui-btn").text("Uploading...")
-			this.Ajax.putinfo(-1,this.historys,
+			this.Ajax.putinfo(this.bottles,this.historys,
 				this.putSuccessHandler,this.putErrorHandler)
 		}
 		this.Popup("#gameover")
