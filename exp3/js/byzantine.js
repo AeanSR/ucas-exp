@@ -70,7 +70,7 @@ function GameManager(){
 	this.army = new Army()
 	this.namemap = [LIUBEI,ZHANGFEI,ZHAOYUN,GUANYU,ZHUGELIANG]
 	this.restTime = 0
-	this.Ajax = new modAjax(1,this);
+	this.Ajax = new modAjax(5,this);
 	this.Ajax.getinfo(this.getSuccessHandler, this.getErrorHandler);
 	this.sock = new SockJS('http://127.0.0.1:8888/api/exp3');
 	this.sock.onopen = function() {
