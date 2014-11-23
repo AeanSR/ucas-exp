@@ -31,68 +31,73 @@
 		<div data-role="page">
 			<div data-role="header">
 				<a href="#nav-panel" data-icon="bars" data-iconpos="notext">Menu</a>
-				<h1>Introduction</h1>
+				<h1>Mice and poisons</h1>
 				<a href="#" data-icon="user" data-iconpos="left" id="login_info">Not login</a>
 			</div>
 			<div data-role="content">
-				<h1>Guide</h1>
-				<h2>Job Rule</h2>
-				<p>In this homework, you need complete all the three games as below. You can test 
+				<h1>Guidance</h1>
+				<h2>To start</h2>
+				<p>In this experiment, you need to complete all the four games as below. You can test 
 					the games in the <a href='#test' data-ajax="false">Games(Test Mode)</a> 
 					with unlimited times. In the formal <a href='#nav-panel'>
-					submit-mode</a>, <b>only <span style='color:red'>three times</span> are provided for you, the system will automatically take the highest score as your final score.</b></p>
+					submit-mode</a>, <b>only <span style='color:red'>3/5 times</span> are provided for <span style='color:red'>your team</span>.</b> It is noticed that you and your partners share the limited trial chances!</p>
 				<h2>Games(Test Mode)</h2>
 				<p>
 					In the test-mode, problem set is much easier than the submit-mode. So, to practise 
-					your algorithm/policy is very important here. After fully testing, you can be ready to 
-					finish a submit-mode(bottles are more).
+					your algorithm/policy is very important here. After fully testing, you and your partners can be ready to finish a submit-mode(bottles are more).
 				</p>
  				<ul>
 					<li><a href='adaptive.html?testA' data-ajax="false">Adaptive Game 1</a></li>
-						<b>Rule:</b> 2 mice, 1 poisoned bottle, mouse will die immediately when
-						drinks the poisoned bottle(counted as 1 step). <br>
-						<b>Target:</b> use the least steps.<br>
+						<b>Rule:</b> 2 mice, 1 poisoned bottle, you can feed a mouse in 1 step with some bottles. Mouse will die immediately when drinks the poisoned bottle. <br>
+						<b>Target:</b> Use the least steps.<br>
 						<b>Introduction:</b>
 						<p>
-						Try to find the only poisoned bottle with the least steps. If your strategy covers all the situations, you win , otherwise, you lose.   The best results will be counted.
+						Try to find the only poisoned bottle with the least steps. If your strategy covers all the situations, you win , otherwise, you lose. The best result will be counted.<br>
+						You and your partners will have 3 chances to submit totally.
 						</p>
-					<li><a href='adaptive.html?testN' data-ajax="false">Adaptive Game 2<b>(Team Version)</b></a></li>
-						<b>Rule:</b> 2 mice, 1 poisoned bottle, mouse will die immediately when
-						drinks the poisoned bottle(counted as 1 step). <br>
-						<b>Target:</b> use the least steps.<br>
+					<li><a href='adaptive.html?testN' data-ajax="false">Adaptive Game 2</a></li>
+						<b>Rule:</b> 2 mice, 1 poisoned bottle, you can feed a mouse in 1 step with some bottles. Mouse will die immediately when drinks the poisoned bottle(counted as 1 step). <br>
+						<b>Target:</b> Use the least steps.<br>
 						<b>Introduction:</b>
 						<p>
-						Try to find the only poisoned bottle with the least steps. If your strategy covers all the situations, you win , otherwise, you lose.  The average results will be counted.
+						Try to find the only poisoned bottle with the least steps. If your strategy covers all the situations, you win , otherwise, you lose.  The average results will be counted.<br>
+						You and your partners will have 5 chances to submit totally.
 						</p>
 					<li><a href='non-adaptive.html' data-ajax="false">Non-Adaptive Game</a></li>
 						<b>Rule:</b> 1 poisoned bottle, limited to 1 step to find out the poisoned bottle.<br>
-						<b>Target:</b> use the least mice.<br>
+						<b>Target:</b> Use the least mice.<br>
 						<b>Introduction:</b>
 						<p>
 						Try to find the only poisoned bottle with the least mice. Note that 
-						you must arrange the bottles to each mouse, then submit the result. If your strategy covers all the situations, you win , otherwise, you lose.  
+						you must arrange the bottles to each mouse, then submit the result. If your strategy covers all the situations, you win , otherwise, you lose. Best result will be counted.<br>
+						You and your partners will have 3 chances to submit totally.
 						</p>
 					<li><a href='hybrid-adaptive.html' data-ajax="false">Hybrid-Adaptive Game</a></li>
 						<b>Rule:</b> 2 mice, 1 poisoned bottle, poisoned mouse will die a week later.<br>
-						<b>Target:</b> use the least weeks.<br>
+						<b>Target:</b> Use the least weeks.<br>
 						<b>Introduction:</b>
 						<p>
 						Try to find the only poisoned bottle with the least weeks. Arrange
 						 the bottles to the mice, then click the "Next week" button and poisoned 
-						 bottles will effect in the next week. Note that you can only have one overlapped bottle of distinct mice.
+						 bottles will effect in the next week. The best result will be counted.<br>
+						 You and your partners will have 3 chances to submit totally.
 						</p>
 				</ul>
 				<h2>Games(Submit Mode)</h2>
-				In case of misoperation, click <a href='#nav-panel'>here</a> and enter different games in submit mode.
+				In case of mis-operation, click <a href='#nav-panel'>here</a> and enter different games in submit mode.
 			</div>
 			<div data-role="panel" data-position-fixed="true" data-display="push" data-ajax="false" data-theme="b" id="nav-panel">
 				<ul data-role="listview">
 					<li data-icon="delete"><a href="#" data-rel="close">Close menu</a></li>
 					<li><a href="index.html" data-ajax="false">Introduction</a></li>
-					<li><a href="adaptive.html?submitA" data-ajax="false">Adaptive Game 1</a></li>
-					<li><a href="adaptive.html?submitN" data-ajax="false">Adaptive Game 2</a></li>
-					<li><a href="non-adaptive.html?submit" data-ajax="false">Non-Adaptive Game</a></li>
-					<li><a href="hybrid-adaptive.html?submit" data-ajax="false">Hybrid-Adaptive Game</a></li>
+					<li><a href="adaptive.html?testA" data-ajax="false"><span style='color:green'>Test:Adaptive 1</span></a></li>
+					<li><a href="adaptive.html?testN" data-ajax="false"><span style='color:green'>Test:Adaptive 2</span></a></li>
+					<li><a href="non-adaptive.html?test" data-ajax="false"><span style='color:green'>Test:Non-Adaptive</span></a></li>
+					<li><a href="hybrid-adaptive.html?test" data-ajax="false"><span style='color:green'>Test:Hybrid-Adaptive</span></a></li>
+					<li><a href="adaptive.html?submitA" data-ajax="false"><span style='color:red'>Submit:Adaptive 1</span></a></li>
+					<li><a href="adaptive.html?submitN" data-ajax="false"><span style='color:red'>Submit:Adaptive 2</span></a></li>
+					<li><a href="non-adaptive.html?submit" data-ajax="false"><span style='color:red'>Submit:Non-Adaptive</span></a></li>
+					<li><a href="hybrid-adaptive.html?submit" data-ajax="false"><span style='color:red'>Submit:Hybrid-Adaptive</span></a></li>
 				</ul>
 			</div><!-- /panel -->
 				<div data-role="panel" data-position="right" data-position-fixed="true" data-display="overlay" data-theme="b" id="add-form">

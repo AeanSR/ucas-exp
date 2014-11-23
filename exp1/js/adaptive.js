@@ -70,13 +70,15 @@ GameManager.prototype.create = function() {
 	this.createMice(this.mouse_list)
 }
 GameManager.prototype.getSuccessHandler = function(data) {
-	console.log(data)
 	name = data["name"]
 	group = data["group"]
 	GM.Ajax.gameLoop = data["curLoop"]
 	if(GM.Ajax.gameLoop>GM.totaltimes-1 && !GM.is_test) {
-		$("#error-notice").text("Sorry, your challenges have been used up.But you can still play the test mode.")
-		$("#error-popup").popup("open")
+		setTimeout(function(){
+			$("#error-notice").text("Sorry, your challenges have been used up.But you can still play the test mode.")
+			$("#error-popup").popup("open")
+		},1000)
+
 	}
 	$("#login_info").text("姓名：" + name + " 组号：" + group)
 	$("#best-score").text(data["bestScore"])
@@ -132,7 +134,6 @@ GameManager.prototype.createRandomPoison = function() {
 }
 
 GameManager.prototype.createEmptyBottles = function(bottles_id) {
-	console.log('bottles ' + bottles_id + ' has been created')
 	var _this = this
 	$("<div></div>", {
 		class: "bottles",
@@ -156,7 +157,6 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 		filter: ".bottle",
 		distance:10,
 		selected: function(event, ui) {
-			console.log('selected')
 			$(ui.selected).draggable("enable")
 			$(ui.selected).attr("select", true);
 			$(ui.selected).css("background-color", "#356799");
@@ -172,7 +172,7 @@ GameManager.prototype.createEmptyBottles = function(bottles_id) {
 	$("#bottles-container #" + bottles_id).click(function(event) {
 		// In case of firefox 
 		if(!_this.mouse_move){
-			console.log('bottles ' + this.id + ' has been clicked')
+			//console.log('bottles ' + this.id + ' has been clicked')
 			_this.popupClosed = false
 
 				$("#bottles-" + this.id).css('visibility', 'visible')
@@ -254,7 +254,7 @@ GameManager.prototype.addToBottles = function(bottle_list, bottles) {
 				_this.addToBottles(_this.curDragList, _this.curDragBottles.split('-')[1])
 			}
 			if (!_this.popupOpen) {
-				console.log(_this.curDragBottles)
+				//console.log(_this.curDragBottles)
 				$("#"+ _this.curDragBottles)
 				$("#"+ _this.curDragBottles).popup('close')
 				$("#"+ _this.curDragBottles).popup('close')
@@ -380,7 +380,7 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 			delete GameModel
 			this.bottles = bottles_list.length
 			this.mice = this.mice - 1
-			console.log(this.bottles)
+			//console.log(this.bottles)
 			return true
 		}
 		$("#mice-container #" + mouse)
@@ -388,7 +388,7 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 		delete GameModel
 		// Kick off the healthy bottles
 		this.bottles = this.bottles - bottles_list.length
-		console.log(this.bottles)
+		//console.log(this.bottles)
 		return false
 	}
 	else{
@@ -553,9 +553,12 @@ $(function() {
 	}
 	$("body").iealert();
 	if (location.href.search('/?submitA') != -1) {
+		alert("This is a sumbit mode. You should be careful to submit your results.")
 		GM = new GameManager(2, 32, 1,false, true);
+
 	}
 	else if(location.href.search('/?submitN') != -1){
+		alert("This is a sumbit mode. You should be careful to submit your results.")
 		GM = new GameManager(2, 32, 1,false, false);
 	}
 	else if(location.href.search('/?testA') != -1){

@@ -52,7 +52,7 @@ HAGameManager.prototype.create = function() {
 		var u_bottle = $("#input-bottle").val()
 		if(u_bottle!=""){
 			$("#submit-popup").popup("close")
-			console.log("a", _this.is_Win)
+			//console.log("a", _this.is_Win)
 			if(_this.is_win){
 				isCorrect =  u_bottle== _this.c_bottle[0]
 				_this.isGameOver(isCorrect,u_bottle, _this.c_bottle[0])
@@ -78,12 +78,14 @@ HAGameManager.prototype.create = function() {
 	_this.addBottles(_this.bottle_list)
 }
 HAGameManager.prototype.getSuccessHandler = function(data) {
-	console.log(data)
+	//console.log(data)
 	name = data["name"]
 	GM.Ajax.gameLoop = data["curLoop"]
 	if(GM.Ajax.gameLoop>2 && !GM.is_test) {
-		$("#error-notice").text("Sorry, your challenges have been used up.But you can still play the test mode.")
-		$("#error-popup").popup("open")
+		setTimeout(function(){
+			$("#error-notice").text("Sorry, your challenges have been used up.But you can still play the test mode.")
+			$("#error-popup").popup("open")
+		},1000)
 	}
 	$("#login_info").text(name)
 	$("#best-score").text(data["bestScore"])
@@ -159,7 +161,7 @@ HAGameManager.prototype.createMouse = function() {
 				curDragList.push(parseInt(selected_doms[i].id))
 			}
 			mouse = $(this)[0].id
-			console.log("Dropping bottle " + bottle_id + " on mouse " + mouse)
+			//console.log("Dropping bottle " + bottle_id + " on mouse " + mouse)
 			_this.addBottlesToMouse(curDragList, mouse)
 		}
 	})
@@ -167,7 +169,7 @@ HAGameManager.prototype.createMouse = function() {
 	// Bind click to popup
 
 	mouse_dom.find('img').click(function(event) {
-		console.log('mouse ' + $(this).parent()[0].id+ ' has been clicked')
+		//console.log('mouse ' + $(this).parent()[0].id+ ' has been clicked')
 		_this.popupClosed = false
 		_this.showMousePopup(parseInt($(this).parent()[0].id),event)
 
@@ -468,27 +470,27 @@ AdaptiveAdversary.prototype.decide=function(mouse1,mouse2,overlaped){
 	console.log(this.bottles,f_mouse1.length,f_mouse2.length,f_overlaped.length,this.mice)
 	r =this.computerDecide(this.bottles,f_mouse1.length,f_mouse2.length,f_overlaped.length,this.mice)
 	if(r[0]==0){
-		console.log('nothing')
+		//console.log('nothing')
 		this.setTested(f_mouse1)
 		this.setTested(f_mouse2)
 		this.setTested(f_overlaped)
 	}
 	else if(r[0]==1){
-		console.log('mouse 1 die')
+		//console.log('mouse 1 die')
 		this.setTested(f_mouse2)
 		this.setTested(f_overlaped)
 		this.setTested(f_rest)
 		this.mice -=1
 	}
 	else if(r[0]==2){
-		console.log('mouse 2 die')
+		//console.log('mouse 2 die')
 		this.setTested(f_mouse1)
 		this.setTested(f_overlaped)
 		this.setTested(f_rest)
 		this.mice -=1
 	}
 	else if(r[0]==3){
-		console.log('mouse 1 2 die')
+		//console.log('mouse 1 2 die')
 		this.setTested(f_mouse1)
 		this.setTested(f_mouse2)
 		this.setTested(f_rest)
@@ -569,6 +571,7 @@ $(function() {
 		return
 	}
 	if (location.href.search('/?submit') != -1) {
+		alert("This is a sumbit mode. You should be careful to submit your results.")
 		GM = new HAGameManager(32,1,false);
 	}
 	else{

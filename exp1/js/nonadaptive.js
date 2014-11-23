@@ -30,12 +30,16 @@ NAGameManager.prototype.create = function() {
 	_this.addBottles(_this.bottle_list)
 }
 NAGameManager.prototype.getSuccessHandler = function(data) {
-	console.log(data)
+	//console.log(data)
 	name = data["name"]
 	GM.Ajax.gameLoop = data["curLoop"]
 	if(GM.Ajax.gameLoop>2 && !GM.is_test) {
-		$("#error-notice").text("Sorry, your challenges have been used up.But you can still play the test mode.")
-		$("#error-popup").popup("open")
+		setTimeout(function(){
+			$("#error-notice").text("Sorry, your challenges have been used up.But you can still play the test mode.")
+			$("#error-popup").popup("open")
+		},1000)
+
+
 	}
 	$("#login_info").text(name)
 	$("#best-score").text(data["bestScore"])
@@ -97,7 +101,7 @@ NAGameManager.prototype.createMouse = function() {
 				curDragList.push(parseInt(selected_doms[i].id))
 			}
 			mouse = $(this)[0].id
-			console.log("Dropping bottle " + bottle_id + " on mouse " + mouse)
+			//console.log("Dropping bottle " + bottle_id + " on mouse " + mouse)
 			_this.addBottlesToMouse(curDragList, mouse)
 		}
 	})
@@ -113,7 +117,7 @@ NAGameManager.prototype.createMouse = function() {
 	// Bind click to popup
 
 	mouse_dom.find('img').click(function(event) {
-		console.log('mouse ' + $(this).parent()[0].id+ ' has been clicked')
+		//console.log('mouse ' + $(this).parent()[0].id+ ' has been clicked')
 		_this.popupClosed = false
 		_this.showMousePopup(parseInt($(this).parent()[0].id),event)
 
@@ -192,7 +196,7 @@ NAGameManager.prototype.addBottleToMouse = function(bottle_id, mouse) {
 	if($.inArray(bottle_id,_this.result[mouse])==-1){
 		_this.result[mouse].push(bottle_id)
 	}
-	console.log("#mice-container #"  + mouse + " p")
+	//console.log("#mice-container #"  + mouse + " p")
 	$("#mice-container #"  + mouse + " p").text(_this.result[mouse].length)
 }
 
@@ -373,7 +377,7 @@ NAGameManager.prototype.submitPopup = function(dead_list, bottles,isWin) {
 	this.Popup("#submit-popup")
 }
 NAGameManager.prototype.Popup = function(selector) {
-	console.log(selector)
+	//console.log(selector)
 	_this = this
 		if(_this.popupClosed)
 		{	
@@ -413,6 +417,7 @@ $(function() {
 		return
 	}
 	if (location.href.search('/?submit') != -1) {
+		alert("This is a sumbit mode. You should be careful to submit your results.")
 		GM = new NAGameManager(16, false);
 	}
 	else{
