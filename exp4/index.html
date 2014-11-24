@@ -1,0 +1,140 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<script type="text/javascript" src="js/jquery-1.11.1.min.js" charset="utf-8"></script>
+		<script type="text/javascript" src="js/jquery-ui.js"></script>
+		<link rel="stylesheet" href="css/jquery.mobile-1.4.3.min.css" />
+		<link rel="stylesheet" href="css/jquery-ui.min.css" />
+		<link rel="stylesheet" href="css/style.css" />
+		<script type="text/javascript" src="js/jquery.mobile-1.4.3.min.js" charset="utf-8"></script>
+		<script src="js/sockjs.min.js"></script>
+		<script src="js/ajax.js"></script>
+		<script type="text/javascript" src="js/paper-full.min.js"  charset="utf-8"></script>
+		<script type="text/javascript" src="js/byzantine.js" charset="utf-8"></script>
+
+		 <script type="text/paperscript" canvas="canvas" src="js/render.pjs" id="script" ></script>
+	</head>
+	<body>
+		<div data-role="page" id = "main-page">
+			<div data-role="header">
+				<h1>系统角度实验:三国战纪</h1>
+				<a href="#" data-icon="user" data-iconpos="left" id="login_info">Not login</a>
+			</div>
+			<div data-role="content" id="container">
+				<div class="Left">
+					<div class="ui-body ui-body-b ui-corner-all"  id="Main">						<div class="canvas">
+							<canvas resize="true" id="canvas"></canvas>
+						</div>
+					</div>
+					<div class="ui-body ui-body-b ui-corner-all"  id="Console">
+						<div class="ui-grid-a" style="width:100%;">
+							<div class="ui-block-a" style="width:80%;">
+								<div id="log" class="ui-body ui-body-a ui-corner-all" style="width: 100%; height:90%; overflow:auto;background-color:#A4CAE1;"></div>							
+							</div>
+							<div class="ui-block-b" style="width:5%;"></div>
+							<div class="ui-block-c" style="width:15%;display:none;" id='console-stage1'>
+								<a href="#" data-role="button" data-corners="false" id="make">构建完成</a>
+							</div>
+							<div class="ui-block-c" style="width:15%;display:none;" id='console-stage2'>
+									<a href="#send-panel" data-role="button" data-corners="false" id="send">释放信鸽</a>
+									<a href="#" data-role="button" data-corners="false" id="attack">实施攻击</a>
+									<a href="#" data-role="button" data-corners="false" id="notattack">拒绝攻击</a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="ui-body ui-body-b ui-corner-all"  id="ControlBoard">
+					<p>玩家列表</p>
+					<div id="userlist">
+						<ul>
+						</ul>
+					</div>
+					<div style="display:none" id='control-stage2'>
+						<p>军队状态</p>
+						<div class="middle-text-large" id="ready-status">待命</div>
+						<p>身份</p>
+						<div class="middle-text-large" id="traitor-status">未知</div>
+						<p>当前天数</p>
+						<div class="middle-text-large" id="current-day">0</div>
+						<p>释放信鸽</p>
+						<div class="middle-text-large" id="current-messages">0</div>
+						<p>距进入下一天还有</p>
+						<div class="middle-text-large" id="rest-time">0</div>
+					</div>
+
+
+				</div>
+			</div>
+			<div data-role="popup" id="error-popup" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+				<div data-role="header" data-theme="b">
+				<h1>出错啦!</h1>
+				</div>
+				<div role="main" class="ui-content">
+				        <h3 class="ui-title" id="error-notice">您必须先登陆作业系统才能进行该游戏.</h3>
+				    </div>
+			</div>
+			<div data-role="popup" id="pause-popup" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+				<div data-role="header" data-theme="b">
+				<h1>请等待！</h1>
+				</div>
+				<div role="main" class="ui-content">
+				        <h3 class="ui-title" id="error-notice">待所有玩家都在线且完成构建阶段后方可进行游戏，目前游戏暂停。</h3>
+				    </div>
+			</div>
+
+			<div data-role="panel" data-position-fixed="true" data-display="push" data-ajax="false" data-theme="b" id="condition-panel">
+				<p>当同时满足以下条件时军队状态转为就绪：</p>
+				<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+					<a href="#" class="ui-btn ui-corner-all">粮食</a>
+				    <select id="food-op">
+				        <option value="smaller">不大于</option>
+				        <option value="larger">大于</option>
+				    </select>
+				    <input type="text" id="food-val" value="" data-inline="true" data-wrapper-class="controlgroup-textinput ui-btn" />
+				</fieldset>
+				<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+					<a href="#" class="ui-btn ui-corner-all">兵力</a>
+				    <select id="troops-op">
+				        <option value="smaller">不大于</option>
+				        <option value="larger">大于</option>
+				    </select>
+				    <input type="text" id="troops-val" value="" data-inline="true" data-wrapper-class="controlgroup-textinput ui-btn" />
+				</fieldset>
+				<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+					<a href="#" class="ui-btn ui-corner-all">天气</a>
+					<a href="#" class="ui-btn ui-corner-all">等于</a>
+				    <select id="weather-val">
+				        <option value="SUNNY">晴天</option>
+				        <option value="RAINY">雨天</option>
+				        <option value="CLOUDY">阴天</option>
+				    </select>
+				</fieldset>
+				<a href="#" data-rel="close" data-role="button" data-corners="false" id="confirm-condition">确定</a>
+			</div>
+
+			<div data-role="panel" data-position-fixed="true" data-display="push" data-ajax="false" data-theme="b" id="send-panel">
+				<p>您要传信给：</p>
+				<fieldset data-role="controlgroup" id="receivers"></fieldset>
+				<p>请选择性的告知他们以下军队的状态：</p>
+				<div id="send-content">
+				</div>
+				<a href="#" data-rel="close" data-role="button" data-corners="false" id="confirm-send">确定</a>
+			</div>
+			
+			<div style="visibility:hidden;width:0;height:0;">
+				<img src="imgs/attack.png" id='img-attack'>
+				<img src="imgs/shield.png" id='img-shield'>
+				<img src="imgs/crown.png" id='img-crown'>
+				<img src="imgs/zhangfei.jpg" id='zhangfei'>
+				<img src="imgs/liubei.jpg" id='liubei'>
+				<img src="imgs/zhaoyun.jpg" id='zhaoyun'>
+				<img src="imgs/zhugeliang.jpg" id='zhugeliang'>
+				<img src="imgs/guanyu.jpg" id='guanyu'>
+				<img src="imgs/message.png" id='message'>
+				<img src="imgs/ready.png" id='img-ready'>
+				<img src="imgs/notready.png" id='img-notready'>
+			</div>
+		</div>
+
+	</body>
+</html>
