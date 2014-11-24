@@ -85,12 +85,7 @@ GameManager.prototype.getSuccessHandler = function(data) {
 	GM.setPanel()
 }
 GameManager.prototype.getErrorHandler = function() {
-	if(!GM.is_test){
-		setTimeout(function(){$("#error-popup").popup("open")},1000)
-	}
-	else{
-		GM.setPanel()
-	}
+	setTimeout(function(){$("#error-popup").popup("open")},1000)
 }
 GameManager.prototype.putSuccessHandler = function(data) {
 	if(data==true){
