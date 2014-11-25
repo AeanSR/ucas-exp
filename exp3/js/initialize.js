@@ -2,11 +2,11 @@ $(document).on("pagecreate", function(){
 	$("body").iealert();
 	if(location.href.search('/?formal') != -1){
 		gm = new GameManager("formal")
-		$("#gameMode").text("正式模式")
+		$("#gameMode").text("Formal-Mode")
 	}
 	else{
 		gm = new GameManager("test")
-		$("#gameMode").text("测试模式")
+		$("#gameMode").text("Test-Mode")
 	}
 	gm.getinfo()
 })
