@@ -91,7 +91,7 @@ NAGameManager.prototype.createMouse = function() {
 		class: "mice",
 		id: _this.mice
 	})
-	.html('<p>0</p><img src="imgs/mouse-alive.png"><span class="ui-icon ui-icon-delete ui-btn-icon-left" style="display:none"></span> ')
+	.html('<p>0</p><img src="imgs/mouse-alive.png"><span class="i-del ui-icon ui-icon-delete ui-btn-icon-left" style="display:none"></span><span class="i-id">'+_this.mice+'</span>')
 	.droppable({
 		drop: function(event, ui) {
 			bottle_id = parseInt(ui.helper[0].id)
@@ -109,10 +109,10 @@ NAGameManager.prototype.createMouse = function() {
 	// Bind hover
 	mouse_dom.hover(
 		function(event){
-			$(this).find('span').show()
+			$(this).find('.i-del').show()
 		},
 		function(event){
-			$(this).find('span').hide()
+			$(this).find('.i-del').hide()
 		});
 	// Bind click to popup
 
@@ -122,7 +122,7 @@ NAGameManager.prototype.createMouse = function() {
 		_this.showMousePopup(parseInt($(this).parent()[0].id),event)
 
 	});
-	mouse_dom.find('span').click(function(event) {
+	mouse_dom.find('.i-del').click(function(event) {
 		_this.mice -=1
 		new_result = {}
 		mouse = parseInt($(this).parent()[0].id)
@@ -133,6 +133,7 @@ NAGameManager.prototype.createMouse = function() {
 				j++
 				new_result[j] = _this.result[i]
 				$('#mice-container #' +i)[0].id = j
+				$('#mice-container #' +j + ' .i-id').text(j)
 			}
 		}
 		delete _this.result
