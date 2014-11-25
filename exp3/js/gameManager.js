@@ -30,7 +30,7 @@ GameManager.prototype.getinfo = function(){
 		var step = data['step']
 		group_users = data['group_users']
 		group_name = data['info']['group']
-		$("#group-head").text(group_name+"组内成员")
+		$("#group-head").text(group_name+"&nbsp; &nbsp; Group Members")
 		info_html = '<ul>'
 		for(var i = 0; i<group_users.length; i++) {
 			info_html += '<li id="'+group_users[i]['userId']+'">'+group_users[i]['name']+'</li>'
@@ -39,13 +39,13 @@ GameManager.prototype.getinfo = function(){
 		var info_dom= $(info_html).listview();
 		info_dom.insertAfter($('#group-head'))
 		$("li#"+_this.info['userId']).css("color", "red")
-		
+
 		_this.ajax.times = times
 
 		// 添加基础按钮
 		$('<div id="actionButtonDiv"><input id="actionButton" type="button" value="Choose Network Topology" /></div>').insertAfter("#actionLable")
 		if(_this.mode=="test"){
-			$("<div id='clearRecordDiv'><input id='clearRecord' type='button' value='Clear and Restart'/></div>").insertBefore("#actionButtonDiv")
+			$("<div id='clearRecordDiv'><input id='clearRecord' type='button' value='Clear and Restart'/></div>").insertAfter("#gameMode")
 			$("#clearRecord").button({icon:"delete"})
 			$("#clearRecord").on("click", function(){
 				if(confirm("测试模式下可清除全组的测试数据，实验从头开始。清除后不可恢复，确认清除？") == true){
@@ -85,8 +85,8 @@ GameManager.prototype.getinfo = function(){
 		}
 		else if(step == 3){
 			$("#statusText").text("此次实验结束")
-			var str = "客户端获得平均速率:  " + (data["averageScore"]).toFixed(2) + "Mbps \n 实验最终得分是（满分100分）:  "+  data["finalScore"]
-			$("<div><h2>实验成绩</h2><h5>"+str+"</h5></div>").appendTo("#ControlBoard")
+			var str = "客户端获得平均速率:  " + (data["averageScore"]).toFixed(2) + "Mbps </br> 实验最终得分是（满分100分）:  "+  data["finalScore"]
+			$("<div><h2>实验成绩</h2><span class='middle-text' style='color:red'>"+str+"</span></div>").appendTo("#ControlBoard")
 			$("#gameAction").remove()
 		}
 
