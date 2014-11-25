@@ -52,10 +52,15 @@ height:100%;
  	top:-30px;
  	right:10px;
  }
- #mice-container .mice span{
+ #mice-container .mice .i-del{
  	position: absolute;
  	top:-8px;
  	left:-20px;
+ }
+ #mice-container .mice .i-id{
+ 	position: absolute;
+ 	bottom:-8px;
+ 	left:-9px;
  }
 
 #bottles-container .bottle{
