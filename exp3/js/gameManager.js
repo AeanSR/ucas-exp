@@ -65,7 +65,7 @@ GameManager.prototype.getinfo = function(){
 		}
 
 		if(step == 0){
-			$("#statusText").text("组员需要选择拓扑图，点击如下按钮选择网络拓扑图")
+			$("#statusText").text("You should choose a network topoloy, click to choose")
 			$("#actionButton").val("Choose Network Topology")
 			$("#actionButton").button({icon:"tag"})
 			$("#actionButton").button("refresh")
@@ -74,7 +74,7 @@ GameManager.prototype.getinfo = function(){
 				_this.firstStep()
 			});
 		} else if(step == 1) {
-			$("#statusText").text("已确定网络拓扑，点击如下按钮，可查看或修改路由表")
+			$("#statusText").text("Network topology has been decided, click to design")
 			$("#actionButton").val("Design Routing Table")
 			$("#actionButton").button({icon:"tag"})
 			$("#actionButton").button("refresh")
@@ -84,7 +84,7 @@ GameManager.prototype.getinfo = function(){
 			});
 		}
 		else if(step == 3){
-			$("#statusText").text("此次实验结束")
+			$("#statusText").text("The experiment is end")
 			var str = "客户端获得平均速率:  " + (data["averageScore"]).toFixed(2) + "Mbps </br> 实验最终得分是（满分100分）:  "+  data["finalScore"]
 			$("<div><h2>实验成绩</h2><span class='middle-text' style='color:red'>"+str+"</span></div>").appendTo("#ControlBoard")
 			$("#gameAction").remove()
@@ -132,7 +132,7 @@ GameManager.prototype.firstStepCallback = function(data) {
 		return
 	}
 	_this.initTopoMatrix(data)
-	$("#statusText").text("第一步：组员确定拓扑图（只要一人确定拓扑图，全组将无法修改）")
+	$("#statusText").text("Step 1: Choose a network topopoly(Your team can't choose anymore when any member of your group decided a network topology)")
 	$("<div id='nextTopoDiv'><input id='nextTopo' type='button' value='Change'/></div>").insertBefore("#actionButtonDiv")
 	$("#nextTopo").button({icon:"refresh"})
 	$("#nextTopo").on("click", function(){
@@ -175,7 +175,7 @@ GameManager.prototype.secondStepCallback = function(data) {
 	}
 	_this.setDistributedNodesAndRoute(data)
 	_this.initTopoMatrix(data)
-	$("#statusText").text("第二步：设计路由表")
+	$("#statusText").text("Step 2: Design Routing Table")
 	$("<div id='evaluateRouteDiv'><input id='evaluateRoute' type='button' value='Test and Simulate'/></div>").insertAfter("#actionButtonDiv")
 	$("#evaluateRoute").button({icon:"eye"})
 	$("#evaluateRoute").on("click", function(){
@@ -255,7 +255,7 @@ GameManager.prototype.thirdStepCallback = function(data) {
 	}
 	if(_this.initRouteEvaluation(data, true) == -1) return
 
-	$("#statusText").text("第三步：以当前的路由表模拟路由(组员新添加的路由不计入)")
+	$("#statusText").text("Step3: Simulate the whole network.")
 	$("<div id ='returnRouteDiv'><input id='returnRoute' type='button'  value='Return to Modify'/><div>").insertBefore("#actionButtonDiv")
 	$("#returnRoute").button({ icon: "edit" })
 	$("#returnRoute").on("click", function(){
