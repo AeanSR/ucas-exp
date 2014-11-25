@@ -20,12 +20,12 @@ GameManager.prototype.errorHandler = function() {
 
 GameManager.prototype.getinfo = function(){
 	this.ajax.getinfo(function(data){
+		$("#login_info").text(data['info']["name"])
+		_this.info = data['info']
 		if(data['status'] == "NA"){
 			alert("您不在此实验可做日期之间，无法开始")
 			return
 		}
-		$("#login_info").text(data['info']["name"])
-		_this.info = data['info']
 		var times = data['gameTimes']
 		var step = data['step']
 		group_users = data['group_users']
@@ -39,7 +39,6 @@ GameManager.prototype.getinfo = function(){
 		var info_dom= $(info_html).listview();
 		info_dom.insertAfter($('#group-head'))
 		$("li#"+_this.info['userId']).css("color", "red")
-
 		
 		_this.ajax.times = times
 
