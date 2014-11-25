@@ -30,7 +30,7 @@ GameManager.prototype.getinfo = function(){
 		var step = data['step']
 		group_users = data['group_users']
 		group_name = data['info']['group']
-		$("#group-head").text(group_name+"&nbsp; &nbsp; Group Members")
+		$("#group-head").text(group_name+"  Group Members")
 		info_html = '<ul>'
 		for(var i = 0; i<group_users.length; i++) {
 			info_html += '<li id="'+group_users[i]['userId']+'">'+group_users[i]['name']+'</li>'
