@@ -342,7 +342,7 @@ GameManager.prototype.fourthStep = function(data) {
 			return
 		}else{
 			console.log(data)
-			alert("客户端获得平均速率:  " + (data["averageRateScore"]).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(data["averageLengthScore"]).toFixed(2)+" </br>实验最终得分是"+  data["finalScore"])
+			alert("客户端获得平均速率:  " + (data["averageRateScore"]).toFixed(2) + "Mbps，客户端到服务器平均路径长度为"+(data["averageLengthScore"]).toFixed(2)+"，实验最终得分是"+  data["finalScore"])
 			location.reload()
 			return
 		}
