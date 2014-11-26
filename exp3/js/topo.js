@@ -1,3 +1,4 @@
+//当不使用随机位置生成时， height, width没有作用
 function Topology(nodeNum, height, width) {
 	this.height = height
 	this.width = width

@@ -19,7 +19,7 @@
 			  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
 			});
 		</script>
-		<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+		<script type="text/javascript" src="http://ucas-2014.tk/static/js/MathJax-2.4-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 	</head>
 	<body>
 		<div data-role="page" id = "main-page">
@@ -33,15 +33,18 @@
 				<h2>Introduction</h2>
 				<p>This experiment has two missions:</p>
 				<ul>
-				<li> to teach students basic network concepts: network topology / network edge / route table / network delay / transmission rate / throughput / client-server model.</li>
+				<li> to teach students basic network concepts: network topology(网络拓扑) / network edge(网络边界) / route table(路由表) / network delay(网络延迟) / transmission rate(传输速率) / throughput(吞吐量) / client-server model(客户端-服务器模型).</li>
 				<li>to make students realize the importance of network protocol in complex and huge enviroment by teamwork. </li>
 				</ul>
-				<p>In order to make the experiment clear and easy, the experiment backgroud is based on the <b>video conference</b>, which need all of the involvers see others, like the multiple persons video communications on QQ. The experiment has a few elements: 
-					<ul><li><b>Client</b> which communicate with the server. It send self video information to server and get the other clients' video information from server. The clients can be PC / Phone / Pad etc.</li> 
+				<p>In order to make the experiment clear and easy, the experiment backgroud is based on the <b>video conference(视频会议)</b>, which need all of the involvers see others, like the multiple persons video communications on QQ. The experiment has a few elements: 
+					<ul>
+					<li><b>Client-Server Model(C-S)</b> is the usual model in network service. Client send a request to server, then the server accept the request and response to the respective client. In our experiment about the video conference, the client send his video information to the server, and receive all others' video information from the server. For simplicity, we just consider that the client sent data to the server when simulate the whole network.</li> 
+					<li><b>Network topology</b> is the arrangement of the various elements (links, clients, routes, servers, etc.) of a computer network. In our experiment, the network topology is a given physical sructure.</li> 
+					<li><b>Client</b> which communicate with the server. It send self video information to server and get the other clients' video information from server. The clients can be PC / Phone / Pad etc.</li> 
 					<li><b>Server</b> which provides the video conference service to clients on the internet, like the QQ server.</li> 
-					<li><b>Datagram</b> which contains the imformation of video and the destination of the server. Datagrams is pieces of video streaming information.</li> 
-					<li><b>Route</b> which is the crossing in newtork and indicate the direction where the route forward the datagram to the next network device(may be another route or a server).</li> 
-					<li><b>Communication Link</b> which transports the video datagram like the roads transporting the vehicles.</li>
+					<li><b>Datagram(数据报文)</b> which contains the imformation of video and the destination of the server. Datagrams is pieces of video streaming information.</li> 
+					<li><b>Route(路由器)</b> which is the crossing in newtork and indicate the direction where the route forward the datagram to the next network device(may be another route or a server).</li> 
+					<li><b>Communication Link(通信链路)</b> which transports the video datagram like the roads transporting the vehicles. In our experiment, the lenght of link beween adjacent devices is 1.</li>
 					</ul>
 				<p>Thus, in many ways, <b>datagram</b>s are analogous to trucks, <b>communication link</b>s are analogous to highways and roads, <b>route</b>s are analogous to intersections, and <b>client</b>s and <b>server</b>s are analogous to buildings. Just as a truck takes a path through the transportation network, a datagram takes a path through a computer network</p>
 
@@ -51,7 +54,7 @@
 				<ul>
 					<li><b>Datagram</b></br>
 					<p>Because of the video data is very big and streaming like a river, so we cut data into pieces and we transport the piece to destination in order. The <b>datagram</b> on the network layer mainly contains a data piece, souce address and destination address. Other elements are neglected for simplicity. In this experiment, the node index(from 0 to n-1) represents the address of the route devices. For example, the figure below reveals that datagram containing video data is tansported from 0 to 5. </p>
-					<p>P.S. : Typically a client and a server is attached directly to one router, the default router for the client or the server (also called the <b>first-hop router</b> for  the client or the server). Whenever a client or the server sends a packet, the packet is transferred to its default router. We refer to the default router of the source client as the source router and the default router of the destination server as the destination router. </p>
+					<p>P.S. : Typically a client and a server is attached directly to one router, the default router for the client or the server (also called the <b>first-hop router(第一跳路由器)</b> for  the client or the server). Whenever a client or the server sends a packet, the packet is transferred to its default router. We refer to the default router of the source client as the source router and the default router of the destination server as the destination router. </p>
 					<img src="#" alt="to do" />
 					</li>
 					<li><b>Route &amp; Routing table</b>
@@ -75,13 +78,13 @@
 						<p><i>A <b>protocol</b> defines the format and the order of messages exchanged between two or more communicating entities, as well as the actions taken on the transmission and/or receipt of a message or other event.</i></p>
 						<p>In our experiment, the protocol is the routing protocol. It indicates us how to design a good route table with every team member's independent work. There are many routing protocols which are too complex for us. So we neglect the existence of protocol. Instead, we team members design the routing table together and needn't care the protocol meaning. <b>It's enough for us to get the first target and take close to second target</b>(We will talk about it below).</p>
 					</li>
-					<li><b>Performance criterion about routing table desinging</b>
+					<li><b>Performance Criterion about Routing Table Desinging</b>
 					<p>There are many properties about the performance of routing protocol. In out experiments, we just take account this properties:
 						<ul>
-							<li><b>delay</b>
+							<li><b>Delay</b>
 								<p>Delay of a datagram is the time interval between being sended by the source and being received by the destination. So delay is affected by many factors, such as link length, processing capability of a route etc. But in our experiment about reduing delay, we only consider the time transporting over the physical links. The longer the path is, the more time is needing. So reducing the path length is a way to reduce the delay.</p>
 							</li>
-							<li>througtput</li>
+							<li><b>Througtput</b></li>
 								<p>Every route has a limited capability to forward the datagram, which is named <b>transmission rate</b>. We measure transmission rate by size of datagrams forwarded per sencod. For example, 100Mbps represents a route can forward 100M byte datagram per second. The better capability route costs more. In reality, we use 100Mbps routes for our computers in home, and 500Mbps or 1Gbps routes in high-level network for servers.</p>
 								<p>Because the transporting path has different routes whose transmission rate are different too, so a question is how to calculate the final transmission rate of the datagram. Like the traffic in road, the rate of the trunk is most limited by the most crowded traffic. We assume the route list of the path for a client to server is $ \{r_1, r_2, ..., r_m\} $, and the  transmission rate of them are $ \{R_1, R_2, ..., R_m\} $ So in the network, the final transmission rate of the client is decided by the least transmission rate of the routes over the path, that is $ min\{R_1, R_2, ..., R_m\} $ , it is the transmission rate of the <b>bottleneck link</b>.</p>
 								<p>In situation where many datagram from $ N_i $ different clients come to the same route($ r_{i} $), every client on this route just gets average transmission rate($ R_{i}/N_{i} $). Assuming the number of clients whose datagrams come to the route($ r_{i} $) is $ N_{i} $, the route list of the path for a client to server is $ \{r_1, r_2, ..., r_m\} $. Then we can conclude that the final transmission rate of the client is $ min\{R_{1}/N_{1}, R_{2}/N_{2}, ..., R_{m}/N_{m}\} $<p>
@@ -95,10 +98,10 @@
 				<p>Every team can choose a network topology which is connected graph and includes 30 routes. The graph is constructed by three regular decagon(正十边形) of different size. The transsimisson rate of routes on the inner decagon is 500Mbps, that of routes on the middler decagon is 300Mbps and that of routes on the outer decagon is 150Mbps. There are two targets in our experiment:</p>
 				<ol>
 					<li>All route can communicate each other. It means datagram from a route to an arbitrary route can be transported normally.</li>
-					<li>Get less delay and better throughput of the network. After got to the taget 1, the team must simulate the network by video conference of 8 clients. The game system will randomize 8 routes at the outer decagon as the default routes of the clients and 1 route at the inner decagon as the default route of the server. The simulation will reveal the average rate of routes, traffic on a link and final transmission of clients. In order to get less delay and better throughput of the network, the team should redesign the routing table and simulate many times.</li>
+					<li>Get less delay and better throughput of the network. After got to the taget 1, the team must simulate the network by video conference of 8 clients. The game system will randomize 8 routes at the outer decagon as the default routes of the clients and 1 route at the inner decagon as the default route of the server. Experiment system will use clients to send theirself video information datagram to the server. <b>For simplicity, we don't account for the datagrams from the server to clients.</b> The simulation will reveal the average rate of routes, traffic on a link and final transmission of clients <b>from clients to the only server</b>. In order to get less delay and better throughput of the network, the team should redesign the routing table and simulate many times.</li>
 				</ol>
 				<h2>Experiment Operation</h2>
-				<p>The experiment has two mode. One is <a href="http://ucas-2014.tk:8889/exp3/route.html?test">Test-Mode</a>, another is <a href="http://ucas-2014.tk:8889/exp3/route.html?formal">Formal-Mode</a>.  Test-Mode is for trying and learning for students. We support every team start the experiment from the Test-Mode. <b>Every team can clear the experiment record and restart the Test-Mode <input type='button' data-inline="true" data-mini="true" data-icon="delete" data-theme="b" value='Clear and Restart'/> anytime except starting the Formal-Mode</b>. </p>
+				<p>The experiment has two mode. One is <a href="http://ucas-2014.tk:8889/exp3/route.html?test">Test-Mode</a>, another is <a href="http://ucas-2014.tk:8889/exp3/route.html?formal">Formal-Mode</a>.  Test-Mode is for trying and learning for students. We support every team start the experiment from the Test-Mode. <b>Every team can clear the experiment record and restart the Test-Mode <input type='button' data-inline="true" data-mini="true" data-icon="delete" data-theme="b" value='Clear and Restart'/> anytime</b>.  <b>But the Formal-Mode can't be restart once your team has decided a network topology</b>.</p>
 				<p>The experiment has four steps:</p>
 				<ol>
 					<li>Choose a network topology for your team. Click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="tag" data-theme="b" value='Choose Network Topology'/> into the choosing page, then click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="lock" data-theme="b" value='Choose This'/> for deciding, or click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="refresh" data-theme="b" value='Change'/> for changing another random network topology.  Anyone in the team can choose network topology util someone in your team click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="lock" data-theme="b" value='Choose This'/> for deciding.</li>
@@ -115,12 +118,13 @@
 					<li>Submit the experiment result including your routing tables and 20-times random simulate result. If the routing table design get the Target 1, the submit will succeed. The system will do 20-time random simulation for the evaluation of your network. That is to say, the position of clients and servers will be random for 20-times.</li>
 				</ol>
 				<h2>Score</h2>
-				<p>The target 1 is 70 grades. And the combination of average path length and transimission rate for 20-times simulation will add up to the final grades.</p>
+				<p>The target 1 is 65 grades. once you can get through the simulation, you can get the 65 grades. <br/>The target 2 is 35 grades, average transimission rate of clients for 20 grades and average path length from clients to server for 15 grades.</p>
 				<h2>Futher Reading</h2>
 				<ul>
-					<li><a href="http://cs.uccs.edu/~cs522/F99rout.PDF" target="_blank">Routing protocols</a></li>
+					<li><a href="http://ucas-2014.tk/static/download/Computer-Networking-A-Top-Down-Approach-6th-Edition.pdf" target="_blank">计算机网络_自顶向下方法（英文第6版）</a></li>
+					<li><a href="http://ucas-2014.tk/static/download/F99rout.PDF" target="_blank">Routing protocols</a></li>
 				</ul>
-				<h3>If you have any questions or experiment errors, please contact me. <b>Andrew Lee(lichundian囧gmail.com)</b></h3>
+				<h3>If you have any questions or experiment errors, please contact me. <b>Andrew Lee(lichundian囧gmail.com)</b>(将囧替换成@)</h3>
 			</div>
 			<div data-role="panel" id="nav-panel" data-theme="b" ddata-ajax="false" ata-position-fixed="true" data-display="push">
 			<ul data-role="listview">

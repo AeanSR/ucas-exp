@@ -22,10 +22,7 @@ GameManager.prototype.getinfo = function(){
 	this.ajax.getinfo(function(data){
 		$("#login_info").text(data['info']["name"])
 		_this.info = data['info']
-		if(data['status'] == "NA"){
-			alert("您不在此实验可做日期之间，无法开始")
-			return
-		}
+		_this.checkStatus(data)
 		var times = data['gameTimes']
 		var step = data['step']
 		group_users = data['group_users']
@@ -84,9 +81,9 @@ GameManager.prototype.getinfo = function(){
 			});
 		}
 		else if(step == 3){
-			$("#statusText").text("The experiment is end")
-			var str = "客户端获得平均速率:  " + (data["averageScore"]).toFixed(2) + "Mbps </br> 实验最终得分是（满分100分）:  "+  data["finalScore"]
-			$("<div><h2>实验成绩</h2><span class='middle-text' style='color:red'>"+str+"</span></div>").appendTo("#ControlBoard")
+			$("#statusText").text("The experiment is end!")
+			var str = "客户端获得平均速率:  " + (data["averageRateScore"]).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(data["averageLengthScore"]).toFixed(2)+" </br>实验最终得分是（满分100分）:  "+  data["finalScore"]
+			$("<div><h3>实验成绩</h3><span class='middle-text' style='color:red;font-size:1em'>"+str+"</span></div>").appendTo("#ControlBoard")
 			$("#gameAction").remove()
 		}
 
@@ -104,7 +101,7 @@ GameManager.prototype.initTopoMatrix = function(data) {
 	paper.project.activeLayer.removeChildren()
 	$('table[id^=route-table]').remove()
 
-	_this.topo = new Topology(data['scale'], paper.project.activeLayer.view.element.clientHeight, paper.project.activeLayer.view.element.clientWidth)
+	_this.topo = new Topology(data['scale'], 0, 0)
 	var link = data['link']
 	for(var i = 0; i < link.length; i++) {
 		var tmp = link[i].split("-")
@@ -129,7 +126,13 @@ GameManager.prototype.setDistributedNodesAndRoute = function(data) {
 GameManager.prototype.firstStepCallback = function(data) {
 	if(data['status'] == "NA"){
 		alert("您不在此实验可做日期之间，无法开始")
-		return
+		return false
+	}
+	// 针对的是getTopo中的topo的status为CHOOSING
+	if(data['status'] != -1){
+		alert("某组员已经选择了网络拓扑图，无法再选择，网页将会刷新。")
+		location.reload()
+		return false
 	}
 	_this.initTopoMatrix(data)
 	$("#statusText").text("Step 1: Choose a network topopoly(Your team can't choose anymore when any member of your group decided a network topology)")
@@ -153,7 +156,7 @@ GameManager.prototype.firstStepCallback = function(data) {
 				_this.secondStep()
 			// to test
 			else if(data["status"] == "someoneSubmited"){
-				alertStr = "提交出错，小组某成员已经确认选择此图。";
+				alertStr = "提交出错，小组某成员已经确认了网络拓扑图。";
 				alert(alertStr);
 				location.reload()
 			}
@@ -169,17 +172,14 @@ GameManager.prototype.secondStep = function() {
 }
 
 GameManager.prototype.secondStepCallback = function(data) {
-	if(data['status'] == "NA"){
-		alert("您不在此实验可做日期之间，无法开始")
-		return
-	}
+	if(_this.checkStatus(data)==false)return
 	_this.setDistributedNodesAndRoute(data)
 	_this.initTopoMatrix(data)
 	$("#statusText").text("Step 2: Design Routing Table")
 	$("<div id='evaluateRouteDiv'><input id='evaluateRoute' type='button' value='Test and Simulate'/></div>").insertAfter("#actionButtonDiv")
 	$("#evaluateRoute").button({icon:"eye"})
 	$("#evaluateRoute").on("click", function(){
-		if(confirm("模拟路由会模拟当前所有组员保存最新路由表，请组员注意保存当前工作。确认模拟？") == true){_this.thirdStep();$("#evaluateRouteDiv").remove()}
+		if(confirm("此按钮不会保存当前节点的路由，请组员注意保存，模拟路由会模拟当前所有组员保存最新路由表。确认继续模拟？") == true){_this.thirdStep();$("#evaluateRouteDiv").remove()}
 	});
 	$("#actionButton").val("Save the Design")
 	$("#actionButton").button({icon:"check"})
@@ -221,10 +221,7 @@ GameManager.prototype.secondStepCallback = function(data) {
 }
 
 GameManager.prototype.submitRouteCallback = function(data) {
-	if(data['status'] == "NA"){
-		alert("您不在此实验可做日期之间，无法开始")
-		return
-	}
+	if(_this.checkStatus(data)==false)return
 	var status = data["status"]
 	var alertStr = null
 	console.log(status)
@@ -249,10 +246,7 @@ GameManager.prototype.thirdStep = function() {
 }
 
 GameManager.prototype.thirdStepCallback = function(data) {
-	if(data['status'] == "NA"){
-		alert("您不在此实验可做日期之间，无法开始")
-		return
-	}
+	if(_this.checkStatus(data)==false)return
 	if(_this.initRouteEvaluation(data, true) == -1) return
 
 	$("#statusText").text("Step3: Simulate the whole network.")
@@ -279,57 +273,76 @@ GameManager.prototype.thirdStepCallback = function(data) {
 	$("#actionButton").button("refresh")
 	$("#actionButton").off("click")
 	$("#actionButton").on("click", function(){
-		var error = []
-		if(runRoute(_this.topo, data["route"], error) == false){
-			alert("路由表设计有误，" + error[0] +"--" + error[1] + "不通，请设计者修改")
-			_this.secondStep();
-			$("#returnRouteDiv").remove();
-			$("#saveImageDiv").remove();
-			return
+		if(confirm("提交前会请求全组最新的路由进行测试，确认测试？") == true){
+			// 请求服务器最新数据
+			_this.ajax.getTopo(function(data){
+				if(_this.checkStatus(data)==false)return
+				_this.topo = new Topology(data['scale'], 0, 0)
+				var link = data['link']
+				for(var i = 0; i < link.length; i++) {
+					var tmp = link[i].split("-")
+					_this.topo.matrix.link(tmp[0], tmp[1])
+				}
+				var error = []
+				if(runRoute(_this.topo, data["route"], error) == false){
+					alert("路由表设计有误，" + error[0] +"--" + error[1] + "不通，请设计者修改")
+					$("#returnRouteDiv").remove();
+					$("#saveImageDiv").remove();
+					$("#evaluateRouteAgainDiv").remove();
+					_this.secondStep();
+					return
+				}else{
+					if(confirm("测试无误。提交后全组实验结束，确认提交答案？") == true){
+						$("#returnRouteDiv").remove();
+						$("#saveImageDiv").remove();
+						$("#evaluateRouteAgainDiv").remove();
+						_this.fourthStep(data)
+					}
+				}
+
+			}, _this.errorHandler)
 		}
-		var r = confirm("提交后全组实验结束，确认提交答案？")
-		if(r == true)
-			_this.fourthStep()
 	});
 }
 
 // 提交结果，随机模拟5次；取每次模拟中，每个客户端得到的带宽，去掉最低和最高带宽，得到平均值；然后对5次再取一个平均值
-GameManager.prototype.fourthStep = function() {
-	_this.ajax.getTopo(_this.fourthtepCallback, _this.errorHandler)
-}
-
-GameManager.prototype.fourthtepCallback = function(data) {
+GameManager.prototype.fourthStep = function(data) {
 	if(data['status'] == "NA"){
 		alert("您不在此实验可做日期之间，无法开始")
 		return
 	}
 	var times = 40
-	var sum = 0
-	var practiceScore =[]
+	var rateSum = 0, lengthSum = 0
+	var practiceRateScore =[], practiceLengthScore=[]
 	for(var i = 0;i<times;i++){
 		var tmpResult = _this.initRouteEvaluation(data,false)
 		if(tmpResult == -1)return
 		console.log("times-" + i + ": 	" + tmpResult)
-		sum += tmpResult
-		practiceScore.push(tmpResult)
+		rateSum += tmpResult[0]
+		lengthSum += tmpResult[1]
+		practiceRateScore.push(tmpResult[0])
+		practiceLengthScore.push(tmpResult[1])
 	}
-	var result = sum / times
+	var rateResult = rateSum / times
+	var lengthResult = lengthSum / times
 	// result在18~63范围
-	var finalScore = parseInt((result-18)/(63-18)*30+70)
-	// console.log("平均瓶颈:"+ result +"	总分:" + finalScore)
-	_this.ajax.score = JSON.stringify({"averageScore":result, "practiceScore":practiceScore, "finalScore":finalScore})
+	var finalScore = parseInt((rateResult-18)/(63-18)*20 + 65 + (15 - (lengthResult-3)/(10-3)*15))
+	if(finalScore > 100)finalScore=100
+	console.log("客户端获得平均速率:  " + (rateResult).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(lengthResult).toFixed(2)+" </br>实验最终得分是"+ finalScore)
+	_this.ajax.score = JSON.stringify({"averageRateScore":rateResult,"averageLengthScore":lengthResult, "practiceRateScore":practiceRateScore, "practiceLengthScore":practiceLengthScore, "finalScore":finalScore})
 	_this.ajax.submitRouteEvaluation(function(data){
 		console.log(data)
 		if(data["status"]=="DONE"){
-			alert("其他组员已提交成绩，实验结束。")
-			_this.viewResult()
+			alert("其他组员已提交成绩，实验已结束。")
+			location.reload()
 			return
 		} else if(data["status"]=="ERROR"){
 			alert("提交出错")
 			location.reload()
 			return
 		}else{
-			alert("平均获得速率为" + (data["averageScore"]).toFixed(2) + "Mbps; 最终成绩得分（满分100分）为" + data["finalScore"])
+			console.log(data)
+			alert("客户端获得平均速率:  " + (data["averageRateScore"]).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(data["averageLengthScore"]).toFixed(2)+" </br>实验最终得分是"+  data["finalScore"])
 			location.reload()
 			return
 		}
@@ -364,14 +377,11 @@ GameManager.prototype.initRouteEvaluation = function(data, needPaint) {
 	paper.project.activeLayer.removeChildren()
 	$("table[id^=route-table]").remove()
 
-	var clientHight = paper.project.activeLayer.view.element.clientHeight
-	var clientWidth = paper.project.activeLayer.view.element.clientWidth
-
-	var p2pTopo = new Topology(data['scale']+outerNum, clientWidth/4, clientHight/2)
-	var c2sTopo = new Topology(data['scale']+outerNum, clientWidth/4, clientHight/2)
+	var p2pTopo = new Topology(data['scale']+outerNum, 0, 0)
+	var c2sTopo = new Topology(data['scale']+outerNum, 0, 0)
 	p2pTopo.avaliableLength = data['scale']
 	c2sTopo.avaliableLength = data['scale']
-	_this.topo = new Topology(data['scale'], clientWidth, clientHight)
+	_this.topo = new Topology(data['scale'], 0, 0)
 
 	var link = data['link']
 	for(var i = 0; i < link.length; i++) {
@@ -418,6 +428,7 @@ GameManager.prototype.initRouteEvaluation = function(data, needPaint) {
 
 	var routeP2PBottleneck = routeP2PAverageRate.concat()
 	var routeC2SBottleneck = routeC2SAverageRate.concat()
+
 	// console.log(routeP2PBottleneck)
 	
 
@@ -429,22 +440,29 @@ GameManager.prototype.initRouteEvaluation = function(data, needPaint) {
 		paper.project.activeLayer.view.update()
 	}
 
-	return getGrade(clientsIndex, routeC2SBottleneck)
+	return getGrade(clientsIndex, serverIndex, routeC2SBottleneck, routeC2SPath)
 }
 
-var getGrade = function(clientsIndex, bottleneck){
+// 得到client得到的平均transimission rate 和 path length的平均长度
+var getGrade = function(clientsIndex, serverIndex, bottleneck, path){
 	var tmpArr =[]
+	var pathLength = []
 	for(var i in clientsIndex){
+		pathLength.push(path[clientsIndex[i]].length)
 		tmpArr.push(bottleneck[clientsIndex[i]])
 	}
-	var tmpArr = tmpArr.sort(function(a,b){
+	tmpArr = tmpArr.sort(function(a,b){
 		return a - b
 	});
-	var sum=0
+	pathLength =  pathLength.sort(function(a,b){
+		return a - b
+	});
+	var sum=0, pathSum = 0;
 	for(var i = 1; i < tmpArr.length - 1; i++){
 		sum+=tmpArr[i]
+		pathSum+=pathLength[i]
 	}
-	return sum/(tmpArr.length-2)
+	return [sum/(tmpArr.length-2), pathSum/(pathLength.length-2)]
 }
 
 var calculateAverageRate = function(routeP2PDegrees, routeP2PAverageRate, routeC2SDegrees, routeC2SAverageRate, innerRate, midRate, outerRate, innerNum, midNum, outerNum){
@@ -492,7 +510,7 @@ var markBottleneck = function(topo, route, clientsIndex, serverIndex,  routeP2PP
 // 视频会议
 var practiceRunRoute = function(topo, route, clientsIndex, serverIndex, routeP2PDegrees, routeP2PPath, routeC2SDegrees, routeC2SPath) {
 	console.log(clientsIndex)
-	// 计算routeP2PDegrees
+	// 计算routeP2PDegrees, 有错误。routeP2PPath的key应该是"clientsIndex[i]-clientsIndex[j]"的形式
 	for(var i in clientsIndex) {
 		for(var j in clientsIndex){
 			if(i == j)continue
@@ -627,6 +645,20 @@ var checkRouteRecord = function(dest, next, topoAvailableScale) {
 	return 0
 }
 
+
+GameManager.prototype.checkStatus = function(data) {
+	if(data['status'] == "NA"){
+		alert("您不在此实验可做日期之间，无法开始")
+		return false
+	}
+	// 针对的是getTopo中的topo的status为CHOOSING
+	if(data['status'] == -1){
+		alert("实验记录已被某组员清除，实验重新开始，页面将会刷新")
+		location.reload()
+		return false
+	}
+	return true
+}
 // GameManager.prototype.thirdStep = function() {
 // 	var _result = {}
 // 	var my_nodes = _this.nodes[_this.info['userId']]

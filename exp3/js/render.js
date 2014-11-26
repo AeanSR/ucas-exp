@@ -31,19 +31,24 @@ getRouteTableHtml = function(topo, localIndex, routeTableScale) {
 
 paintEvaluation = function(p2pTopo, c2sTopo, route, clientsIndex, serverIndex, routeP2PAverageRate, routeP2PPath,  routeP2PBottleneck, routeC2SAverageRate, routeC2SPath, routeC2SBottleneck, routeTableScale) {
 	var num = p2pTopo.length;
-	// var p2pTopoCenter = new Point(view.element.clientWidth/5*1, view.element.clientHeight/2)
-	var c2sTopoCenter = new Point(view.element.clientWidth/5 *2, view.element.clientHeight/2)
+	// var p2pTopoCenter = view.center
+	var c2sTopoCenter = view.center
+
+	var topoMin = (view.center.x > view.center.y? view.center.y:view.center.x)
+	var innerRadius = parseInt(topoMin/10*3.5)
+	var midRadius = parseInt(topoMin/10*6)
+	var outerRadius =parseInt(topoMin/10*8)
+	
 	// renderTopoFrame(p2pTopo, p2pTopoCenter, 100, 200, 300)
 	// renderTopoFrame(c2sTopo, c2sTopoCenter, 100, 200, 300)
 
 	// renderTopoFrame(p2pTopo, p2pTopoCenter, 80, 160, 240)
-	renderTopoFrame(c2sTopo, c2sTopoCenter, 80, 160, 240)
+	renderTopoFrame(c2sTopo, c2sTopoCenter, innerRadius, midRadius, outerRadius)
 
 	// 先画path，在对下面的图层
 	// renderPath(p2pTopo)
 	renderPath(c2sTopo)
-	// renderTrafficPath(p2pTopo, routeP2PAverageRate, routeP2PPath)
-	renderTrafficPath(c2sTopo, routeC2SAverageRate, routeC2SPath)
+	
 
 	for(var i = 0; i < num; i++ ) {
 		// var p2pPath = renderBasicNode(p2pTopo, i)
@@ -51,20 +56,38 @@ paintEvaluation = function(p2pTopo, c2sTopo, route, clientsIndex, serverIndex, r
 		var c2sPath = renderBasicNode(c2sTopo, i)
 		renderSpecialNode(c2sTopo, "c2s" , c2sPath, i, route, routeTableScale, true, routeC2SAverageRate, routeC2SBottleneck, clientsIndex, serverIndex)
 	}
-	
-
-	
-	// to do 
-	// 用不一样的颜色表示正在传输的path
-	// 表示平均速率
+	// renderTrafficPath(p2pTopo, routeP2PAverageRate, routeP2PPath)
+	renderTrafficPath(c2sTopo, routeC2SAverageRate, routeC2SPath)
+	var ClientText = new PointText({
+		point: [2, 30],
+		content: "Rate on Client represents the final transimissioin rate it got",
+		fillColor: 'blue',
+		fontFamily: 'Lato, sans-serif',
+		fontWeight: 'bold',
+		fontSize: 12
+	});
+	var RouteText = new PointText({
+		point: [2, 45],
+		content: "Rate on Route represents the average transimissioin rate by clients",
+		fillColor: 'blue',
+		fontFamily: 'Lato, sans-serif',
+		fontWeight: 'bold',
+		fontSize: 12
+	});
 	console.log("render done!")
 }
 
 // flag 值可能为-1 和 0, 其中-1表示正在选择topo图(不会处理nodes和myRoute变量)
 paintTopo = function(flag, topo, info, nodes, myRoute, routeTableScale) {
 	var num = topo.length;
-	var topoFrameCenter = new Point(view.element.clientWidth/5*2, view.element.clientHeight/2)
-	renderTopoFrame(topo, topoFrameCenter, 100, 200 ,300)
+	var topoFrameCenter = view.center
+
+	var topoMin = (view.center.x > view.center.y? view.center.y:view.center.x)
+	var innerRadius = parseInt(topoMin/10*4)
+	var midRadius = parseInt(topoMin/10*7)
+	var outerRadius =parseInt(topoMin/10*9)
+
+	renderTopoFrame(topo, topoFrameCenter, innerRadius, midRadius ,outerRadius)
 	renderPath(topo)
 	for(var i = 0; i < num; i++ ) {
 		var path = renderBasicNode(topo, i)
@@ -76,6 +99,7 @@ paintTopo = function(flag, topo, info, nodes, myRoute, routeTableScale) {
 			}
 		}
 	}
+
 	console.log("render done!")
 }
 
@@ -112,16 +136,17 @@ var renderTrafficPath = function(topo, averageRate, routePaths) {
 		var path = new Path.Line(new Point(iNode.x, iNode.y), new Point(jNode.x, jNode.y))
 		path.strokeColor = 'red'
 		path.strokeWidth = 5 * weight
+		path.sendToBack()
 	}
 
 	// 平均transmission rate
-	for(var index=0; index<topo.length; index++){
+	for(var index=0; index<topo.avaliableLength; index++){
 		if(averageRate[index] == -1)
 			continue
 		var p = topo.nodeList.get(index);
 		var text = new PointText({
 			point: [p.x+15, p.y+20],
-			content: averageRate[index],
+			content: averageRate[index] +"Mbps",
 			fillColor: 'black',
 			fontFamily: 'Courier New',
 			fontWeight: 'bold',
@@ -138,13 +163,11 @@ var renderTopoFrame = function(topo, center, innerRadius, midRadius, outerRadius
 	if(num != topo.length){
 		clientNum = topo.length - num
 	}
-	var center = new Point(center.x, center.y)
 	var edgeNum = parseInt(num / 3)
 	var outerNum = parseInt(num - edgeNum * 2)
 	var inner = new Path.RegularPolygon(center, edgeNum, innerRadius);
 	var mid = new Path.RegularPolygon(center, edgeNum, midRadius);
 	var outer = new Path.RegularPolygon(center, outerNum, outerRadius);
-	//var outerClient = new Path.RegularPolygon(center, outerNum, outerRadius + 30);
 	for(var i = 0; i < num; i ++) {
 		if( i < edgeNum){
 			var tmp = inner.segments[i].point
@@ -160,7 +183,7 @@ var renderTopoFrame = function(topo, center, innerRadius, midRadius, outerRadius
 
 	if(clientNum!=0){
 		for(var i = num; i < num+outerNum; i ++) {
-			var clientOuter = new Path.RegularPolygon(center, outerNum, outerRadius+50);
+			var clientOuter = new Path.RegularPolygon(center, outerNum, outerRadius+innerRadius/9*4);
 			var tmp = clientOuter.segments[i - num].point
 			topo.nodeList.set(i, tmp.x, tmp.y)
 		}
@@ -208,8 +231,8 @@ var renderSpecialNode = function(topo, topoName, basicPath, index, myRoute, rout
 				raster.scale(0.3)
 				var text = new PointText({
 				point: [node.x+10, node.y+25],
-				content: "吞吐率"+routeC2SBottleneck[index - outerNum],
-				fillColor: 'black',
+				content: routeC2SBottleneck[index - outerNum] + "Mbps",
+				fillColor: 'blue',
 				fontFamily: 'Courier New',
 				fontWeight: 'bold',
 				fontSize: 10
@@ -224,7 +247,7 @@ var renderSpecialNode = function(topo, topoName, basicPath, index, myRoute, rout
 			raster.scale(0.3)
 		} else if( index ==  serverIndex){
 			var raster = new Raster(serverUrl, new Point(node.x, node.y));
-			raster.scale(0.35)
+			raster.scale(0.5)
 		} else {
 			if(averageRate[index] != -1){
 				basicPath.fillColor = new Color(0.2,0.1,0.1)
