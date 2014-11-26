@@ -12,7 +12,7 @@
 	left: 20px;
 	top: 50px;
 	right: 0px;
-	bottom: 20px;
+	bottom: 10px;
 }
 
 .Left #Main{
@@ -37,9 +37,9 @@
 #container #ControlBoard{
 	position: absolute;
 	right :20px;
-	width: 15%;
+	width: 18%;
 	top: 50px;
-	bottom: 20px;
+	bottom: 10px;
 }
 
 #canvas{
@@ -51,4 +51,19 @@
 .middle-text {
 	text-align: center;
 	font-size: 20px;
+}
+
+#group-info li{
+	padding: 0.1em 1em;
+	border-style: hidden;
+}
+
+#gameAction div, #clearRecordDiv{
+	font-size: 0.9em;
+	font-weight: bold;
+	color: blue;
+}
+
+#ControlBoard h3{
+	color: yellow;
 }
