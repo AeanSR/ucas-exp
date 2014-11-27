@@ -35,9 +35,9 @@ paintEvaluation = function(p2pTopo, c2sTopo, route, clientsIndex, serverIndex, r
 	var c2sTopoCenter = view.center
 
 	var topoMin = (view.center.x > view.center.y? view.center.y:view.center.x)
-	var innerRadius = parseInt(topoMin/10*3.5)
-	var midRadius = parseInt(topoMin/10*6)
-	var outerRadius =parseInt(topoMin/10*8)
+	var innerRadius = parseInt(topoMin/20*7)
+	var midRadius = parseInt(topoMin/20*12)
+	var outerRadius =parseInt(topoMin/20*15)
 	
 	// renderTopoFrame(p2pTopo, p2pTopoCenter, 100, 200, 300)
 	// renderTopoFrame(c2sTopo, c2sTopoCenter, 100, 200, 300)
@@ -54,29 +54,40 @@ paintEvaluation = function(p2pTopo, c2sTopo, route, clientsIndex, serverIndex, r
 		// var p2pPath = renderBasicNode(p2pTopo, i)
 		// renderSpecialNode(p2pTopo, "p2p", p2pPath, i, route, routeTableScale, true, routeP2PAverageRate, clientsIndex, serverIndex)
 		var c2sPath = renderBasicNode(c2sTopo, i)
-		renderSpecialNode(c2sTopo, "c2s" , c2sPath, i, route, routeTableScale, true, routeC2SAverageRate, routeC2SBottleneck, clientsIndex, serverIndex)
+		renderSpecialNode(c2sTopo, "c2s" , c2sPath, i, route, routeTableScale, true, routeC2SAverageRate, routeC2SBottleneck, routeC2SPath, clientsIndex, serverIndex)
 	}
 	// 在中心画出server
 	renderOnlyServerInCenter(c2sTopo, serverIndex)
 
 	// renderTrafficPath(p2pTopo, routeP2PAverageRate, routeP2PPath)
 	renderTrafficPath(c2sTopo, routeC2SAverageRate, routeC2SPath)
+
 	var ClientText = new PointText({
 		point: [2, 30],
 		content: "Rate on Client represents the final transmissioin rate it got",
 		fillColor: 'blue',
 		fontFamily: 'Lato, sans-serif',
-		fontWeight: 'bold',
-		fontSize: 12
+		// fontWeight: 'bold',
+		fontSize: 13
 	});
 	var RouteText = new PointText({
-		point: [2, 45],
+		point: [2, 50],
 		content: "Rate on Route represents the average transmissioin rate by clients",
 		fillColor: 'blue',
 		fontFamily: 'Lato, sans-serif',
-		fontWeight: 'bold',
-		fontSize: 12
+		// fontWeight: 'bold',
+		fontSize: 13
 	});
+	var TrafficText = new PointText({
+		point: [2, 70],
+		content: "The width of a red line represents the weight of traffic on the path",
+		fillColor: 'blue',
+		fontFamily: 'Lato, sans-serif',
+		// fontWeight: 'bold',
+		fontSize: 13
+	});
+	renderClickHintArrow(c2sTopo, 27)
+
 	console.log("render done!")
 }
 
@@ -98,12 +109,37 @@ paintTopo = function(flag, topo, info, nodes, myRoute, routeTableScale) {
 		if(flag != -1 ){
 			if($.inArray(i, nodes[info["userId"]]) != -1){
 
-				renderSpecialNode(topo, "", path, i, myRoute, routeTableScale, false, null, null, null, null)
+				renderSpecialNode(topo, "", path, i, myRoute, routeTableScale, false, null, null, null, null, null)
 			}
 		}
 	}
 
 	console.log("render done!")
+}
+
+var renderClickHintArrow = function(topo, index) {
+	var hintNodeRadius = getCircleSize(topo.avaliableLength, index)
+	var hintTargtet = topo.nodeList.get(index)
+	var to = new Point(hintTargtet.x, hintTargtet.y - hintNodeRadius)
+	var from = new Point(hintTargtet.x + 30, hintTargtet.y -30)
+	var through = new Point(hintTargtet.x + 20, hintTargtet.y - 40)
+	var hintArrow = new Path.Arc(from, through, to);
+	var arrowLeft = new Path.Line(new Point(to.x-10, to.y -13), to)
+	var arrowRight = new Path.Line(new Point(to.x+8, to.y -15), to)
+	hintArrow.strokeColor = 'yellow';
+	arrowLeft.strokeColor = 'yellow';
+	arrowRight.strokeColor = 'yellow';
+	hintArrow.sendToBack()
+	arrowLeft.sendToBack()
+	arrowRight.sendToBack()
+
+	var hintText = new PointText({
+		point: from,
+		content: "Click to view routing tables",
+		fillColor: 'yellow',
+		fontFamily: 'Lato, sans-serif',
+		fontSize: 13
+	});
 }
 
 var renderOnlyServerInCenter = function(topo, serverIndex) {
@@ -158,12 +194,12 @@ var renderTrafficPath = function(topo, averageRate, routePaths) {
 			continue
 		var p = topo.nodeList.get(index);
 		var text = new PointText({
-			point: [p.x+15, p.y+20],
+			point: [p.x+12, p.y+20],
 			content: averageRate[index] +"Mbps",
 			fillColor: 'black',
 			fontFamily: 'Courier New',
-			fontWeight: 'bold',
-			fontSize: 10
+			// fontWeight: 'bold',
+			fontSize: 13
 		});
 		text.bringToFront()
 	}
@@ -196,7 +232,7 @@ var renderTopoFrame = function(topo, center, innerRadius, midRadius, outerRadius
 
 	if(clientNum!=0){
 		for(var i = num; i < num+outerNum; i ++) {
-			var clientOuter = new Path.RegularPolygon(center, outerNum, outerRadius+innerRadius/9*4);
+			var clientOuter = new Path.RegularPolygon(center, outerNum, outerRadius+innerRadius/2*1);
 			var tmp = clientOuter.segments[i - num].point
 			topo.nodeList.set(i, tmp.x, tmp.y)
 		}
@@ -226,7 +262,7 @@ var renderBasicNode = function(topo, index){
 }
 
 // 涂上特定颜色，并且导入该节点路由表；如果是isEvaluation，还需要标识出client和server，颜色要用深浅表示
-var renderSpecialNode = function(topo, topoName, basicPath, index, myRoute, routeTableScale, isEvaluation, averageRate, routeC2SBottleneck, clientsIndex, serverIndex){
+var renderSpecialNode = function(topo, topoName, basicPath, index, myRoute, routeTableScale, isEvaluation, averageRate, routeC2SBottleneck, routeC2SPath, clientsIndex, serverIndex){
 	var num = topo.avaliableLength;
 	var outerNum = num - parseInt(num/3) * 2
 	
@@ -240,17 +276,37 @@ var renderSpecialNode = function(topo, topoName, basicPath, index, myRoute, rout
 		if(index > num-1){
 			basicPath.remove()
 			if($.inArray(index - outerNum, clientsIndex) !=- 1){
+				var tmp = index - outerNum
+				var putLeft = [29, 20, 21, 22, 23]
+				var putRight = [25, 26, 27, 28, 24]
+				var node_x = 0, node_y
+				if($.inArray(tmp, putLeft) != -1){
+					node_x = node.x-100
+					node_y = node.y
+				} else{
+					node_x = node.x+20
+					node_y = node.y
+				}
 				var raster = new Raster(clientUrl, new Point(node.x, node.y));
 				raster.scale(0.3)
 				var text = new PointText({
-				point: [node.x+10, node.y+25],
-				content: routeC2SBottleneck[index - outerNum] + "Mbps",
+				point: [node_x, node_y],
+				content: "Rate:"+routeC2SBottleneck[index - outerNum] + "Mbps",
 				fillColor: 'blue',
 				fontFamily: 'Courier New',
 				fontWeight: 'bold',
-				fontSize: 10
+				fontSize: 13
 				});
 				text.bringToFront()
+				var plText = new PointText({
+				point: [node_x, node_y+15],
+				content: "Length:"+routeC2SPath[index - outerNum].length,
+				fillColor: 'blue',
+				fontFamily: 'Courier New',
+				fontWeight: 'bold',
+				fontSize: 13
+				});
+				plText.bringToFront()
 			}
 			return;
 		}

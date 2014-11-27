@@ -73,3 +73,7 @@ b{
 	font-size:1em;
 	font-family: serif;
 }
+
+#statusText{
+	font-size: 0.9em;
+}

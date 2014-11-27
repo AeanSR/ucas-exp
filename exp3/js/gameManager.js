@@ -82,8 +82,8 @@ GameManager.prototype.getinfo = function(){
 		}
 		else if(step == 3){
 			$("#statusText").text("The experiment is end!")
-			var str = "客户端获得平均速率:  " + (data["averageRateScore"]).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(data["averageLengthScore"]).toFixed(2)+" </br>实验最终得分是（满分100分）:  "+  data["finalScore"]
-			$("<div><h3>实验成绩</h3><span class='middle-text' style='color:red;font-size:1em'>"+str+"</span></div>").appendTo("#ControlBoard")
+			var str = "客户端获得平均速率:  " + (data["averageRateScore"]).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(data["averageLengthScore"]).toFixed(2)+" </br>实验测评是:  "+  data["finalScore"]
+			$("<div><h3>实验测评</h3><span class='middle-text' style='color:red;font-size:1em'>"+str+"</span></div>").appendTo("#ControlBoard")
 			$("#gameAction").remove()
 		}
 
@@ -329,7 +329,7 @@ GameManager.prototype.fourthStep = function(data) {
 	// result在18~63范围
 	var finalScore = parseInt((rateResult-18)/(63-18)*20 + 65 + (15 - (lengthResult-3)/(10-3)*15))
 	if(finalScore > 100)finalScore=100
-	console.log("客户端获得平均速率:  " + (rateResult).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(lengthResult).toFixed(2)+" </br>实验最终得分是"+ finalScore)
+	console.log("客户端获得平均速率:  " + (rateResult).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(lengthResult).toFixed(2)+" </br>实验测评得分是"+ finalScore)
 	_this.ajax.score = JSON.stringify({"averageRateScore":rateResult,"averageLengthScore":lengthResult, "practiceRateScore":practiceRateScore, "practiceLengthScore":practiceLengthScore, "finalScore":finalScore})
 	_this.ajax.submitRouteEvaluation(function(data){
 		console.log(data)
@@ -343,7 +343,7 @@ GameManager.prototype.fourthStep = function(data) {
 			return
 		}else{
 			console.log(data)
-			alert("客户端获得平均速率:  " + (data["averageRateScore"]).toFixed(2) + "Mbps，客户端到服务器平均路径长度为"+(data["averageLengthScore"]).toFixed(2)+"，实验最终得分是"+  data["finalScore"])
+			alert("客户端获得平均速率:  " + (data["averageRateScore"]).toFixed(2) + "Mbps，客户端到服务器平均路径长度为"+(data["averageLengthScore"]).toFixed(2)+"，实验测评得分是"+  data["finalScore"])
 			location.reload()
 			return
 		}
