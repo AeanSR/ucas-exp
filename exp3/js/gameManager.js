@@ -82,7 +82,7 @@ GameManager.prototype.getinfo = function(){
 		}
 		else if(step == 3){
 			$("#statusText").text("The experiment is end!")
-			var str = "客户端获得平均速率:  " + (data["averageRateScore"]).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(data["averageLengthScore"]).toFixed(2)+" </br>实验测评是:  "+  data["finalScore"]
+			var str = "客户端获得平均速率:  " + (data["averageRateScore"]).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(data["averageLengthScore"]).toFixed(2)+" </br>实验测评是:  "+  data["finalScore"] +"</br>实验结束后，会根据所有同学实验情况进行给分。"
 			$("<div><h3>实验测评</h3><span class='middle-text' style='color:red;font-size:1em'>"+str+"</span></div>").appendTo("#ControlBoard")
 			$("#gameAction").remove()
 		}
