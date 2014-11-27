@@ -54,7 +54,7 @@
 				<ul>
 					<li><b>Datagram</b></br>
 					<p>Because of the video data is very big and streaming like a river, so we cut data into pieces and we transport the piece to destination in order. The <b>datagram</b> on the network layer mainly contains a data piece, source address and destination address. Other elements are neglected for simplicity. In this experiment, the node‘s index(from 0 to n-1) represents the address of the router devices. For example, the figure below reveals that datagram containing video data is transported from 0 to 5. </p>
-					<p>P.S. : Typically a client and a server is attached directly to one router, the default router for the client or the server (also called the <b>first-hop router(第一跳路由器)</b> for  the client or the server). Whenever a client or the server sends a packet, the packet is transferred to its default router. We refer to the default router of the source client as the source router and the default router of the destination server as the destination router. The figure below shows the router 1 is the first-hop router for the client, and the route 5 is the first-hop router for the server.</p>
+					<p><b style="color:red">P.S.</b> : Typically a client and a server is attached directly to one router, the default router for the client or the server (also called the <b>first-hop router(第一跳路由器)</b> for  the client or the server). Whenever a client or the server sends a packet, the packet is transferred to its default router. We refer to the default router of the source client as the source router and the default router of the destination server as the destination router. The figure below shows the router 1 is the first-hop router for the client, and the route 5 is the first-hop router for the server.</p>
 					</li>
 					<li><b>Router &amp; Routing table</b>
 					<p>Let’s turn our attention to its forwarding function—the actual transfer of datagrams from a router’s incoming links to the appropriate outgoing links at that router. The router mainly has three components:</p>
@@ -104,10 +104,12 @@
 				<p>The experiment has four steps:</p>
 				<ol>
 					<li>Choose a network topology for your team. Click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="tag" data-theme="b" value='Choose Network Topology'/> into the choosing page, then click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="lock" data-theme="b" value='Choose This'/> for deciding, or click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="refresh" data-theme="b" value='Change'/> for changing another random network topology.  Anyone in the team can choose network topology until someone in your team click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="lock" data-theme="b" value='Choose This'/> for deciding.</li>
-					<li>Design the routing table on your own routers. After the Step1, every member will get 6 routers randomly and will get into the design page. You can click the yellow router for filling your routing table. Every table has only 5 rows. You can fill numbers split by "," (英文半角逗号) into the first column, such as "1,3,4" or you can fill "default" into it. The 5 rows needn't be all fiiled, and the blank rows will be neglected when router forward the datagram. For the second column, you can select the next router address.</br>
+					<li>Design the routing table on your own routers. After the Step1, every member will get 6 routers randomly and will get into the design page. You can click the <b style="color:yellow">yellow router </b>for filling your routing table. Every table has only 5 rows. You can fill numbers split by "," (英文半角逗号) into the first column, such as "1,3,4" or you can fill "default" into it. The 5 rows needn't be all fiiled, and the blank rows will be neglected when router forward the datagram. For the second column, you can select the next router address.</br>
 					You can click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="check" data-theme="b" value='Save the Design'/> to save your work. You can click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="eye" data-theme="b" value='Test and Simulate'/> to test whether the whole network routing table satisfies the <i>Target 1</i> and do simulating if the Target 1 is satisfied. If Target 1 is not satisfied, the system will warn you from which source to which destination can't be communicated. So the team member can modify the routing table to get the Target 1.
 					</li>
 					<li>Simulate the network and calculate the delay factor and throughput. After take the Target 1 in step 2, the team member can simulate the network. The game system will randomize 8 routers at the outer decagon as the default routers of the clients and 1 router at the inner decagon as the default router of the server. The simulation of 8 clients video conference will reveal the average rate of routers, traffic on a link and final transmission of clients. 
+					</br><i><b style="color:red">P.S.</b>: In the simulation, you can view all the routing tables in the whole network by clicking the arbitrary router.</i>
+
 						<ul><li>Click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="edit" data-theme="b" value='Return to Modify'/> to return the step 2 to modify the routing table.</li>
 						<li>Click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="refresh" data-theme="b" value='Simulate Again'/> to simulate again. </li>
 						<li>Click <input type='button' data-shadow="false" data-inline="true" data-mini="true" data-icon="action" data-theme="b" value='Download Image'/> to download the image for later presentation.</li>
@@ -116,14 +118,14 @@
 					</li>
 					<li>Submit the experiment result including your routing tables and 20-times random simulate result. If the routing table design get the Target 1, the submit will succeed. The system will do 20-time random simulation for the evaluation of your network. That is to say, the position of clients and servers will be random for 20-times.</li>
 				</ol>
-				<h2>Score</h2>
+				<h2>Experiment Score</h2>
 				<p>The target 1 is 65 grades. Once you can get through the simulation, you can get the 65 grades. <br/>The target 2 is 35 grades, average transmission rate of clients for 20 grades and average path length from clients to server for 15 grades.</p>
 				<h2>Further Reading</h2>
 				<ul>
 					<li><a href="http://ucas-2014.tk/static/download/Computer-Networking-A-Top-Down-Approach-6th-Edition.pdf" target="_blank">计算机网络_自顶向下方法（英文第6版）</a></li>
 					<li><a href="http://ucas-2014.tk/static/download/F99rout.PDF" target="_blank">Routing protocols</a></li>
 				</ul>
-				<h3>If you have any questions or experiment errors, please contact me. <b>Andrew Lee(lichundian囧gmail.com)</b>(将囧替换成@)</h3>
+				<i style="font-size:1.2em">If you have any questions or experiment errors, please contact me. <b>Andrew Lee(lichundian囧gmail.com)</b>(将囧替换成@)</i>
 			</div>
 			<div data-role="panel" id="nav-panel" data-theme="b" ddata-ajax="false" ata-position-fixed="true" data-display="push">
 			<ul data-role="listview">
