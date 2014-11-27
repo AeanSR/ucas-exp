@@ -512,7 +512,7 @@ AdaptiveAdversary.prototype.computerDecide = function(bottles, selectedbottles, 
 	if(bottles==selectedbottles)return [1,this.humanDecide(selectedbottles,mice-1)];
 	var a=this.humanDecide(bottles-selectedbottles,mice);
 	var b=this.humanDecide(selectedbottles,mice-1);
-	if(a>b)return [0,a];
+	if(a>=b)return [0,a];
 	return [1,b];
 }
 AdaptiveAdversary.prototype.humanDecide = function(bottles,mice){     
@@ -536,6 +536,7 @@ AdaptiveAdversary.prototype.humanDecide = function(bottles,mice){
     			if(t<min){
     				min=t
     				ind=i
+
     			}
     		}
     		this.mat[bottles][mice]=min+1

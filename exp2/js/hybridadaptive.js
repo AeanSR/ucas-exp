@@ -515,7 +515,7 @@ AdaptiveAdversary.prototype.computerDecide = function(bottles, mouse1,mouse2 ,ov
 	var a=this.humanDecide(bottles-selectedbottles,mice);    //dead 0
 	var b=this.humanDecide(mouse,mice-1);    //dead 1
 	var c=this.humanDecide(overlaped,mice-2);    //dead 2 ,overlapped won't be considered by human.
-	if(b>=a&&b>=c){
+	if(b>a&&b>=c){
 		return [larger,b]
 	}
 	else{
@@ -542,19 +542,22 @@ AdaptiveAdversary.prototype.humanDecide = function(bottles,mice){
     		}
     		var min=65535
     		var ind=0
+    		var overlap=0
     		for (var i=1;i<=bottles;++i){
     			for(var j=0;j<i;j++){
     				var t1=this.computerDecide(bottles,i-j,j, 0,mice)    //0 overlap
-				var t2=this.computerDecide(bottles, i-j-1, j,1,mice)    //1 overlap
+					var t2=this.computerDecide(bottles, i-j-1, j,1,mice)    //1 overlap
 	    			var t=t1[1]
 	    			if(t<min){
 	    				min=t
 	    				ind=i
+	    				overlap=0
 	    			}
 	    			var t=t2[1]
 	    			if(t<min){
 	    				min=t
 	    				ind=i
+	    				overlap=1
 	    			}
 
     			}
