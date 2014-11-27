@@ -22,7 +22,7 @@ GameManager.prototype.getinfo = function(){
 	this.ajax.getinfo(function(data){
 		$("#login_info").text(data['info']["name"])
 		_this.info = data['info']
-		_this.checkStatus(data)
+		if(_this.checkStatus(data)==false)return
 		var times = data['gameTimes']
 		var step = data['step']
 		group_users = data['group_users']
