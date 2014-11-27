@@ -236,6 +236,7 @@ GameManager.prototype.submitRouteCallback = function(data) {
 		location.reload() 
 		return
 	} else {
+		alert("保存路由成功");
 		_this.secondStep()
 	}
 }

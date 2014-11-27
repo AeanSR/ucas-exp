@@ -56,11 +56,14 @@ paintEvaluation = function(p2pTopo, c2sTopo, route, clientsIndex, serverIndex, r
 		var c2sPath = renderBasicNode(c2sTopo, i)
 		renderSpecialNode(c2sTopo, "c2s" , c2sPath, i, route, routeTableScale, true, routeC2SAverageRate, routeC2SBottleneck, clientsIndex, serverIndex)
 	}
+	// 在中心画出server
+	renderOnlyServerInCenter(c2sTopo, serverIndex)
+
 	// renderTrafficPath(p2pTopo, routeP2PAverageRate, routeP2PPath)
 	renderTrafficPath(c2sTopo, routeC2SAverageRate, routeC2SPath)
 	var ClientText = new PointText({
 		point: [2, 30],
-		content: "Rate on Client represents the final transimissioin rate it got",
+		content: "Rate on Client represents the final transmissioin rate it got",
 		fillColor: 'blue',
 		fontFamily: 'Lato, sans-serif',
 		fontWeight: 'bold',
@@ -68,7 +71,7 @@ paintEvaluation = function(p2pTopo, c2sTopo, route, clientsIndex, serverIndex, r
 	});
 	var RouteText = new PointText({
 		point: [2, 45],
-		content: "Rate on Route represents the average transimissioin rate by clients",
+		content: "Rate on Route represents the average transmissioin rate by clients",
 		fillColor: 'blue',
 		fontFamily: 'Lato, sans-serif',
 		fontWeight: 'bold',
@@ -101,6 +104,16 @@ paintTopo = function(flag, topo, info, nodes, myRoute, routeTableScale) {
 	}
 
 	console.log("render done!")
+}
+
+var renderOnlyServerInCenter = function(topo, serverIndex) {
+	var serverUrl = 'imgs/server.png';
+	var raster = new Raster(serverUrl, view.center);
+	raster.scale(0.5)
+	var p = topo.nodeList.get(serverIndex)
+	var path = Path.Line(view.center, new Point(p.x, p.y))
+	path.strokeColor = 'black'
+	path.sendToBack()
 }
 
 // 绘流量图（流量粗细）和平均transmission rate
@@ -245,9 +258,9 @@ var renderSpecialNode = function(topo, topoName, basicPath, index, myRoute, rout
 		if($.inArray(index - outerNum, clientsIndex) !=- 1){
 			var raster = new Raster(clientUrl, new Point(node.x, node.y));
 			raster.scale(0.3)
-		} else if( index ==  serverIndex){
-			var raster = new Raster(serverUrl, new Point(node.x, node.y));
-			raster.scale(0.5)
+		// } else if( index ==  serverIndex){
+		// 	var raster = new Raster(serverUrl, new Point(node.x, node.y));
+		// 	raster.scale(0.5)
 		} else {
 			if(averageRate[index] != -1){
 				basicPath.fillColor = new Color(0.2,0.1,0.1)
