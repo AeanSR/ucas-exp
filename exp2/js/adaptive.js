@@ -75,7 +75,7 @@ GameManager.prototype.getSuccessHandler = function(data) {
 	GM.Ajax.gameLoop = data["curLoop"]
 	if(GM.Ajax.gameLoop>GM.totaltimes-1 && !GM.is_test) {
 		setTimeout(function(){
-			$("#error-notice").text("Sorry, your challenges have been used up.But you can still play the test mode.")
+			$("#error-notice").html('<h3>Sorry, your challenges have been used up.But you can still play the test mode.</h3><a href="index.html" data-ajax="false" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">Back to the Guidance.</a>')
 			$("#error-popup").popup("open")
 		},1000)
 
