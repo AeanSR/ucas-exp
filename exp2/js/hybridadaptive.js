@@ -37,7 +37,12 @@ HAGameManager.prototype.create = function() {
 		if(_this.c_bottle.length==1)
 			_this.is_win = true
 		if(_this.aa.mice ==0){
-			_this.Popup("#submit-popup")
+			if(!_this.is_win){
+				_this.isGameOver(false,0,1)
+			}
+			else{
+				_this.Popup("#submit-popup")
+			}
 		}
 
 	});
