@@ -37,7 +37,12 @@ HAGameManager.prototype.create = function() {
 		if(_this.c_bottle.length==1)
 			_this.is_win = true
 		if(_this.aa.mice ==0){
-			_this.Popup("#submit-popup")
+			if(!_this.is_win&&!_this.is_test){
+				_this.isGameOver(false,-1,-1)
+			}
+			else{
+				_this.Popup("#submit-popup")
+			}
 		}
 
 	});
@@ -358,6 +363,7 @@ HAGameManager.prototype.isGameOver = function(isWin,u_bottle,c_bottle) {
 	this.is_test?
 	newhref = 'hybrid-adaptive.html':
 	newhref = 'hybrid-adaptive.html?submit'
+	if(u_bottle!=-1&&c_bottle!=-1)
 	$("#gameover-result").text("The poisoned bottle is " + c_bottle + ", your answer is bottle " + u_bottle)
 	if(isWin){
 		$("#gameover h1").text("Great!")
