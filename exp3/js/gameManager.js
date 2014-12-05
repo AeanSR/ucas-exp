@@ -3,6 +3,7 @@ function GameManager(mode){
 	this.ajax = new modAjax()
 	this.routeTableScale = 5
 	this.info = null
+	this.group_users=null
 	this.mode = mode
 	if(mode == "formal"){
 		this.ajax.mode = 0
@@ -22,6 +23,7 @@ GameManager.prototype.getinfo = function(){
 	this.ajax.getinfo(function(data){
 		$("#login_info").text(data['info']["name"])
 		_this.info = data['info']
+		_this.group_users = data['group_users']
 		if(_this.checkStatus(data)==false)return
 		var times = data['gameTimes']
 		var step = data['step']
@@ -114,8 +116,10 @@ GameManager.prototype.initTopoMatrix = function(data) {
 GameManager.prototype.setDistributedNodesAndRoute = function(data) {
 	_this.nodes = data['distributeNodes']
 	_this.myRoute = {}
-	for(var userId in _this.nodes)
-		$("li#"+userId).text(_this.info["name"]+'(' + _this.nodes[userId].toString() + ')')
+	for(var i = 0; i<_this.group_users.length; i++) {
+		var tmpUserId = group_users[i]['userId']
+		$("li#"+tmpUserId).text(group_users[i]['name']+'(' + _this.nodes[tmpUserId].toString() + ')')
+	}
 	for(var index in _this.nodes[_this.info['userId']]){
 		var myNode = _this.nodes[_this.info['userId']][index]
 		if(myNode.toString() in data['route'])
@@ -151,7 +155,7 @@ GameManager.prototype.firstStepCallback = function(data) {
 		data["status"] = 0 // 将status改成TopoStatus["NEW"]
 		_this.ajax.data = JSON.stringify(data)
 		_this.ajax.submitTopo(function(data){
-			console.log(data)
+			// console.log(data)
 			if(data["status"] == "NORMAL")
 				_this.secondStep()
 			// to test
@@ -213,7 +217,7 @@ GameManager.prototype.secondStepCallback = function(data) {
 			}
 			_result[my_nodes[j]] = table
 		}
-		console.log(JSON.stringify(_result))
+		// console.log(JSON.stringify(_result))
 		$("#evaluateRouteDiv").remove()
 		_this.ajax.result = JSON.stringify(_result)
 		_this.ajax.submitRoute(_this.submitRouteCallback, _this.errorHandler)
@@ -224,7 +228,7 @@ GameManager.prototype.submitRouteCallback = function(data) {
 	if(_this.checkStatus(data)==false)return
 	var status = data["status"]
 	var alertStr = null
-	console.log(status)
+	// console.log(status)
 	if(status == "ERROR"){
 		alertStr = "提交出错，可能原因是没有获取拓扑图。将刷新页面。";
 		alert(alertStr);
@@ -318,7 +322,7 @@ GameManager.prototype.fourthStep = function(data) {
 	for(var i = 0;i<times;i++){
 		var tmpResult = _this.initRouteEvaluation(data,false)
 		if(tmpResult == -1)return
-		console.log("times-" + i + ": 	" + tmpResult)
+		// console.log("times-" + i + ": 	" + tmpResult)
 		rateSum += tmpResult[0]
 		lengthSum += tmpResult[1]
 		practiceRateScore.push(tmpResult[0])
@@ -329,10 +333,10 @@ GameManager.prototype.fourthStep = function(data) {
 	// result在18~63范围
 	var finalScore = parseInt((rateResult-18)/(63-18)*20 + 65 + (15 - (lengthResult-3)/(10-3)*15))
 	if(finalScore > 100)finalScore=100
-	console.log("客户端获得平均速率:  " + (rateResult).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(lengthResult).toFixed(2)+" </br>实验测评得分是"+ finalScore)
+	// console.log("客户端获得平均速率:  " + (rateResult).toFixed(2) + "Mbps </br>客户端到服务器平均路径长度为"+(lengthResult).toFixed(2)+" </br>实验测评得分是"+ finalScore)
 	_this.ajax.score = JSON.stringify({"averageRateScore":rateResult,"averageLengthScore":lengthResult, "practiceRateScore":practiceRateScore, "practiceLengthScore":practiceLengthScore, "finalScore":finalScore})
 	_this.ajax.submitRouteEvaluation(function(data){
-		console.log(data)
+		// console.log(data)
 		if(data["status"]=="DONE"){
 			alert("其他组员已提交成绩，实验已结束。")
 			location.reload()
@@ -342,7 +346,7 @@ GameManager.prototype.fourthStep = function(data) {
 			location.reload()
 			return
 		}else{
-			console.log(data)
+			// console.log(data)
 			alert("客户端获得平均速率:  " + (data["averageRateScore"]).toFixed(2) + "Mbps，客户端到服务器平均路径长度为"+(data["averageLengthScore"]).toFixed(2)+"，实验测评得分是"+  data["finalScore"])
 			location.reload()
 			return
@@ -510,7 +514,7 @@ var markBottleneck = function(topo, route, clientsIndex, serverIndex,  routeP2PP
 
 // 视频会议
 var practiceRunRoute = function(topo, route, clientsIndex, serverIndex, routeP2PDegrees, routeP2PPath, routeC2SDegrees, routeC2SPath) {
-	console.log(clientsIndex)
+	// console.log(clientsIndex)
 	// 计算routeP2PDegrees, 有错误。routeP2PPath的key应该是"clientsIndex[i]-clientsIndex[j]"的形式
 	for(var i in clientsIndex) {
 		for(var j in clientsIndex){
@@ -660,51 +664,3 @@ GameManager.prototype.checkStatus = function(data) {
 	}
 	return true
 }
-// GameManager.prototype.thirdStep = function() {
-// 	var _result = {}
-// 	var my_nodes = _this.nodes[_this.info['userId']]
-// 	for(var j in my_nodes){
-// 		var table = []
-// 		for(var i =1; i <= _this.routeTableScale; i++) {
-// 			var dest = $("#dest-" + my_nodes[j] + i).val();
-// 			var next = $("#next-" + my_nodes[j] + i).val();
-// 			if(dest==null || dest=="")dest = "null";
-// 			if(next==null || next=="")next = "null";
-// 			var tmp ={}
-// 			tmp[dest] = next
-// 			table.push(tmp)
-// 		}
-// 		_result[my_nodes[j]] = table
-// 	}
-// 	console.log(JSON.stringify(_result))
-// 	this.ajax.result = JSON.stringify(_result)
-// 	this.ajax.submitResult(_this.thirdStepCallback, _this.errorHandler)
-// }
-
-
-
-// GameManager.prototype.thirdStep = function() {
-
-// 	this.ajax.checkStatus(_this.thirdStepCallback, _this.errorHandler)
-// }
-
-// GameManager.prototype.thirdStepCallback = function(data) {
-// 	var status = data["status"]
-// 	console.log(status)
-// 	if(status == "ERROR"){
-// 		alert("本次实验还没开始，无法进入下一次实验");
-// 		return
-// 	} else if(status == "ING") {
-// 		alert("还有其他组员没有提交路由表，请稍后再进入下一次实验");
-// 		return
-// 	} else if(status == "DONE") {
-// 		_this.ajax.times += 1
-// 		$("#statusText").text("第一步")
-// 		$("#actionButton").val("请求拓扑图")
-// 		$("#actionButton").button("refresh")
-// 		$("#actionButton").off("click")
-// 		$("#actionButton").on("click", function(){
-// 			_this.firstStep()
-// 		});
-// 	}
-// }
