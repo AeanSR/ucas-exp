@@ -427,6 +427,7 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 				else this.active_bottle_list[x] = true
 			}
 			this.mice = this.mice - 1
+			if(this.mice==0&&this.bottles>1)this.isGameOver(false,-1,-1)
 			//console.log(this.bottles)
 			return true
 		}
@@ -475,7 +476,7 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 				else this.active_bottle_list[x] = true
 			}
 			this.mice = this.mice - 1
-			console.log(this.bottles)
+			if(this.mice==0&&this.bottles>1)this.isGameOver(false,-1,-1)
 			return true
 		}
 		$("#mice-container #" + mouse)
@@ -496,12 +497,16 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 
 GameManager.prototype.isGameOver = function(isCorrect, u_bottle, c_bottle) {
 	this.historys['submit'] = {"user":u_bottle,"correct":c_bottle}
+
 	this.is_test?
 	newhref = 'adaptive.html?test':
 	newhref = 'adaptive.html?submit'
 	this.is_adversary?
 	newhref += 'A':
 	newhref += 'N'
+	if(u_bottle==-1){
+		$("#gameover-result").text("All mice are dead.")
+	}else
 	$("#gameover-result").text("The poisoned bottle is " + c_bottle + ", your answer is bottle " + u_bottle)
 	if (isCorrect) {
 		$("#gameover h1").text("Great!")
