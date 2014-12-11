@@ -6,6 +6,7 @@ var WEATHERS = 3;
 var SUNNY = 0;
 var RAINY = 1;
 var CLOUDY = 2;
+var weahterList = ["晴天","雨天","多云"]
 
 var LIUBEI = "刘备";
 var ZHANGFEI = "张飞";
@@ -15,7 +16,7 @@ var ZHUGELIANG = "诸葛亮";
 
 function Army(){
 	this.globalTime = 0;
-	this.transferCondition = "";   // 定义转换为Ready的条件表达式, 后经eval判断
+	this.transferCondition = {};   // 定义转换为Ready的条件表达式, 后经eval判断
 	//  上下文
 	this.generalName =  LIUBEI,      // 将领名称
 	this.troops =  5000,     // 5000人
@@ -23,43 +24,75 @@ function Army(){
 	this.supply =  5000	//  粮食斤数
 }
 
-/*
-*	下一小时, 更新上下文
-*/
-
-Army.prototype.nextDay = function(){
-	this.weahter = Math.floor(Math.random()*WEATHERS)
-	this.supply -= Math.floor(Math.random()*200)
-};
 Army.prototype.chkReady = function(){
-	console.log(eval(this.transferCondition))
+
+	evalStr = "" +
+	"this.supply" + this.transferCondition['supply'][0] + this.transferCondition['supply'][1] + '&&' +
+	"this.troops" + this.transferCondition['troops'][0] + this.transferCondition['troops'][1] + '&&' +
+	"this.weahter" + "==" + this.transferCondition['weahter'][1];
+	return eval(evalStr)
 }
 Army.prototype.chkCorrect = function(){
 	var n = 0;
-	if(this.transferCondition!="") n++    // 1
+	if(this.transferCondition!={}) n++    // 1
 	var newDAG = jQuery.extend(true, {}, DAG)
 	console.log(newDAG)
+	// 2
 	if('army-mainBody' in newDAG){
 		delete newDAG['army-mainBody']
 		n++
 	}
+	// 3
 	if('mainBody-weather' in newDAG){
 		delete newDAG['mainBody-weather']
 		n++
 	}
+	// 4
 	if('food-mainBody' in DAG){
 		delete newDAG['food-mainBody']
 		n++
 	}
+	// 5
+	if('food-timer' in DAG){
+		delete newDAG['food-timer']
+		n++
+	}
+	// 6
+	if('food-randomer' in DAG){
+		delete newDAG['food-randomer']
+		n++
+	}
+	// 7
+	if('army-timer' in DAG){
+		delete newDAG['army-timer']
+		n++
+	}
+	// 8
+	if('army-randomer' in DAG){
+		delete newDAG['army-randomer']
+		n++
+	}
+	// 9
+	if('timer-weather' in DAG){
+		delete newDAG['timer-weather']
+		n++
+	}
+	// 10
+	if('randomer-weather' in DAG){
+		delete newDAG['randomer-weather']
+		n++
+	}
+
 	if($.map(newDAG, function(n, i) { return i; }).length!=0){
 		alert()
 		n =-1  //dummy
 	}
+	// 11
 	if(numInBody == 6){
 		n++;
 	}
 	console.log('correct:',n)
-	if(n==5)return true
+	if(n==11)return true
 	else return false
 }
 
@@ -67,6 +100,7 @@ Army.prototype.chkCorrect = function(){
 function GameManager(){
 	var _this = this
 	this.day = 0
+	this.everAttack = false
 	this.army = new Army()
 	this.namemap = [LIUBEI,ZHANGFEI,ZHAOYUN,GUANYU,ZHUGELIANG]
 	this.restTime = 0
@@ -89,14 +123,14 @@ function GameManager(){
 	     		_this.log("",'人员就位，游戏开始，今天是第' + _this.day + '天。' , 'sys')
 	     		_this.interval = parseInt(msg['data']['interval'])
 	     		_this.startTimer()
-	     		_this.sync()
+	     		_this.sync(true)
 	     		_this.report()
 	     	}
 	     	else if(msg['data']['event'] == 'sync'){
 	     		_this.day = msg['data']['day']
 	     		_this.isTraitor = msg['data']['isTraitor']
 	     		_this.log("",'新的一天到来，今天是第' + _this.day + '天。' , 'sys')
-	     		_this.sync()
+	     		_this.sync(false)
 	     		_this.report()
 	     		_this.startTimer()
 	     	}
@@ -134,8 +168,13 @@ function GameManager(){
 	     		_this.id = parseInt(msg['data']['id'])
 	     		_this.isTraitor = msg['data']['isTraitor']
 	     		_this.messages = msg['data']['messages']
+	     		_this.ready = msg['data']['ready']
 	     		_this.name = _this.namemap[_this.id]
 	     		_this.stage = msg['data']['stage']
+	     		_this.army.transferCondition = msg['data']['cond']
+	     		_this.army.troops = msg['data']['resource']['troops']
+	     		_this.army.supply = msg['data']['resource']['supply']
+	     		_this.army.weahter = msg['data']['resource']['weahter']
 	     		_this.initStage2()
 	     		if(_this.stage==0){
 	     			_this.initStage1()
@@ -207,6 +246,7 @@ GameManager.prototype.initStage2 = function(){
 		$('#current-messages').text(_this.messages)
 	});
 	$('#attack').click(function(){
+		_this.everAttack = true
 		_this.sock.send(_this.getMsgJson(0, true, 'attack'))
 	})
 	$('#notattack').click(function(){
@@ -217,6 +257,7 @@ GameManager.prototype.initStage2 = function(){
 GameManager.prototype.moveStage2 = function(){
 
 	$('#console-stage1').css('display','none')
+	$('#control-stage1').css('display','none')
 	$('#console-stage2').css('display','block')
 	$('#control-stage2').css('display','block')
 	setTimeout(function(){$("#pause-popup").popup("open")},500)
@@ -226,18 +267,22 @@ GameManager.prototype.moveStage2 = function(){
 GameManager.prototype.initStage1 = function(){
 	_this = this
 	$('#console-stage1').css('display','block')
+	$('#control-stage1').css('display','block')
 	$("#confirm-condition").click(function(){
 		if(parseInt($("#food-val").val())!=NaN && parseInt($("#troops-val").val())!=NaN){
-			_this.army.transferCondition = "this.ready = " +
-			"this.supply" + ($("#food-op").val()=="smaller"?"<=":">") + parseInt($("#food-val").val()) + '&&' +
-			"this.troops" + ($("#troops-op").val()=="smaller"?"<=":">") + parseInt($("#troops-val").val()) + '&&' +
-			"this.weahter" + "==" + $("#weather-val").val();
+			_this.army.transferCondition = {'supply':[$("#food-op").val()=="smaller"?"<=":">",parseInt($("#food-val").val())],
+			'troops':[$("#troops-op").val()=="smaller"?"<=":">",parseInt($("#troops-val").val())],
+			'weahter':['==',$("#weather-val").val()]}
+			// "this.ready = " +
+			// "this.supply" + ($("#food-op").val()=="smaller"?"<=":">") + parseInt($("#food-val").val()) + '&&' +
+			// "this.troops" + ($("#troops-op").val()=="smaller"?"<=":">") + parseInt($("#troops-val").val()) + '&&' +
+			// "this.weahter" + "==" + $("#weather-val").val();
 		}
 	})
 	$('#make').click(function(){
 		if(_this.army.chkCorrect()){
 			_this.log('','部队构建完毕，等待战斗！','sys')
-			_this.sock.send(_this.getMsgJson(0, true, 'nextstage'))
+			_this.sock.send(_this.getMsgJson(0, {"cond":_this.army.transferCondition}, 'nextstage'))
 			_this.moveStage2()
 			_this.stage = 1
 		}
@@ -245,6 +290,9 @@ GameManager.prototype.initStage1 = function(){
 			_this.log('','部队一盘散沙，不能成军，请重下军令！','sys')
 
 		}
+	})
+	$('#clean').click(function(){
+		_this.waitPaperjs("initStep1")
 	})
 	_this.waitPaperjs("initStep1")
 }
@@ -292,22 +340,80 @@ GameManager.prototype.getErrorHandler = function() {
 	setTimeout(function(){$("#error-popup").popup("open")},1000)
 }
 
-GameManager.prototype.sync = function(){
-	var randnum = Math.random()
-	if(randnum>0.5){
+GameManager.prototype.newStatus = function(ready){
+	var newResource = {}
+	var range = 1000
+	var maxTimes = 100
+	var times = 0
+	var cond = this.army.transferCondition
+	if(ready){
 		this.ready = true
-		$("#ready-status").text("已经就绪")
+	}else{
+		this.ready = false
+	}
+	var thresTroops = cond['troops'][1]
+	var thresSupply = cond['supply'][1]
+	var oldTroops = this.army.troops
+	var oldSupply = this.army.supply
+
+	while(true){
+		this.army.troops = Math.floor(thresTroops - range + Math.random()*range*2)
+		this.army.supply = Math.floor(thresSupply - range + Math.random()*range*2)
+		this.army.weahter = Math.floor(Math.random()*WEATHERS)
+		times += 1
+		if(this.army.chkReady()==this.ready || times >= maxTimes) break
+
+	}
+}
+GameManager.prototype.sync = function(isStart){
+	oldTroops = this.army.troops
+	oldSupply = this.army.supply
+	oldWeather = this.army.weahter
+	if(!isStart){
+		var randnum = Math.random()
+		if(randnum>0.5){
+			this.newStatus(true)
+		}
+		else{
+			this.newStatus(false)
+		}
+		
+
+		diffTroops = this.army.troops - oldTroops
+		diffSupply = this.army.supply - oldSupply
+		loseTroops = diffTroops<=0?Math.abs(diffTroops):(Math.floor(Math.abs(diffTroops)*0.2 + Math.random(Math.floor(Math.abs(diffTroops)*0.2))))
+		addTroops = diffTroops<=0?0:(diffTroops + loseTroops)
+		useSupply = diffSupply<=0?Math.abs(diffSupply):Math.floor(oldTroops * 0.1)
+		addSupply = diffSupply<=0?0:(diffSupply + useSupply)
+		console.log(diffTroops,diffSupply)
+		str = ""
+		if(this.everAttack){
+			str += "由于昨天发动了攻击，兵力损失了" + loseTroops + '人, 新募集士兵' + addTroops + '人；'
+		}
+		else{
+			str += "由于昨天未进行攻击，兵力因伤病损失了" + loseTroops + '人, 新募集士兵' + addTroops + '人；'
+		}
+		str += "供给士兵消耗粮食" + useSupply + "斤，" + "同时新增补给粮食" + addSupply + "斤；"
+		str += '今天天气是' + weahterList[this.army.weahter] + '。'
+		this.log('',str,'sys')
+		this.everAttack = false
+
 	}
 	else{
-		this.ready = false
-		$("#ready-status").text("整备中")
+		this.log('',('现有兵力')+ this.army.troops + '人，' +
+		('现有粮食') + this.army.supply + '斤，' +
+		'今天天气是' + weahterList[this.army.weahter] + '。','sys')
 	}
+	this.ready = this.army.chkReady()
+	this.log('', "将军根据设定条件判断，" + (this.ready?"军队为就绪状态，战斗胜算较大。":"军队为整备状态，战斗胜算较小。"),'sys')
+	this.ready?$("#ready-status").text("已经就绪"):$("#ready-status").text("整备中")
+	$('#resource-status').text(this.army.troops+ '/'+ this.army.supply + '/' + weahterList[this.army.weahter])
 	resetStep2()
 	$("#current-day").text(this.day)
 	$('#traitor-status').text(this.isTraitor==false?"忠臣":"奸臣")
 }
 GameManager.prototype.report = function(){
-	this.sock.send(this.getMsgJson(0,{"ready":this.ready},'report'))
+	this.sock.send(this.getMsgJson(0,{'troops':this.army.troops,'supply':this.army.supply,'weahter':this.army.weahter,"ready":this.ready},'report'))
 }
 GameManager.prototype.log = function(from,message, type){
 	control = $("#log")

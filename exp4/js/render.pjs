@@ -29,6 +29,25 @@ var avatars_name = [LIUBEI,ZHANGFEI,ZHAOYUN,GUANYU,ZHUGELIANG];
 var dragElem = null;
 numInBody = 0
 DAG = {}
+var ModuleInfo={
+	"模块：随机数生成器":'<p style="color:blue;">接口：</p>【输出】生成的随机数{整数}。<p style="color:blue;">内部逻辑：</p>生成随机数。',
+	"模块：日期发生器":'<p style="color:blue;">接口：</p>【输出】当前天数{整数}。<p style="color:blue;">内部逻辑：</p>每隔10分钟（现实世界时间）天数增加1。',
+	"模块：兵力":'<p style="color:blue;">接口：</p>【输入】天数{整数}，随机数{整数}<br>【输出】当前天数{整数}。<p style="color:blue;">内部逻辑：</p> 在不同的天数依据随机数获得获得不同的兵力数量。',
+	"模块：粮食":'<p style="color:blue;">接口：</p>【输入】天数{整数}，随机数{整数}<br>【输出】当前粮食{整数}。<p style="color:blue;">内部逻辑：</p> 在不同的天数依据随机数获得获得不同的粮食数量。',
+	"模块：天气":'<p style="color:blue;">接口：</p>【输入】天数{整数}，随机数{整数}<br>【输出】当前天气{晴天，雨天}。<p style="color:blue;">内部逻辑：</p> 在不同的天数依据随机数获得获得不同的天气状况。',
+	"模块：部队":'<p style="color:blue;">内部接口：</p>【输入】兵力数{整数}，粮食数{整数}，天气{晴天，雨天}<br>'+
+		'【输出】部队状态{就绪，整备}。<p style="color:blue;">内部逻辑：</p> 点击界面中的模块进行填写。'+
+		'<p style="color:blue;">外部接口：</p> 可与与其他部队子系统发生交互。请点击界面中的模块进行填写。'+
+		'<p style="color:blue;">属性：</p> 这里的属性，模块内部可读写，模块外部只读。请点击界面中的模块进行填写。',
+	"属性：整备状态":'<p style="color:blue;">属性：</p><p>状态类：该状态下部队进攻的基本条件没有达到。</p>',
+	"属性：就绪状态":'<p style="color:blue;">属性：</p><p>状态类：该状态下部队进攻的基本条件已经达到。</p>',
+	"接口：拒绝攻击":'<p style="color:blue;">接口：</p><p>决策类：通过该接口可做出拒绝战斗决策。</p>',
+	"接口：开始攻击":'<p style="color:blue;">接口：</p><p>决策类：通过该接口可做出开始战斗决策。</p>',
+	"接口：释放信鸽":'<p style="color:blue;">接口：</p><p>动作类：通过该接口可做出开始战斗决策。</p>'
+
+}
+
+
 var createArray2D = function(m,n){
 	array = {}
 	for(var x=0;x<m;x++){
@@ -79,6 +98,17 @@ function Connector(point,size,item,connectable,color, connectname) {
 		this.group.addChild(this.connectGroup)
 	}
 
+	// Add moudule name
+	
+		var h = new PointText({
+		fillColor : 'purple',
+		name: 'textMoudule',
+		content : connectname,
+		position: new Point([0,1])*size/2 + new Point([0,20]) + point
+		}).bringToFront()
+	this.group.addChild(h)
+	h.sendToBack()
+
 	// add content
 	innerSize = new Size(size) - new Size(20,20)
 	if(item){
@@ -89,7 +119,12 @@ function Connector(point,size,item,connectable,color, connectname) {
 		this.group.addChild(item)
 		item.sendToBack()
 	}
-		
+	this.group.onMouseEnter = function(event) {
+		$('#module-info').html(ModuleInfo[connectname])
+	}
+	this.group.onMouseLeave = function(event) {
+		$('#module-info').html('把鼠标移动到相应部件上显示详细信息。')
+	}
 }
 
 function onMouseDown(event) {
@@ -126,6 +161,8 @@ function onMouseDown(event) {
 
 function onMouseMove(event) {
 	if (event.item && event.item.name == 'connector') {
+		if(previousGroup!=null && previousGroup!=event.item)
+		hideConnectpoint(previousGroup)
 		showConnectpoint(event.item)
 		previousGroup = event.item;
 	} else {
@@ -205,8 +242,13 @@ function onMouseUp(event) {
 				addElem(mainBody, dragElem)
 				console.log('drop elem')
 			}
-			if(!isDragging && group.children['mainBody'])
-			$("#condition-panel").panel("open")
+			if(!isDragging && group.children['mainBody']){
+				$('#condition-panel fieldset')[0].style["display"]=('food-mainBody' in DAG)?"Block":"None"
+				$('#condition-panel fieldset')[1].style["display"]=('army-mainBody' in DAG)?"Block":"None"
+				$('#condition-panel fieldset')[2].style["display"]=('mainBody-weather' in DAG)?"Block":"None"
+				$("#condition-panel").panel("open")
+			}
+			
 
 		}
 	}
@@ -245,46 +287,53 @@ function addElem(body, elem){
 		body.addChild(e)
 		//e.position = body.children['line-' + e.name].position +[60,0]+ new Point([20,0])*textLineItems[e.name]
 		//e.fitBounds[60,60]
-		e.fitBounds(body.children['line-' + e.name].bounds.topLeft +[60,0]+ new Point([40,0])*textLineItems[e.name],[25,25])
+		e.fitBounds(body.children['line-' + e.name].bounds.topLeft +[100,0]+ new Point([30,0])*textLineItems[e.name],[20,20])
 		elem.remove()
 		textLineItems[e.name] +=1
 		numInBody ++;
 	}
 }
 initStep1 = function(id){
+	onResize()
+	project.activeLayer.removeChildren()
+	view.draw()
+
 	var commander = new Raster(avatars_url[id]);
-	commander.name = 'commander'
+	commander.name = 'attributes'
 	var message = new Raster('message');
-	message.name = 'actions'
+	message.name = 'sockets'
 	var attack = new Raster('img-attack');
-	attack.name = 'actions'
+	attack.name = 'sockets'
 	var shield = new Raster('img-shield');
-	shield.name = 'actions'
+	shield.name = 'sockets'
 	var ready = new Raster('img-ready');
-	ready.name = 'message'
+	ready.name = 'attributes'
 	var notready = new Raster('img-notready');
-	notready.name = 'message'
+	notready.name = 'attributes'
 
 	var troops =  new Group();
 	troops.name = "army"
-	troops.addChild(new PointText({
-		fillColor : 'black',
-		content : '士兵'
-		}))
+	troops.addChild(new Raster('img-troops'))
 
 	var food =  new Group();
 	food.name = "food"
-	food.addChild(new PointText({
-		fillColor : 'black',
-		content : '粮食'
-		}))
+	food.addChild(new Raster('img-supply'))
+
 	var weather =  new Group();
 	weather.name = 'weather'
-	weather.addChild(new PointText({
-		fillColor : 'black',
-		content : '天气'
-		}))
+	weather.addChild(new Raster('img-weather'))
+
+	var timer =  new Group();
+	timer.name = 'timer'
+	timer.addChild(new Raster('img-timer'))
+
+	var randomer =  new Group();
+	randomer.name = 'randomer'
+	randomer.addChild(new Raster('img-randomer'))
+
+
 	mainBody =  new Group({name:"mainBody"});
+
 	mainBody.addChild(new PointText({
 		fillColor : 'black',
 		name: 'line-army',
@@ -293,40 +342,45 @@ initStep1 = function(id){
 		}))
 	mainBody.addChild(new PointText({
 		fillColor : 'black',
-		name: 'line-commander',
-		content : '司令:请拖动至此处',
-		position: [0,-20]
-		}))
-	mainBody.addChild(new PointText({
-		fillColor : 'black',
-		name: 'line-message',
-		content : '状态:请拖动至此处',
+		name: 'line-attributes',
+		content : '属        性:请拖动至此处',
 		position: [0,0]
 		}))
 	mainBody.addChild(new PointText({
 		fillColor : 'black',
-		name: 'line-actions',
-		content : '动作:请拖动至此处',
+		name: 'line-sockets',
+		content : '外部接口:请拖动至此处',
 		position: [0,20]
 		}))
 	mainBody.addChild(new PointText({
 		fillColor : 'black',
 		name : 'conditions',
-		content : '条件:点击此处修改',
+		content : '控制逻辑:点击此处修改',
 		position: [0,40]
 		}))
-	objects = []
-	objects.push(new Connector(new Point(300, 50), [100,100],commander,false,'green', "关羽"))
-	objects.push(new Connector(new Point(300, 170), [100,100],message,false,'green'))
-	objects.push(new Connector(new Point(300, 290), [100,100],attack,false,'green'))
-	objects.push(new Connector(new Point(300, 410), [100,100],shield,false,'green'))
-	objects.push(new Connector(new Point(450, 150), [100,100],ready,false,'green'))
-	objects.push(new Connector(new Point(450, 300), [100,100],notready,false,'green'))
+	// mainBody.addChild(new Raster({
+	// 	source:'img-army',
+	// 	position:[0,-50],
+	// 	size:[1000,1000]
+	// }).sendToBack())
 
-	objects.push(new Connector(new Point(100, 100), [100,100],troops,true,'blue'))
-	objects.push(new Connector(new Point(100, 220), [100,100],food,true,'blue'))
-	objects.push(new Connector(new Point(100, 340), [100,100],weather,true,'blue'))
-	objects.push(new Connector(new Point(650, 200), [200,300],mainBody,true,'red'))
+	objects = []
+	objects.push(new Connector(new Point(300, 60), [70,70],commander,false,'green', "属性：" + avatars_name[id]))
+	objects.push(new Connector(new Point(300, 200), [70,70],message,false,'green',"接口：释放信鸽"))
+	objects.push(new Connector(new Point(300, 340), [70,70],attack,false,'green',"接口：开始攻击"))
+	
+	objects.push(new Connector(new Point(450, 60), [70,70],shield,false,'green',"接口：拒绝攻击"))
+	objects.push(new Connector(new Point(450, 200), [70,70],ready,false,'green',"属性：就绪状态"))
+	objects.push(new Connector(new Point(450, 340), [70,70],notready,false,'green',"属性：整备状态"))
+
+	objects.push(new Connector(new Point(850, 80), [80,80],troops,true,'blue',"模块：兵力"))
+	objects.push(new Connector(new Point(850, 220), [80,80],food,true,'blue',"模块：粮食"))
+	objects.push(new Connector(new Point(850, 360), [80,80],weather,true,'blue',"模块：天气"))
+
+	objects.push(new Connector(new Point(650, 200), [200,250],mainBody,true,'white',"模块：部队"))
+
+	objects.push(new Connector(new Point(100, 150), [80,80],timer,true,'blue',"模块：日期发生器"))
+	objects.push(new Connector(new Point(100, 300), [80,80],randomer,true,'blue',"模块：随机数生成器"))
 
 }
 
@@ -336,7 +390,6 @@ initStep2 = function (id){
 	onResize()
 	project.activeLayer.removeChildren()
 	view.draw()
-	console.log(view.center)
 
 	poly5in = new Path.RegularPolygon(view.center,5,170)
 	for(var i=0;i<5;i++){
