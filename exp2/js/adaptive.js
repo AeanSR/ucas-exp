@@ -1,6 +1,7 @@
 function GameManager(mice, bottles, poisons,is_test, is_adversary) {
 	this.mice = mice;
 	this.bottles = bottles;
+	this.orig_bottles = bottles;
 	this.poisons = poisons;
 	this.is_test =is_test
 	this.is_adversary = is_adversary
@@ -494,7 +495,7 @@ GameManager.prototype.testMice = function(bottles_list, mouse) {
 
 
 GameManager.prototype.isGameOver = function(isCorrect, u_bottle, c_bottle) {
-	console.log(isCorrect,  u_bottle, c_bottle)
+	this.historys['submit'] = {"user":u_bottle,"correct":c_bottle}
 	this.is_test?
 	newhref = 'adaptive.html?test':
 	newhref = 'adaptive.html?submit'
@@ -537,7 +538,7 @@ GameManager.prototype.isGameOver = function(isCorrect, u_bottle, c_bottle) {
 		}
 		else{
 			$("#gameover .ui-btn").text("Uploading...")
-			this.Ajax.putinfo(this.bottles,this.historys,
+			this.Ajax.putinfo(this.orig_bottles,this.historys,
 				this.putSuccessHandler,this.putErrorHandler)
 		}
 		this.Popup("#gameover")	
