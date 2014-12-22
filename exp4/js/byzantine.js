@@ -34,7 +34,7 @@ Army.prototype.chkReady = function(){
 }
 Army.prototype.chkCorrect = function(){
 	var n = 0;
-	if(this.transferCondition!={}) n++    // 1
+	if(this.transferCondition && this.transferCondition!={} ) n++    // 1
 	var newDAG = jQuery.extend(true, {}, DAG)
 	console.log(newDAG)
 	// 2
@@ -84,7 +84,6 @@ Army.prototype.chkCorrect = function(){
 	}
 
 	if($.map(newDAG, function(n, i) { return i; }).length!=0){
-		alert()
 		n =-1  //dummy
 	}
 	// 11
@@ -97,10 +96,15 @@ Army.prototype.chkCorrect = function(){
 }
 
 
-function GameManager(){
+function GameManager(submitMode){
 	var _this = this
 	this.day = 0
 	this.everAttack = false
+	this.submitMode = submitMode
+	if(submitMode)
+	$("#titles").text("系统角度实验:淝水之战(提交模式)")
+	else
+	$("#titles").text("系统角度实验:淝水之战(测试模式)")
 	this.army = new Army()
 	this.namemap = [LIUBEI,ZHANGFEI,ZHAOYUN,GUANYU,ZHUGELIANG]
 	this.restTime = 0
@@ -111,7 +115,7 @@ function GameManager(){
 
 	this.sock.onopen = function() {
 	     console.log('Established the connection.');
-	     _this.sock.send(_this.getLoginJson(_this.userId))
+	     _this.sock.send(_this.getLoginJson(_this.userId,_this.submitMode))
 	 };
 	 this.sock.onmessage = function(e) {
 	     console.log('message', e.data);
@@ -125,6 +129,10 @@ function GameManager(){
 	     		_this.startTimer()
 	     		_this.sync(true)
 	     		_this.report()
+	     	}
+	     	else if(msg['data']['event'] == 'end'){
+	     		setTimeout(function(){$("#pause-popup").popup("close")},500)
+	     		setTimeout(function(){$("#end-popup").popup("open")},1000)
 	     	}
 	     	else if(msg['data']['event'] == 'sync'){
 	     		_this.day = msg['data']['day']
@@ -160,8 +168,9 @@ function GameManager(){
 	     	_this.log(msg['from'],msg['data'],'game')
 	     }
 	     else if(msg['data_type'] == 'attack'){
-	     	_this.log(msg['from'],msg['data']==true?"发起攻击":"拒绝攻击",'attack')
-	     	setAttack(parseInt(msg['from']),msg['data'])
+	     	// _this.log("",msg['data']==true?"有人发起攻击":"有人拒绝攻击",'attack')
+	     	// setAttack(parseInt(msg['from']),msg['data'])
+	     	_this.log("","刚刚有人做出了决策。",'sys')
 	     }
 	     else if(msg['data_type'] == 'auth'){
 	     	if(msg['data']['notify']=='success'){
@@ -202,7 +211,7 @@ GameManager.prototype.getNameList = function(){
 GameManager.prototype.initStage2 = function(){
 	_this = this
 	$('#current-messages').text(_this.messages)
- 	$('#receivers').text("")
+ 	$('#receivers').html('<input type="checkbox" name="all" id="c1-all" data-mini="true"><label for="c1-all">全部</label>')
  	$('#send-content').text("")
  	var x=0;
  	for(var x=0;x<5;x++){
@@ -225,12 +234,19 @@ GameManager.prototype.initStage2 = function(){
  	}
  	$('#receivers').trigger('create')
  	$('#send-content').trigger('create')
+ 	$('#c1-all').click(function(){
+		$('#receivers input').each(function(x,y){
+			if($(y).prop('name')!='all'){
+				$(y).prop('checked',$('#c1-all').prop('checked')).checkboxradio("refresh")
+			}
+		})
+ 	})
 
 	$('#confirm-send').click(function(){
 		var receivers = []
 		var sendContent = {}
 		$('#receivers input').each(function(x,y){
-			if($(y).prop('checked')){
+			if($(y).prop('name')!='all' && $(y).prop('checked')){
 				receivers.push($(y).prop('name'))
 			}
 		})
@@ -239,18 +255,29 @@ GameManager.prototype.initStage2 = function(){
 				sendContent[$(y).prop('name')] = $($('#send-content select')[x]).val()
 			}
 		})
-		if(receivers.length>0)
-		_this.sock.send(_this.getMsgJson(receivers, sendContent, 'message'))
-		_this.log(_this.id,sendContent,'game')
-		_this.messages += receivers.length
-		$('#current-messages').text(_this.messages)
+		if(receivers.length>0){
+			_this.sock.send(_this.getMsgJson(receivers, sendContent, 'message'))
+			_this.log(_this.id,sendContent,'game',receivers)
+			_this.messages += receivers.length
+			$('#current-messages').text(_this.messages)
+		}
+
 	});
 	$('#attack').click(function(){
-		_this.everAttack = true
-		_this.sock.send(_this.getMsgJson(0, true, 'attack'))
+		_this.sock.send(_this.getMsgJson(0, {'decide':true, 'messages':_this.messages}, 'attack'))
 	})
 	$('#notattack').click(function(){
-		_this.sock.send(_this.getMsgJson(0, false, 'attack'))
+		_this.sock.send(_this.getMsgJson(0, {'decide':false, 'messages':_this.messages}, 'attack'))
+	})
+	$('#hides').click(function(){
+		if($("#traitor-status").css('display')=='block'){
+			$("#traitor-status").css('display','none')
+
+		}
+		else{
+			$("#traitor-status").css('display','block')
+		}
+			
 	})
 }
 
@@ -313,11 +340,12 @@ GameManager.prototype.startTimer = function(){
 }
 
 
-GameManager.prototype.getLoginJson = function(userId){
+GameManager.prototype.getLoginJson = function(userId,submitMode){
 	return JSON.stringify({
 	    "data_type": "login",
 	    "data": {
-	    	"userId": userId
+	    	"userId": userId,
+	    	"submitMode":submitMode
     	}})
 }
 
@@ -361,7 +389,7 @@ GameManager.prototype.newStatus = function(ready){
 		this.army.supply = Math.floor(thresSupply - range + Math.random()*range*2)
 		this.army.weahter = Math.floor(Math.random()*WEATHERS)
 		times += 1
-		if(this.army.chkReady()==this.ready || times >= maxTimes) break
+		if(this.army.chkReady()== this.ready || times >= maxTimes) break
 
 	}
 }
@@ -415,22 +443,32 @@ GameManager.prototype.sync = function(isStart){
 GameManager.prototype.report = function(){
 	this.sock.send(this.getMsgJson(0,{'troops':this.army.troops,'supply':this.army.supply,'weahter':this.army.weahter,"ready":this.ready},'report'))
 }
-GameManager.prototype.log = function(from,message, type){
+GameManager.prototype.log = function(from,message, type, receiver){
 	control = $("#log")
 	if(type=='sys'){
 		control.append('<span style="color:blue">系统通知: </span>' + message + '<br/>')
 	}
 	else if(type=='game'){
 		var from = parseInt(from)
+		var tar = []
+		var t
+		for(r in receiver){
+			t = parseInt(receiver[r])
+			tar.push(this.namemap[t])
+		}
 		var target
 		if(from<5 ){
 			var text = []
 			for(var i in message){
 				target = parseInt(i)
 				text.push(this.namemap[target] + "->" + ((message[i]=='READY')?"就绪":"整备中"))
+				console.log('a',from,target)
 				setStep2(from,target,message[i]=='READY')			
 			}
-			control.append('<span style="color:green">' + this.namemap[from] + ':</span>' + text.join(",") + '<br/>')
+			if(tar.length>0)
+			control.append('<span style="color:green">' + this.namemap[from] + ':</span>' + '发送给 => ' + tar.join(",") +", 消息是 => "+ text.join(",") + '<br/>')
+			else
+			control.append('<span style="color:green">' + this.namemap[from] + ':</span>' + '发送给 => 你 '+", 消息是 => "+ text.join(",") + '<br/>')
 			// edges[]
 
 		}
@@ -438,9 +476,9 @@ GameManager.prototype.log = function(from,message, type){
 			console.log('Unknwon User')
 		}
 	}
-	else if (type=='attack'){
-		control.append('<span style="color:green">' + this.namemap[from] + ':</span>' + message + '<br/>')
-	}
+	// else if (type=='attack'){
+	// 	control.append('<span style="color:green">' + this.namemap[from] + ':</span>' + message + '<br/>')
+	// }
 	control.scrollTop(control[0].scrollHeight);
 }
 GameManager.prototype.id2name = function(id){
@@ -479,8 +517,17 @@ $(function(){
 		location.href = location.href.substr(0,index)
 		return
 	}
-	a = new Army()
-	GM = new GameManager()
+	if (location.href.search('/?submit') != -1) {
+		alert("这里是提交模式，您应该谨慎操作。")
+		GM = new GameManager(true);
+
+	}
+	else if(location.href.search('/?test') != -1){
+		GM = new GameManager(false);
+	}
+	else{
+		alert("你不应该来这儿的。")
+	}
 });
 
 

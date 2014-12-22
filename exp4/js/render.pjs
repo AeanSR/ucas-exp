@@ -336,7 +336,6 @@ initStep1 = function(id){
 
 	mainBody.addChild(new PointText({
 		fillColor : 'black',
-		name: 'line-army',
 		content : avatars_name[id] + '部队',
 		position: [0,-50]
 		}))
@@ -390,6 +389,14 @@ initStep2 = function (id){
 	onResize()
 	project.activeLayer.removeChildren()
 	view.draw()
+	towns = new Raster("img-town")
+	towns.position = view.center
+	towns.scale(0.4)
+	new PointText({
+			content: '淝水城',
+			fillColor:'white',
+			position: view.center+ [0,30]
+		})
 
 	poly5in = new Path.RegularPolygon(view.center,5,170)
 	for(var i=0;i<5;i++){
@@ -416,6 +423,7 @@ initStep2 = function (id){
 	poly5out = new Path.RegularPolygon(view.center,5,200)
 	for(var i=0;i<5;i++){
 		s = poly5out.segments[i].point
+
 		var r = new Raster(avatars_url[i]);
 		r.position = s;
 		r.scale(0.5)
@@ -427,6 +435,12 @@ initStep2 = function (id){
 			fillColor: 'grey'
 		})
 		avatars[i].sendToBack();
+		new PointText({
+		fillColor : 'white',
+		name: 'line-attributes',
+		content : avatars_name[i],
+		position: new Point(r.bounds.x + r.bounds.width-10, r.bounds.y+r.bounds.height +10) 
+		})
 	}
 	var temp = new Raster('img-crown')
 	temp.fitBounds(new Rectangle({
@@ -437,14 +451,14 @@ initStep2 = function (id){
 	showLegend()
 	view.draw()
 }
-setAttack = function (id, attack){
-	var temp = new Raster(attack==true?'img-attack':'img-shield')
-	temp.fitBounds(new Rectangle({
-			point:pos_crwon[id] +[26,0],
-			size:[30,30]
-		}))
-	attacks[id] = temp
-}
+// setAttack = function (id, attack){
+// 	var temp = new Raster(attack==true?'img-attack':'img-shield')
+// 	temp.fitBounds(new Rectangle({
+// 			point:pos_crwon[id] +[26,0],
+// 			size:[30,30]
+// 		}))
+// 	attacks[id] = temp
+// }
 setStep2 = function(from, to, ready){
 	if(from!=to)
 		edges[from][to].strokeColor = ready?"green":"red"
@@ -528,26 +542,26 @@ showLegend = function(){
  		fillColor : 'black',
  		content : '起点玩家声称终点玩家为整备状态'
  	})
- 	var temp = new Raster('img-attack')
-	temp.fitBounds(new Rectangle({
-			point:[20,100],
-			size:[20,20]
-		}))
-	new PointText({
-		position:[80,110],
- 		fillColor : 'black',
- 		content : '该角色发起攻击'
- 	})
- 	var temp = new Raster('img-shield')
-	temp.fitBounds(new Rectangle({
-			point:[20,120],
-			size:[20,20]
-		}))
-	new PointText({
-		position:[80,130],
- 		fillColor : 'black',
- 		content : '该角色拒绝攻击'
- 	})
+ // 	var temp = new Raster('img-attack')
+	// temp.fitBounds(new Rectangle({
+	// 		point:[20,100],
+	// 		size:[20,20]
+	// 	}))
+	// new PointText({
+	// 	position:[80,110],
+ // 		fillColor : 'black',
+ // 		content : '该角色发起攻击'
+ // 	})
+ // 	var temp = new Raster('img-shield')
+	// temp.fitBounds(new Rectangle({
+	// 		point:[20,120],
+	// 		size:[20,20]
+	// 	}))
+	// new PointText({
+	// 	position:[80,130],
+ // 		fillColor : 'black',
+ // 		content : '该角色拒绝攻击'
+ // 	})
 }
 
 onResize = function() {
