@@ -101,6 +101,7 @@ function GameManager(submitMode){
 	this.day = 0
 	this.everAttack = false
 	this.submitMode = submitMode
+	this.testUser = false
 	if(submitMode)
 	$("#titles").text("系统角度实验:淝水之战(提交模式)")
 	else
@@ -110,7 +111,7 @@ function GameManager(submitMode){
 	this.restTime = 0
 	this.Ajax = new modAjax(5,this);
 	this.Ajax.getinfo(this.getSuccessHandler, this.getErrorHandler);
-	//this.sock = new SockJS('http://127.0.0.1:8888/api/exp4');
+	// this.sock = new SockJS('http://127.0.0.1:8888/api/exp4');
 	this.sock = new SockJS('http://ucas-2014.tk/api/exp4');
 
 	this.sock.onopen = function() {
@@ -175,6 +176,7 @@ function GameManager(submitMode){
 	     else if(msg['data_type'] == 'auth'){
 	     	if(msg['data']['notify']=='success'){
 	     		_this.id = parseInt(msg['data']['id'])
+	     		_this.testUser =  msg['data']['test']
 	     		_this.isTraitor = msg['data']['isTraitor']
 	     		_this.messages = msg['data']['messages']
 	     		_this.ready = msg['data']['ready']
@@ -321,6 +323,16 @@ GameManager.prototype.initStage1 = function(){
 	$('#clean').click(function(){
 		_this.waitPaperjs("initStep1")
 	})
+	if(_this.testUser){
+		$('#jump').css("display","block")
+		$('#jump').click(function(){
+			_this.log('','部队构建完毕，等待战斗！','sys')
+			_this.sock.send(_this.getMsgJson(0, {"cond":_this.army.transferCondition}, 'nextstage'))
+			_this.moveStage2()
+			_this.stage = 1
+		})
+	}
+
 	_this.waitPaperjs("initStep1")
 }
 

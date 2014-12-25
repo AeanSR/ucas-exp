@@ -42,6 +42,7 @@
 							<div class="ui-block-c" style="width:15%;display:none;" id='console-stage1'>
 								<a href="#" data-role="button" data-corners="false" id="make">构建完成</a>
 								<a href="#" data-role="button" data-corners="false" id="clean">重新构建</a>
+								<a href="#" data-role="button" data-corners="false" style="display:none" id="jump">教师跳过构建</a>
 							</div>
 							<div class="ui-block-c" style="width:15%;display:none;" id='console-stage2'>
 									<a href="#send-panel" data-role="button" data-corners="false" id="send">释放信鸽</a>
@@ -59,7 +60,7 @@
 					</div>
 					<div style="display:none" id='control-stage1'>
 						<p>功能介绍</p>
-						<span id="module-info">把鼠标移动到相应部件上显示详细信息。</span>
+						<span id="module-info">把鼠标移动到相应部件上显示详细信息，蓝色部件可以通过连接点进行连接，绿色部件不可连接，只能放入另一个部件中。</span>
 					</div>
 					<div style="display:none" id='control-stage2'>
 						<p>军队状态</p>
@@ -92,7 +93,7 @@
 				<h1>请等待！</h1>
 				</div>
 				<div role="main" class="ui-content">
-				        <h3 class="ui-title" id="error-notice">待所有玩家都在线且完成构建阶段后方可进行游戏，目前游戏暂停, 请稍等片刻</h3>
+				        <h3 class="ui-title" id="error-notice">待所有玩家都在线且完成构建阶段后方可进行游戏，目前游戏暂停, 请稍等片刻, 人员到齐后，本网页会自动更新。</h3>
 						<a href="index.html" data-ajax="false" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">不等了，返回首页</a>
 
 				    </div>
