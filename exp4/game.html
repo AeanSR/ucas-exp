@@ -112,24 +112,29 @@
 
 			<div data-role="panel" data-position-fixed="true" data-display="push" data-ajax="false" data-theme="b" id="condition-panel">
 				<p>当同时满足以下条件时军队状态转为就绪(如下方空白，表明你没有使用对应的接口)：</p>
+				<div class="group">
 				<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
 					<a href="#" class="ui-btn ui-corner-all">粮食</a>
 				    <select id="food-op">
 				        <option value="smaller">不大于</option>
 				        <option value="larger">大于</option>
 				    </select>
-				    <input type="range" name="slider-1" id="food-val" value="4000" data-inline="true" data-mini="true" data-wrapper-class="controlgroup-textinput ui-btn" min="3000" max="5000">
 			<!-- 	    <input type="text" id="food-val" value="" data-inline="true" data-wrapper-class="controlgroup-textinput ui-btn" /> -->
 				</fieldset>
+				    <input type="range" name="slider-1" id="food-val" value="4000" data-inline="true" data-mini="true" style="width:50px;" min="3000" max="5000">
+				</div>
+				<div class="group">
 				<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
 					<a href="#" class="ui-btn ui-corner-all">兵力</a>
 				    <select id="troops-op">
 				        <option value="smaller">不大于</option>
 				        <option value="larger">大于</option>
 				    </select>
-				  	<input type="range" id="troops-val" value="4000" data-inline="false" data-mini="true" min="3000" max="5000">
 	<!-- 			    <input type="text" id="troops-val" value="" data-inline="true" data-wrapper-class="controlgroup-textinput ui-btn" /> -->
 				</fieldset>
+				  	<input type="range" id="troops-val" value="4000" data-inline="ture" data-mini="true" style="width:50px;" min="3000" max="5000">
+				</div>
+				<div class="group">
 				<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
 					<a href="#" class="ui-btn ui-corner-all">天气</a>
 					<a href="#" class="ui-btn ui-corner-all">等于</a>
@@ -139,6 +144,7 @@
 				        <option value="2">阴天</option>
 				    </select>
 				</fieldset>
+				</div>
 				<a href="#" data-rel="close" data-role="button" data-corners="false" id="confirm-condition">确定</a>
 			</div>
 

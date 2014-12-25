@@ -244,9 +244,9 @@ function onMouseUp(event) {
 				console.log('drop elem')
 			}
 			if(!isDragging && group.children['mainBody']){
-				$('#condition-panel fieldset')[0].style["display"]=('food-mainBody' in DAG)?"Block":"None"
-				$('#condition-panel fieldset')[1].style["display"]=('army-mainBody' in DAG)?"Block":"None"
-				$('#condition-panel fieldset')[2].style["display"]=('mainBody-weather' in DAG)?"Block":"None"
+				$('#condition-panel .group')[0].style["display"]=('food-mainBody' in DAG)?"Block":"None"
+				$('#condition-panel .group')[1].style["display"]=('army-mainBody' in DAG)?"Block":"None"
+				$('#condition-panel .group')[2].style["display"]=('mainBody-weather' in DAG)?"Block":"None"
 				$("#condition-panel").panel("open")
 			}
 			

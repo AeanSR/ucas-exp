@@ -16,15 +16,11 @@ var ZHUGELIANG = "诸葛亮";
 
 function Army(){
 	this.globalTime = 0;
-	this.transferCondition = {
-						"weahter":[ "==", "0" ],
-						"troops":[ "<=", 4000 ],
-						"supply":[ "<=", 4000 ] 
-						};   // 定义转换为Ready的条件表达式, 后经eval判断
+	this.transferCondition = {}   // 定义转换为Ready的条件表达式, 后经eval判断
 	//  上下文
-	this.generalName =  LIUBEI,      // 将领名称
-	this.troops =  5000,     // 5000人
-	this.weahter =  SUNNY,       // SUNNY:晴天, RAINY:雨天, CLOUDY: 雪天
+	this.generalName =  LIUBEI      // 将领名称
+	this.troops =  5000     // 5000人
+	this.weahter =  SUNNY       // SUNNY:晴天, RAINY:雨天, CLOUDY: 雪天
 	this.supply =  5000	//  粮食斤数
 }
 
@@ -38,9 +34,9 @@ Army.prototype.chkReady = function(){
 }
 Army.prototype.chkCorrect = function(){
 	var n = 0;
-	if(this.transferCondition && this.transferCondition!={} ) n++    // 1
+	if(this.transferCondition && this.transferCondition!={} && GM.everSetCond==true) n++    // 1
+	console.log('xxx1'+n)
 	var newDAG = jQuery.extend(true, {}, DAG)
-	console.log(newDAG)
 	// 2
 	if('army-mainBody' in newDAG){
 		delete newDAG['army-mainBody']
@@ -106,6 +102,7 @@ function GameManager(submitMode){
 	this.everAttack = false
 	this.submitMode = submitMode
 	this.testUser = false
+	this.everSetCond = false
 	if(submitMode)
 	$("#titles").text("系统角度实验:淝水之战(提交模式)")
 	else
@@ -306,6 +303,7 @@ GameManager.prototype.initStage1 = function(){
 			_this.army.transferCondition = {'supply':[$("#food-op").val()=="smaller"?"<=":">",parseInt($("#food-val").val())],
 			'troops':[$("#troops-op").val()=="smaller"?"<=":">",parseInt($("#troops-val").val())],
 			'weahter':['==',$("#weather-val").val()]}
+			_this.everSetCond = true
 			// "this.ready = " +
 			// "this.supply" + ($("#food-op").val()=="smaller"?"<=":">") + parseInt($("#food-val").val()) + '&&' +
 			// "this.troops" + ($("#troops-op").val()=="smaller"?"<=":">") + parseInt($("#troops-val").val()) + '&&' +
