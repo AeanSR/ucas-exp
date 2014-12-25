@@ -88,8 +88,9 @@ function Connector(point,size,item,connectable,color, connectname) {
 			this.connectGroup.addChild(
 				new Path.Circle({
 					center: new Point(conPosition[i])*size/2 + point,
-					radius: 3,
+					radius: 5,
 					strokeColor: 'blue',
+					fillColor: 'grey',
 					name: 'connectpoint',
 					visible: false
 				})
@@ -364,19 +365,19 @@ initStep1 = function(id){
 	// }).sendToBack())
 
 	objects = []
-	objects.push(new Connector(new Point(250, 60), [70,70],commander,false,'green', "属性：" + avatars_name[id]))
-	objects.push(new Connector(new Point(250, 200), [70,70],message,false,'green',"接口：释放信鸽"))
-	objects.push(new Connector(new Point(250, 340), [70,70],attack,false,'green',"接口：开始攻击"))
+	objects.push(new Connector(new Point(230, 60), [70,70],commander,false,'green', "属性：" + avatars_name[id]))
+	objects.push(new Connector(new Point(230, 200), [70,70],message,false,'green',"接口：释放信鸽"))
+	objects.push(new Connector(new Point(230, 340), [70,70],attack,false,'green',"接口：开始攻击"))
 	
-	objects.push(new Connector(new Point(400, 60), [70,70],shield,false,'green',"接口：拒绝攻击"))
-	objects.push(new Connector(new Point(400, 200), [70,70],ready,false,'green',"属性：就绪状态"))
-	objects.push(new Connector(new Point(400, 340), [70,70],notready,false,'green',"属性：整备状态"))
+	objects.push(new Connector(new Point(340, 60), [70,70],shield,false,'green',"接口：拒绝攻击"))
+	objects.push(new Connector(new Point(340, 200), [70,70],ready,false,'green',"属性：就绪状态"))
+	objects.push(new Connector(new Point(340, 340), [70,70],notready,false,'green',"属性：整备状态"))
 
-	objects.push(new Connector(new Point(800, 60), [70,70],troops,true,'blue',"模块：兵力"))
-	objects.push(new Connector(new Point(800, 200), [70,70],food,true,'blue',"模块：粮食"))
-	objects.push(new Connector(new Point(800, 340), [70,70],weather,true,'blue',"模块：天气"))
+	objects.push(new Connector(new Point(700, 60), [70,70],troops,true,'blue',"模块：兵力"))
+	objects.push(new Connector(new Point(700, 200), [70,70],food,true,'blue',"模块：粮食"))
+	objects.push(new Connector(new Point(700, 340), [70,70],weather,true,'blue',"模块：天气"))
 
-	objects.push(new Connector(new Point(600, 200), [200,250],mainBody,true,'white',"模块：部队"))
+	objects.push(new Connector(new Point(530, 200), [200,250],mainBody,true,'white',"模块：部队"))
 
 	objects.push(new Connector(new Point(100, 150), [70,70],timer,true,'blue',"模块：日期发生器"))
 	objects.push(new Connector(new Point(100, 300), [70,70],randomer,true,'blue',"模块：随机数生成器"))
