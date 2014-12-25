@@ -16,7 +16,11 @@ var ZHUGELIANG = "诸葛亮";
 
 function Army(){
 	this.globalTime = 0;
-	this.transferCondition = {};   // 定义转换为Ready的条件表达式, 后经eval判断
+	this.transferCondition = {
+						"weahter":[ "==", "0" ],
+						"troops":[ "<=", 4000 ],
+						"supply":[ "<=", 4000 ] 
+						};   // 定义转换为Ready的条件表达式, 后经eval判断
 	//  上下文
 	this.generalName =  LIUBEI,      // 将领名称
 	this.troops =  5000,     // 5000人
