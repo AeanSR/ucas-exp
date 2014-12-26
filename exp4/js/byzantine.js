@@ -312,6 +312,11 @@ GameManager.prototype.initStage1 = function(){
 	})
 	$('#make').click(function(){
 		if(_this.army.chkCorrect()){
+			var r=confirm("构建成功，是否要保存截图？若保存，请再弹出的新标签页中右键图片保存，然后再返回本标签页。截图可用于实验报告中。")
+			if(r==true){
+				var dataURL = document.getElementById("canvas").toDataURL('image/png');
+				window.open(dataURL, "_blank");
+			}
 			_this.log('','部队构建完毕，等待战斗！','sys')
 			_this.sock.send(_this.getMsgJson(0, {"cond":_this.army.transferCondition}, 'nextstage'))
 			_this.moveStage2()

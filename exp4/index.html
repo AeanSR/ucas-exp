@@ -156,8 +156,84 @@
 				<p>以诸葛亮视角为例，其中绿色为就绪状态，红色为整备状态。赵云的头像背景的颜色为红色表示赵云声称自己为整备状态。赵云指向关羽的箭头为红色，表示赵云声称关羽为整备状态。</p>
 				<p>游戏的一天并不限制通信的次数，但在图例里，后一次同一链路的颜色会覆盖之前的链路颜色。玩家此时需要借助日志区的信息进行辅助判断。</p>
 				<p>经过若干轮的通信后，玩家便可做出决策，进行攻击或者不攻击。若在指定时间内无法完成决策，系统将进入下一天。</p>
+				<p>
+				<span style='color:red'>一个不完善的算法举例</span><br>
+				每个忠臣都忠诚的广播自己的状态，随后，每个忠臣依据收到的就绪数量判断是否进行攻击，若大于等于3，则攻击，反之则不攻击。<br>
+				好的情况中：
+				<table class="tg">
+				  <tr>
+				    <th class="tg-031e">忠臣1</th>
+				    <th class="tg-031e">忠臣2</th>
+				    <th class="tg-031e">忠臣3</th>
+				    <th class="tg-031e">忠臣4</th>
+				    <th class="tg-031e">奸臣</th>
+				  </tr>
+				  <tr>
+				    <td class="tg-031e">就绪</td>
+				    <td class="tg-031e">就绪</td>
+				    <td class="tg-031e">就绪</td>
+				    <td class="tg-031e">整备</td>
+				    <td class="tg-031e">任意</td>
+				  </tr>
+				</table>
+				广播过后，不论奸臣发任意消息，各玩家收到的就绪数量(包括自己)：
+				<table class="tg">
+				  <tr>
+				    <th class="tg-031e">忠臣1</th>
+				    <th class="tg-031e">忠臣2</th>
+				    <th class="tg-031e">忠臣3</th>
+				    <th class="tg-031e">忠臣4</th>
+				    <th class="tg-031e">奸臣</th>
+				  </tr>
+				  <tr>
+				    <td class="tg-031e">&gt;=3</td>
+				    <td class="tg-031e">&gt;=3</td>
+				    <td class="tg-031e">&gt;=3</td>
+				    <td class="tg-031e">&gt;=3</td>
+				    <td class="tg-031e"></td>
+				  </tr>
+				</table>
+				忠臣将一致决定进行攻击，符合胜利条件，游戏胜利。<br>
+				坏的情况中：	
+				<table class="tg">
+				  <tr>
+				    <th class="tg-031e">忠臣1</th>
+				    <th class="tg-031e">忠臣2</th>
+				    <th class="tg-031e">忠臣3</th>
+				    <th class="tg-031e">忠臣4</th>
+				    <th class="tg-031e">奸臣</th>
+				  </tr>
+				  <tr>
+				    <td class="tg-031e">就绪</td>
+				    <td class="tg-031e">就绪</td>
+				    <td class="tg-031e">就绪</td>
+				    <td class="tg-031e">整备</td>
+				    <td class="tg-031e">任意</td>
+				  </tr>
+				</table>
+				忠臣广播过后，若奸臣给忠臣1发送了自己是就绪状态，给忠臣2发送了自己是整备状态，给其余两人发是整备状态，那么：
+				<table class="tg">
+				  <tr>
+				    <th class="tg-031e">忠臣1</th>
+				    <th class="tg-031e">忠臣2</th>
+				    <th class="tg-031e">忠臣3</th>
+				    <th class="tg-031e">忠臣4</th>
+				    <th class="tg-031e">奸臣</th>
+				  </tr>
+				  <tr>
+				    <td class="tg-031e">3</td>
+				    <td class="tg-031e">2</td>
+				    <td class="tg-031e">3</td>
+				    <td class="tg-031e">3</td>
+				    <td class="tg-031e"></td>
+				  </tr>
+				</table>
+				此时，忠臣1，3，4会做出攻击决策，而忠臣2做出拒绝攻击决策，不符合一致性条件，游戏失败。
+				</p>
 				<h2>实验结果</h2>
 				<p>请提交演示ppt和实验报告，详细阐述你对实验目的的理解和实现，实验报告。</p>
+				<p>实验展示和报告必须对两个阶段都进行思考，例如，探讨如何利用抽象帮助设计系统；在本实验中，为什么要设置部分接口，模块，属性对外可见？为什么有些不不可见？；第一阶段与第二阶段怎样通过子系统进行关联？第二阶段中：奸臣做哪些举动可能导致忠臣判断失误？可不可以利用现有的通信手段实现较为完善的容错保障？
+				</p>
 				<h2>其他</h2>
 				<p>如果你有其他任何问题，欢迎联系我的邮箱me@chao.lu</p>
 
