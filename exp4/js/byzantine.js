@@ -112,8 +112,8 @@ function GameManager(submitMode){
 	this.restTime = 0
 	this.Ajax = new modAjax(5,this);
 	this.Ajax.getinfo(this.getSuccessHandler, this.getErrorHandler);
-	this.sock = new SockJS('http://127.0.0.1:8888/api/exp4');
-	// this.sock = new SockJS('http://ucas-2014.tk/api/exp4');
+	// this.sock = new SockJS('http://127.0.0.1:8888/api/exp4');
+	this.sock = new SockJS('http://ucas-2014.tk/api/exp4');
 
 	this.sock.onopen = function() {
 	     console.log('Established the connection.');
