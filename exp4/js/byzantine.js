@@ -267,9 +267,11 @@ GameManager.prototype.initStage2 = function(){
 
 	});
 	$('#attack').click(function(){
+		_this.everAttack=true
 		_this.sock.send(_this.getMsgJson(0, {'decide':true, 'messages':_this.messages}, 'attack'))
 	})
 	$('#notattack').click(function(){
+		_this.everAttack=false
 		_this.sock.send(_this.getMsgJson(0, {'decide':false, 'messages':_this.messages}, 'attack'))
 	})
 	$('#hides').click(function(){
