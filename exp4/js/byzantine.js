@@ -330,7 +330,7 @@ GameManager.prototype.initStage1 = function(){
 	$('#clean').click(function(){
 		_this.waitPaperjs("initStep1")
 	})
-	if(_this.testUser){
+	if(true){
 		$('#jump').css("display","block")
 		$('#jump').click(function(){
 			_this.log('','部队构建完毕，等待战斗！','sys')
