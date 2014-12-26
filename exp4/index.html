@@ -16,7 +16,7 @@
 			$(function() {
 				$("body").iealert();
 			})
-			Ajax = new modAjax(1,this)
+			Ajax = new modAjax(5,this)
 			Ajax.getinfo(getSuccessHandler,getErrorHandler)
 			function getSuccessHandler(data){
 				name = data["name"]
