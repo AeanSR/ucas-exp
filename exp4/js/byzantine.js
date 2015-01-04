@@ -35,7 +35,6 @@ Army.prototype.chkReady = function(){
 Army.prototype.chkCorrect = function(){
 	var n = 0;
 	if(this.transferCondition && this.transferCondition!={} && GM.everSetCond==true) n++    // 1
-	console.log('xxx1'+n)
 	var newDAG = jQuery.extend(true, {}, DAG)
 	// 2
 	if('army-mainBody' in newDAG){
@@ -91,6 +90,7 @@ Army.prototype.chkCorrect = function(){
 		n++;
 	}
 	console.log('correct:',n)
+	if(n==10 && GM.everSetCond==false) alert("还没有设置内部逻辑，请点击部队模块设置转移条件。")
 	if(n==11)return true
 	else return false
 }
