@@ -50,7 +50,10 @@
 
 .middle-text-large{
 	text-align: center;
-	font-size: 20px;
+	font-size: 14px;
+}
+#module-info{
+	font-size: 14px;
 }
 .controlgroup-textinput{
     padding-top:.22em;

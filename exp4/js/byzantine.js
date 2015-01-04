@@ -90,7 +90,7 @@ Army.prototype.chkCorrect = function(){
 		n++;
 	}
 	console.log('correct:',n)
-	if(n==10 && GM.everSetCond==false) alert("还没有设置内部逻辑，请点击部队模块设置转移条件。")
+	if(n==10 && GM.everSetCond==false) alert("还没有设置内部逻辑，请点击部队模块设置转移条件，设置完成后请务必点击设置界面的确定按钮。")
 	if(n==11)return true
 	else return false
 }
