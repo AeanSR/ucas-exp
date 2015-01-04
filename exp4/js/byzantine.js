@@ -331,6 +331,7 @@ GameManager.prototype.initStage1 = function(){
 	})
 	$('#clean').click(function(){
 		_this.waitPaperjs("initStep1")
+		DAG = {}
 	})
 	if(true){
 		$('#jump').css("display","block")
