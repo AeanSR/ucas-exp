@@ -382,6 +382,9 @@ initStep1 = function(id){
 	objects.push(new Connector(new Point(100, 150), [70,70],timer,true,'blue',"模块：日期发生器"))
 	objects.push(new Connector(new Point(100, 300), [70,70],randomer,true,'blue',"模块：随机数生成器"))
 
+	DAG = {}
+	numInBody = 0
+	connections = {}
 }
 
 
