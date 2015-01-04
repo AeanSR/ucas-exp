@@ -385,6 +385,7 @@ initStep1 = function(id){
 	DAG = {}
 	numInBody = 0
 	connections = {}
+	textLineItems = {}
 }
 
 
