@@ -343,7 +343,7 @@ initStep1 = function(id){
 	mainBody.addChild(new PointText({
 		fillColor : 'black',
 		name: 'line-attributes',
-		content : '属        性:请拖动至此处',
+		content : '属　　性:请拖动至此处',
 		position: [0,0]
 		}))
 	mainBody.addChild(new PointText({
