@@ -1,6 +1,6 @@
 //document.domain = "ucas-2014.tk" 
 function modAjax(){
-	this.url = "http://ucas-2014.tk/"
+	this.url = "http://ucas-2016.tk/"
 	this.times = 1
 	this.mode = 1 // 默认为测试模式
 	this.topoScale = 30
