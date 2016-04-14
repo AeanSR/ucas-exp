@@ -5,7 +5,7 @@
 		<meta name="viewport" content="user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name="format-detection" content="telephone=no">
-		<title>实验4:淝水之战</title>
+		<title>实验4:三国战役</title>
 		<script type="text/javascript" src="js/jquery-1.11.1.min.js" charset="utf-8"></script>
 		<script type="text/javascript" src="js/jquery-ui.js"></script>
 		<link rel="stylesheet" href="css/jquery.mobile-1.4.3.min.css" />
@@ -24,7 +24,7 @@
 		<div data-role="page" id = "main-page">
 			<div data-role="header">
 				<a href="#nav-panel" data-icon="bars" data-iconpos="notext">菜单</a>
-				<h1 id="titles">系统角度实验:淝水之战</h1>
+				<h1 id="titles">系统角度实验:三国战役</h1>
 				<a href="#" data-icon="user" data-iconpos="left" id="login_info">未登录</a>
 			</div>
 			<div data-role="content" id="container">
@@ -98,6 +98,14 @@
 						<a href="index.html" data-ajax="false" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-transition="flow">不等了，返回首页</a>
 
 				    </div>
+			</div>
+			<div data-role="popup" id="standby-popup" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
+				<div data-role="header" data-theme="b">
+				<h1>请等待！</h1>
+				</div>
+				<div role="main" class="ui-content">
+				        <h3 class="ui-title" id="error-notice">本局身份为旁观者，不能进行操作，请等待下局开始。</h3>
+				</div>
 			</div>
 			<div data-role="popup" id="end-popup" data-overlay-theme="b" data-theme="b" data-dismissible="false" style="max-width:400px;">
 				<div data-role="header" data-theme="b">
@@ -177,6 +185,8 @@
 				<img src="imgs/liubei.jpg" id='liubei'>
 				<img src="imgs/zhaoyun.jpg" id='zhaoyun'>
 				<img src="imgs/zhugeliang.jpg" id='zhugeliang'>
+				<img src="imgs/huangzhong.jpg" id='huangzhong'>
+				<img src="imgs/default.jpg" id='default'>
 				<img src="imgs/guanyu.jpg" id='guanyu'>
 				<img src="imgs/message.png" id='message'>
 				<img src="imgs/ready.png" id='img-ready'>

@@ -13,6 +13,7 @@ var ZHANGFEI = "张飞";
 var ZHAOYUN = "赵云";
 var GUANYU = "关羽";
 var ZHUGELIANG = "诸葛亮";
+var HUANGZHONG = "黄忠"
 
 function Army(){
 	this.globalTime = 0;
@@ -104,11 +105,12 @@ function GameManager(submitMode){
 	this.testUser = false
 	this.everSetCond = false
 	if(submitMode)
-	$("#titles").text("系统角度实验:淝水之战(提交模式)")
+	$("#titles").text("系统角度实验:三国战役(提交模式)")
 	else
-	$("#titles").text("系统角度实验:淝水之战(测试模式)")
+	$("#titles").text("系统角度实验:三国战役(测试模式)")
 	this.army = new Army()
-	this.namemap = [LIUBEI,ZHANGFEI,ZHAOYUN,GUANYU,ZHUGELIANG]
+	//DONE
+	this.namemap = [LIUBEI,ZHANGFEI,ZHAOYUN,GUANYU,ZHUGELIANG,HUANGZHONG]
 	this.restTime = 0
 	this.Ajax = new modAjax(5,this);
 	this.Ajax.getinfo(this.getSuccessHandler, this.getErrorHandler);
@@ -118,14 +120,16 @@ function GameManager(submitMode){
 	this.sock.onopen = function() {
 	     console.log('Established the connection.');
 	     _this.sock.send(_this.getLoginJson(_this.userId,_this.submitMode))
-	 };
-	 this.sock.onmessage = function(e) {
+	};
+	this.sock.onmessage = function(e) {
 	     console.log('message', e.data);
 	     var msg = $.parseJSON(e.data)
 	     if(msg['data_type'] == 'notify'){
 	     	if(msg['data']['event'] == 'start'){
 	     		setTimeout(function(){$("#pause-popup").popup("close")},500)
 	     		_this.day = msg['data']['day']
+	     		_this.playersList = msg['data']['playersList']
+	     		_this.playersListMaps = _this.getPlayerMaps()
 	     		_this.log("",'人员就位，游戏开始，今天是第' + _this.day + '天。' , 'sys')
 	     		_this.interval = parseInt(msg['data']['interval'])
 	     		_this.startTimer()
@@ -136,9 +140,11 @@ function GameManager(submitMode){
 	     		setTimeout(function(){$("#pause-popup").popup("close")},500)
 	     		setTimeout(function(){$("#end-popup").popup("open")},1000)
 	     	}
-	     	else if(msg['data']['event'] == 'sync'){
+	     	else if(msg['data']['event'] == 'sync'){	
 	     		_this.day = msg['data']['day']
-	     		_this.isTraitor = msg['data']['isTraitor']
+	     		_this.identity = msg['data']['identity']
+	     		_this.playersList = msg['data']['playersList']
+	     		_this.playersListMaps = _this.getPlayerMaps()
 	     		_this.log("",'新的一天到来，今天是第' + _this.day + '天。' , 'sys')
 	     		_this.sync(false)
 	     		_this.report()
@@ -178,7 +184,8 @@ function GameManager(submitMode){
 	     	if(msg['data']['notify']=='success'){
 	     		_this.id = parseInt(msg['data']['id'])
 	     		_this.testUser =  msg['data']['test']
-	     		_this.isTraitor = msg['data']['isTraitor']
+	     		_this.identity = msg['data']['identity']
+	     		_this.numPlayers = msg['data']['numPlayers']
 	     		_this.messages = msg['data']['messages']
 	     		_this.ready = msg['data']['ready']
 	     		_this.name = _this.namemap[_this.id]
@@ -198,10 +205,10 @@ function GameManager(submitMode){
 	     		//_this.sock.send(_this.getMsgJson(0,{"generalname":_this.name},'register'))
 	     	}
 	     }
-	 };
-	 this.sock.onclose = function() {
-	     console.log('close');
-	 };
+	};
+	this.sock.onclose = function() {
+		console.log('close');
+	};
 }
 
 GameManager.prototype.getNameList = function(){
@@ -211,13 +218,22 @@ GameManager.prototype.getNameList = function(){
 	}
 	return u
 }
+GameManager.prototype.getPlayerMaps = function(){
+	var maps = {}
+	var i = 0
+	for(var id in this.playersList){
+		maps[this.playersList[id]] = i
+		i++
+	}
+	return maps
+}
 GameManager.prototype.initStage2 = function(){
 	_this = this
 	$('#current-messages').text(_this.messages)
  	$('#receivers').html('<input type="checkbox" name="all" id="c1-all" data-mini="true"><label for="c1-all">全部</label>')
  	$('#send-content').text("")
  	var x=0;
- 	for(var x=0;x<5;x++){
+ 	for(var x=0;x<_this.numPlayers;x++){
  		if(x!=_this.id){
  			var html ='<input type="checkbox" name="'+ x +'" id="c1-' + x + '" data-mini="true"><label for="c1-'+ x + '">'+ _this.namemap[x] + '</label>'
  			$('#receivers').append(html)
@@ -237,13 +253,6 @@ GameManager.prototype.initStage2 = function(){
  	}
  	$('#receivers').trigger('create')
  	$('#send-content').trigger('create')
- 	$('#c1-all').click(function(){
-		$('#receivers input').each(function(x,y){
-			if($(y).prop('name')!='all'){
-				$(y).prop('checked',$('#c1-all').prop('checked')).checkboxradio("refresh")
-			}
-		})
- 	})
 
 	$('#confirm-send').click(function(){
 		var receivers = []
@@ -287,7 +296,6 @@ GameManager.prototype.initStage2 = function(){
 }
 
 GameManager.prototype.moveStage2 = function(){
-
 	$('#console-stage1').css('display','none')
 	$('#control-stage1').css('display','none')
 	$('#console-stage2').css('display','block')
@@ -416,6 +424,7 @@ GameManager.prototype.newStatus = function(ready){
 	}
 }
 GameManager.prototype.sync = function(isStart){
+	// 新的一天到来，或者刚开局，重新渲染界面
 	oldTroops = this.army.troops
 	oldSupply = this.army.supply
 	oldWeather = this.army.weahter
@@ -428,7 +437,6 @@ GameManager.prototype.sync = function(isStart){
 			this.newStatus(false)
 		}
 		
-
 		diffTroops = this.army.troops - oldTroops
 		diffSupply = this.army.supply - oldSupply
 		loseTroops = diffTroops<=0?Math.abs(diffTroops):(Math.floor(Math.abs(diffTroops)*0.2 + Math.random(Math.floor(Math.abs(diffTroops)*0.2))))
@@ -458,9 +466,53 @@ GameManager.prototype.sync = function(isStart){
 	this.log('', "将军根据设定条件判断，" + (this.ready?"军队为就绪状态，战斗胜算较大。":"军队为整备状态，战斗胜算较小。"),'sys')
 	this.ready?$("#ready-status").text("已经就绪"):$("#ready-status").text("整备中")
 	$('#resource-status').text(this.army.troops+ '/'+ this.army.supply + '/' + weahterList[this.army.weahter])
-	resetStep2()
+	resetStep2(this.id,this.playersList)
+
+	standbyId = 0+1+2+3+4+5;
+	for(var i=0; i<this.playersList.length; i++) standbyId -= parseInt(this.playersList[i]);
+	for(var i=0; i<this.numPlayers; i++) {
+		if (i == standbyId){
+			$('#c1-'+i).prop('checked', false).checkboxradio("refresh")
+			$('#c1-'+i).attr('disabled', 'disabled')
+			$('#c1-'+i).parent().css('display','none')
+
+			$('#checkbox-'+i).prop('checked', false).checkboxradio("refresh")
+			$('#checkbox-'+i).attr('disabled', 'disabled')
+			$('#checkbox-'+i).parent().parent().parent().css('display','none')
+
+			//$('#flipswitch'+i).parent().parent().css('display','none')
+		} 
+		else{
+			$('#c1-'+i).removeAttr('disabled')	
+			$('#c1-'+i).prop('checked', false).checkboxradio("refresh")	
+			$('#c1-'+i).parent().css('display','block')
+
+			$('#checkbox-'+i).removeAttr('disabled')
+			$('#checkbox-'+i).prop('checked', false).checkboxradio("refresh")	
+			$('#checkbox-'+i).parent().parent().parent().css('display','block')
+
+			//$('#flipswitch'+i).parent().parent().css('display','block')
+		}
+	}
+	$('#c1-all').prop('checked', false).checkboxradio("refresh")
+	
+
+	$('#c1-all').click(function(){
+		$('#receivers input').each(function(x,y){
+			if($(y).prop('name')!='all' && $(y).prop('name')!= $('#c1-'+standbyId).prop('name') ){
+				$(y).prop('checked',$('#c1-all').prop('checked')).checkboxradio("refresh")
+			}
+		})
+ 	}) 
+
 	$("#current-day").text(this.day)
-	$('#traitor-status').text(this.isTraitor==false?"忠臣":"奸臣")
+	$('#traitor-status').text(this.identity=='loyal'?"忠臣":(this.identity=='traitor'?"内奸":"旁观者"))
+	if(this.identity == 'standby'){
+		setTimeout(function(){$("#standby-popup").popup("open")},1000)
+	}
+	else{
+		setTimeout(function(){$("#standby-popup").popup("close")},500)
+	}
 }
 GameManager.prototype.report = function(){
 	this.sock.send(this.getMsgJson(0,{'troops':this.army.troops,'supply':this.army.supply,'weahter':this.army.weahter,"ready":this.ready},'report'))
@@ -471,6 +523,7 @@ GameManager.prototype.log = function(from,message, type, receiver){
 		control.append('<span style="color:blue">系统通知: </span>' + message + '<br/>')
 	}
 	else if(type=='game'){
+		var fromMaps = this.playersListMaps[from]
 		var from = parseInt(from)
 		var tar = []
 		var t
@@ -478,14 +531,17 @@ GameManager.prototype.log = function(from,message, type, receiver){
 			t = parseInt(receiver[r])
 			tar.push(this.namemap[t])
 		}
+		var targetMaps
 		var target
-		if(from<5 ){
+		// DONE
+		if(from<this.numPlayers){
 			var text = []
 			for(var i in message){
+				targetMaps = this.playersListMaps[i]
 				target = parseInt(i)
 				text.push(this.namemap[target] + "->" + ((message[i]=='READY')?"就绪":"整备中"))
-				console.log('a',from,target)
-				setStep2(from,target,message[i]=='READY')			
+				console.log('a',from,target,fromMaps,targetMaps)
+				setStep2(fromMaps,targetMaps,message[i]=='READY')			
 			}
 			if(tar.length>0)
 			control.append('<span style="color:green">' + this.namemap[from] + ':</span>' + '发送给 => ' + tar.join(",") +", 消息是 => "+ text.join(",") + '<br/>')

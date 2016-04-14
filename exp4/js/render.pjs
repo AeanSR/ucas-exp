@@ -15,7 +15,8 @@ var ZHANGFEI = "张飞";
 var ZHAOYUN = "赵云";
 var GUANYU = "关羽";
 var ZHUGELIANG = "诸葛亮";
-
+var HUANGZHONG = "黄忠"
+//DONE
 var segment, item, connection, endPoint;
 connections = {}
 var movePath = false;
@@ -24,8 +25,9 @@ var connId;
 var previousGroup;
 var mainBody;
 var textLineItems = {}
-var avatars_url = ['liubei','zhangfei','zhaoyun','guanyu','zhugeliang']
-var avatars_name = [LIUBEI,ZHANGFEI,ZHAOYUN,GUANYU,ZHUGELIANG];
+var avatars_url = ['liubei','zhangfei','zhaoyun','guanyu','zhugeliang','huangzhong']
+var default_url = 'default'
+var avatars_name = [LIUBEI,ZHANGFEI,ZHAOYUN,GUANYU,ZHUGELIANG,HUANGZHONG];
 var dragElem = null;
 numInBody = 0
 DAG = {}
@@ -62,7 +64,11 @@ var createArray2D = function(m,n){
 edges = createArray2D(5,5)
 pos_crwon = {}
 avatars = {}
+profiles = {}
+nameText = {}
 attacks = {}
+selfCrwon = null
+poly5out = null
 
 
 
@@ -398,7 +404,7 @@ initStep2 = function (id){
 	towns.position = view.center
 	towns.scale(0.4)
 	new PointText({
-			content: '淝水城',
+			content: '益州',
 			fillColor:'white',
 			position: view.center+ [0,30]
 		})
@@ -426,33 +432,22 @@ initStep2 = function (id){
 		}
 	}
 	poly5out = new Path.RegularPolygon(view.center,5,200)
+	
 	for(var i=0;i<5;i++){
 		s = poly5out.segments[i].point
-
-		var r = new Raster(avatars_url[i]);
-		r.position = s;
-		r.scale(0.5)
-		pos_crwon[i] = new Point(r.bounds.x + r.bounds.width-10, r.bounds.y-20)
+		profiles[i] = new Raster(default_url);
+		profiles[i].position = s;
+		profiles[i].scale(0.5)
+		pos_crwon[i] = new Point(profiles[i].bounds.x + profiles[i].bounds.width-10, profiles[i].bounds.y-20)
 		avatars[i] = new Path.Rectangle({
 			position: s,
-			size: [r.bounds.width+10,r.bounds.height+10],
+			size: [profiles[i].bounds.width+10,profiles[i].bounds.height+10],
 			radius: 20,
 			fillColor: 'grey'
 		})
 		avatars[i].sendToBack();
-		new PointText({
-		fillColor : 'white',
-		name: 'line-attributes',
-		content : avatars_name[i],
-		position: new Point(r.bounds.x + r.bounds.width-10, r.bounds.y+r.bounds.height +10) 
-		})
 	}
-	var temp = new Raster('img-crown')
-	temp.fitBounds(new Rectangle({
-			point:pos_crwon[id],
-			size:[30,30]
-		}))
-	temp.rotate(30)
+
 	showLegend()
 	view.draw()
 }
@@ -472,18 +467,65 @@ setStep2 = function(from, to, ready){
 	}
 	view.draw()
 }
-resetStep2 = function(){
+resetStep2 = function(id,playersList){
 	for(var i=0;i<5;i++){
 		for (var j=0; j<5; j++) {
 			if(i!=j)
 			edges[i][j].strokeColor = 'grey';
 		};
 		avatars[i].fillColor = 'grey';
+
 		if((i in attacks)&&(attacks[i]!=null)){
 			attacks[i].remove()
 			attacks[i] = null
 		}
+		if((i in profiles)&&(profiles[i]!=null)){
+			profiles[i].remove()
+			profiles[i] = null
+		}
+		if((i in nameText)&&(nameText[i]!=null)){
+			nameText[i].remove()
+			nameText[i] = null
+		}
 	}
+	if (selfCrwon !=null){
+		selfCrwon.remove()
+		selfCrwon = null
+	}
+	for(var i=0;i<5;i++){
+		s = poly5out.segments[i].point
+
+		//var r = new Raster(avatars_url[i]);
+		profiles[i] = new Raster(avatars_url[parseInt(playersList[i])]);
+		profiles[i].position = s;
+		profiles[i].scale(0.5)
+
+		nameText[i] = new PointText({
+		fillColor : 'white',
+		name: 'line-attributes',
+		//content : avatars_name[i],
+		content : avatars_name[parseInt(playersList[i])],
+		position: new Point(profiles[i].bounds.x + profiles[i].bounds.width-10, profiles[i].bounds.y+profiles[i].bounds.height +10) 
+		})
+	}
+	var idMaps = 0
+	var isStandby = true
+	for(var i=0;i<5;i++){
+		if (playersList[i] == id){
+			isStandby = false
+			idMaps = i
+			break
+		}
+	}
+	if(!isStandby){
+		selfCrwon = new Raster('img-crown')
+		selfCrwon.fitBounds(new Rectangle({
+			point:pos_crwon[idMaps],
+			size:[30,30]
+		}))
+		selfCrwon.rotate(30)
+	}
+
 	view.draw()
 }
 showLegend = function(){
