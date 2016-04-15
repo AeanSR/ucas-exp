@@ -186,6 +186,9 @@ function GameManager(submitMode){
 	     		_this.testUser =  msg['data']['test']
 	     		_this.identity = msg['data']['identity']
 	     		_this.numPlayers = msg['data']['numPlayers']
+	     		if(_this.numPlayers == 1){
+	     			_this.numPlayers = 5
+	     		}
 	     		_this.messages = msg['data']['messages']
 	     		_this.ready = msg['data']['ready']
 	     		_this.name = _this.namemap[_this.id]
