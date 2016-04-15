@@ -469,7 +469,7 @@ GameManager.prototype.sync = function(isStart){
 	this.log('', "将军根据设定条件判断，" + (this.ready?"军队为就绪状态，战斗胜算较大。":"军队为整备状态，战斗胜算较小。"),'sys')
 	this.ready?$("#ready-status").text("已经就绪"):$("#ready-status").text("整备中")
 	$('#resource-status').text(this.army.troops+ '/'+ this.army.supply + '/' + weahterList[this.army.weahter])
-	resetStep2(this.id,this.playersList)
+	this.waitPaperjs("resetStep2")
 
 	standbyId = 0+1+2+3+4+5;
 	for(var i=0; i<this.playersList.length; i++) standbyId -= parseInt(this.playersList[i]);
@@ -572,7 +572,7 @@ GameManager.prototype.waitPaperjs = function(fun) {
 	_this = this
 	ok = false
 	try{
-		if(initStep1){
+		if(initStep1&&resetStep2){
 			ok = true
 		}
 	}catch(e){
@@ -586,6 +586,9 @@ GameManager.prototype.waitPaperjs = function(fun) {
 			}
 			else if (fun=="initStep2"){
 				initStep2(_this.id)
+			}
+			else if(fun=="resetStep2"){
+				resetStep2(_this.id,_this.playersList)
 			}
 		}
 		else{
