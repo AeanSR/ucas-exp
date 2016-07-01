@@ -373,12 +373,12 @@ var renderSpecialNode = function(topo, topoName, basicPath, index, myRoute, rout
 			var tmp = myRoute[index][k-1]
 			for(var key in tmp) {
 				if(isEvaluation == true){
-					$("input#dest-"+index+k).attr("disabled", true)
-					$("select#next-"+index+k).attr("disabled", true)
+					$("input#dest-"+index+k).prop("disabled", true)
+					$("select#next-"+index+k).prop("disabled", true)
 				}
 				if(key == "null")continue
 				$("input#dest-"+index+k).val(key)
-				$("select#next-"+index+k+" option[value=" + tmp[key]+ "]").attr("selected", true)
+				$("select#next-"+index+k+" option[value=" + tmp[key]+ "]").prop("selected", true)
 			}
 		}
 	}
